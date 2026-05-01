@@ -101,11 +101,6 @@ jobs:
               IdentitiesOnly yes
               StrictHostKeyChecking accept-new
 
-      - name: Add Hostinger to known_hosts
-        run: |
-          ssh-keyscan -p ${{ secrets.HOSTINGER_PORT }} -t ed25519 ${{ secrets.HOSTINGER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          chmod 644 ~/.ssh/known_hosts
-
       # ───── Pre-deploy: relax permissions on remote sites/default ─────
       - name: Pre-deploy permissions
         id: predeploy
