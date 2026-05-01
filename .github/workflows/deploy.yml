@@ -108,6 +108,7 @@ jobs:
 
       # ───── Pre-deploy: relax permissions on remote sites/default ─────
       - name: Pre-deploy permissions
+        id: predeploy
         run: |
           ssh hostinger "
             mkdir -p ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/files \
@@ -155,9 +156,9 @@ jobs:
             fi
           "
 
-      # ───── Post-deploy: re-harden permissions ─────
+      # ───── Post-deploy: re-harden permissions (only if SSH was set up) ─────
       - name: Re-harden remote permissions
-        if: always()
+        if: always() && steps.predeploy.outcome == 'success'
         run: |
           ssh hostinger "
             chmod 555 ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
