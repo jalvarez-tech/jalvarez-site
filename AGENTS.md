@@ -2,12 +2,18 @@
 
 This codebase is a Composer-managed Drupal site. Local development uses `ddev`.
 
-## Architecture and design (read first)
+## Architecture, design and deployment (read first)
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — site architecture (content types, taxonomies, views, SDC, routing, i18n). Read before structural changes.
-- [docs/DESIGN.md](docs/DESIGN.md) — visual design tokens, component cross-reference (CSS ↔ SDC), final ES/EN copy, page composition. Read before theme/SDC/copy work.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — site architecture (content types, taxonomies, views, SDC, routing, i18n).
+- [docs/DESIGN.md](docs/DESIGN.md) — visual design tokens, component cross-reference (CSS ↔ SDC), final ES/EN copy, page composition.
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — GitHub Actions → Hostinger pipeline. CSS is compiled in CI from SCSS sources, only built artefacts ship to the host.
 
-Update both in the same PR when architecture or design changes.
+Update the relevant doc in the same PR when architecture, design, or pipeline changes.
+
+**Build/deploy invariants:**
+- The repo versions **only sources**: `.scss`, `.twig`, `.json`, `.php`, etc. NO compiled CSS, NO `node_modules/`, NO `vendor/`, NO `dist/`, NO `icons.svg` sprite.
+- All compilation (Composer, npm, sass, icon sprite) happens in GitHub Actions on every push to `main`.
+- Hostinger receives a clean artefact with `vendor/` + compiled CSS + sprite + theme + modules. Hostinger does not run build tools.
 
 ## Local environment (DDEV)
 

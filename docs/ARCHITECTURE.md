@@ -7,6 +7,7 @@
 - **Última actualización:** 2026-05-01
 - **Stack base:** Drupal CMS 11 · Drupal Canvas · DDEV · Theme `byte`
 - **Diseño visual y copy:** ver [DESIGN.md](DESIGN.md) (tokens, componentes CSS↔SDC, contenido ES/EN, composición por página).
+- **Deployment:** ver [DEPLOYMENT.md](DEPLOYMENT.md) (pipeline GitHub Actions → Hostinger, SCSS compilado en CI).
 - **Idiomas:** Español (default) · Inglés
 - **Carpeta de trabajo activa:** `jalvarez-site/`
 - **Carpeta de referencia (sitio anterior):** `../jalvarez-web-site/` — **solo referencia visual y de contenido (CSS/JS/copy/diseño)**. NO se reutiliza su configuración YML.

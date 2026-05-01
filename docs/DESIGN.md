@@ -504,9 +504,9 @@ El handoff bundle está extraído en:
 ## 14. Próximos pasos sugeridos
 
 1. ⏳ Descargar `woff2` de Geist (300/400/500/600/700), Geist Mono (400/500), JetBrains Mono (400/500), Instrument Serif (regular + italic) → `web/themes/custom/byte/fonts/`.
-2. ⏳ Crear `web/themes/custom/byte/css/tokens.css` con los tokens de §2 (incluye sistema dual de acento).
-3. ⏳ Crear `web/themes/custom/byte/css/fonts.css` con `@font-face` self-hosted (`font-display: swap`).
-4. ⏳ Crear `web/themes/custom/byte/css/base.css` con reset, body, theme attr.
+2. ⏳ Crear `web/themes/custom/byte/scss/_tokens.scss` con los tokens de §2 (incluye sistema dual de acento). El CSS final lo genera el build de CI a `dist/css/main.css` — ver [DEPLOYMENT.md §5](DEPLOYMENT.md#5-sass-y-assets-del-theme).
+3. ⏳ Crear `web/themes/custom/byte/scss/_fonts.scss` con `@font-face` self-hosted (`font-display: swap`).
+4. ⏳ Crear `web/themes/custom/byte/scss/_base.scss` con reset, body, theme attr.
 5. ⏳ Inline script en `<head>` (`html.html.twig` preprocess) para aplicar `data-theme` antes del primer paint.
 6. ⏳ Crear SDC `lang-toggle` y SDC `theme-toggle` en `nav-glass`.
 7. ⏳ Scaffold de SDCs en `web/themes/custom/byte/components/` por orden:
