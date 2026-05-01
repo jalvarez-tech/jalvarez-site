@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * CTA Final — closing band: title (with italic fragment), sub, two CTAs.
+ */
+#}
+<section class="cta-band">
+  <div class="wrap">
+    {%- if title -%}
+      <h2 class="cta-band__title">
+        {{ title }}{% if title_em %} <span class="cta-band__italic">{{ title_em }}</span>{% endif %}
+      </h2>
+    {%- endif -%}
+    {%- if sub -%}
+      <p class="cta-band__sub">{{ sub }}</p>
+    {%- endif -%}
+    {%- if primary_label or secondary_label -%}
+      <div class="cta-band__actions">
+        {%- if primary_label -%}
+          {%- include 'byte:button' with {
+            label: primary_label,
+            href: primary_href|default('#'),
+            variant: 'primary',
+            arrow: true,
+          } -%}
+        {%- endif -%}
+        {%- if secondary_label -%}
+          {%- include 'byte:button' with {
+            label: secondary_label,
+            href: secondary_href|default('#'),
+            variant: 'ghost',
+          } -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>

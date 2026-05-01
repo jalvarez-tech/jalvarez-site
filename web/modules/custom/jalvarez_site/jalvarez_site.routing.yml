@@ -1,0 +1,9 @@
+jalvarez_site.styleguide:
+  path: '/styleguide'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\StyleguideController::index'
+    _title: 'Styleguide — byte components'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'

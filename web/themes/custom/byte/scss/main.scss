@@ -9,6 +9,14 @@
 
 @use 'tokens';
 
+// ─── Component styles ───
+@use 'components/chip';
+@use 'components/button';
+@use 'components/eyebrow';
+@use 'components/section';
+@use 'components/cta-final';
+@use 'components/banner-inicio';
+
 // ─── Reset (minimal) ───
 * { box-sizing: border-box; margin: 0; padding: 0; }
 

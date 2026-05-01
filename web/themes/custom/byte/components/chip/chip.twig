@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * Chip — pill tag/label.
+ */
+#}
+{%- set tag = tag|default('span') -%}
+{%- set variant = variant|default('default') -%}
+{%- set classes = ['chip', variant == 'accent' ? 'chip--accent' : ''] -%}
+<{{ tag }}
+  class="{{ classes|filter(c => c)|join(' ') }}"
+  {%- if tag == 'a' and href %} href="{{ href }}"{% endif -%}
+>{{ label }}</{{ tag }}>

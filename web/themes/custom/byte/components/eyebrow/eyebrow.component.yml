@@ -1,0 +1,18 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Eyebrow
+status: stable
+description: 'Section eyebrow with optional § 0N number prefix. Mono font, uppercase tracking.'
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      examples: ['cómo lo hago', 'el método', 'palabras de cliente']
+    number:
+      type: integer
+      title: 'Section number'
+      minimum: 0
+      maximum: 99
+      examples: [1, 2, 3]

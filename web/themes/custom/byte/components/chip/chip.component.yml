@@ -1,0 +1,26 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Chip
+status: stable
+description: 'Pill tag/label. Variants: default (line), accent (filled green, hover orange).'
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      examples: [WordPress, 2025, Drupal 11]
+    variant:
+      type: string
+      title: Variant
+      enum: [default, accent]
+      default: default
+    tag:
+      type: string
+      title: 'HTML tag'
+      enum: [span, a, button]
+      default: span
+    href:
+      type: string
+      title: 'Link URL (only when tag=a)'

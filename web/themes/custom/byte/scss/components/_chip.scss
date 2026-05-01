@@ -1,0 +1,26 @@
+// _chip.scss
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+
+  &--accent {
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
+    color: var(--accent);
+
+    &:hover {
+      background: var(--accent-hover-soft);
+      border-color: var(--accent-hover-line);
+      color: var(--accent-hover);
+    }
+  }
+}

@@ -1,0 +1,32 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: Button
+status: stable
+description: 'Pill button. Variants: primary (green→hover orange), ghost (outline). Optional →.'
+
+props:
+  type: object
+  properties:
+    label:
+      type: string
+      title: Label
+      examples: ['Iniciar tu proyecto', 'Ver el trabajo']
+    href:
+      type: string
+      title: 'URL'
+    variant:
+      type: string
+      enum: [primary, ghost]
+      default: primary
+    size:
+      type: string
+      enum: [default, sm]
+      default: default
+    arrow:
+      type: boolean
+      title: 'Show arrow'
+      default: false
+    tag:
+      type: string
+      enum: [a, button]
+      default: a
