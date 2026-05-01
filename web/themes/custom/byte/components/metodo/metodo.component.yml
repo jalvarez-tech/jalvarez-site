@@ -1,0 +1,19 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Método (Process)'
+status: stable
+description: 'Numbered process steps. 4-column grid on desktop: num | title | body | tag.'
+props:
+  type: object
+  properties:
+    eyebrow_label: { type: string, examples: ['el método'] }
+    eyebrow_number: { type: integer, examples: [3] }
+    title: { type: string }
+    title_em: { type: string }
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          title: { type: string }
+          body: { type: string }
+          tag: { type: string, description: 'e.g. "Semana 1"' }

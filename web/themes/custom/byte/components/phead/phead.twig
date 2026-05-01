@@ -1,0 +1,15 @@
+{# Page header #}
+<section class="phead wrap">
+  {%- if eyebrow_main or eyebrow_aside -%}
+    <div class="phead__eyebrow">
+      {%- if eyebrow_main %}<span>{{ eyebrow_main }}</span>{% endif -%}
+      {%- if eyebrow_aside %}<span class="phead__sep">·</span><span>{{ eyebrow_aside }}</span>{% endif -%}
+    </div>
+  {%- endif -%}
+  {%- if title -%}
+    <h1 class="phead__title">
+      {{ title }}{% if title_em %} <span class="phead__italic">{{ title_em }}</span>{% endif %}{{ title_dot|default('.') }}
+    </h1>
+  {%- endif -%}
+  {%- if sub %}<p class="phead__sub">{{ sub }}</p>{% endif -%}
+</section>

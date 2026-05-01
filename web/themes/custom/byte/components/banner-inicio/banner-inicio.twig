@@ -36,14 +36,14 @@
               href: cta_primary_href|default('#'),
               variant: 'primary',
               arrow: true,
-            } -%}
+            } only -%}
           {%- endif -%}
           {%- if cta_secondary_label -%}
             {%- include 'byte:button' with {
               label: cta_secondary_label,
               href: cta_secondary_href|default('#'),
               variant: 'ghost',
-            } -%}
+            } only -%}
           {%- endif -%}
         </div>
       {%- endif -%}

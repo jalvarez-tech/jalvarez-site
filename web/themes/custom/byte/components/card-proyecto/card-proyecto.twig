@@ -1,0 +1,44 @@
+{# Card Proyecto #}
+{%- set h = hue|default(160) -%}
+<a class="project" href="{{ href|default('#') }}">
+  <div class="project__media" style="background: linear-gradient(135deg,#0e1514,#182320);">
+    <div class="pm__browser">
+      <div class="pm__dots"><span></span><span></span><span></span></div>
+      <div class="pm__url">{{ name|lower }}</div>
+    </div>
+    <div class="pm__canvas">
+      <div class="pm__nav">
+        <div class="pm__brand" style="color: oklch(78% 0.14 {{ h }});">◆ {{ name|split('.')|first }}</div>
+        <div class="pm__links"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="pm__hero">
+        <div class="pm__l1"></div>
+        <div class="pm__l2" style="background: oklch(75% 0.16 {{ h }});"></div>
+        <div class="pm__l3"></div>
+        <div class="pm__btn" style="background: oklch(68% 0.18 {{ h }});"></div>
+      </div>
+      <div class="pm__tiles">
+        <div class="pm__tile"></div><div class="pm__tile"></div><div class="pm__tile"></div>
+      </div>
+    </div>
+  </div>
+  <div class="project__info">
+    <div class="project__tags">
+      {%- if category -%}
+        {%- include 'byte:chip' with { label: category, variant: 'accent' } only -%}
+      {%- endif -%}
+      {%- if year -%}
+        {%- include 'byte:chip' with { label: year } only -%}
+      {%- endif -%}
+    </div>
+    <h3 class="project__name">{{ name }} <span class="project__arrow" aria-hidden="true">↗</span></h3>
+    {%- if description -%}<p class="project__desc">{{ description }}</p>{% endif -%}
+    {%- if metrics|length > 0 -%}
+      <div class="project__metrics">
+        {%- for m in metrics -%}
+          <div><strong>{{ m.value }}</strong>{{ m.key }}</div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</a>

@@ -1,0 +1,31 @@
+{# Qué construyo — featured projects #}
+<section class="section wrap" id="featured">
+  <div class="section__head">
+    <div>
+      {%- if eyebrow_label -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if title -%}
+        <h2 class="section__title">{{ title }}{% if title_em %}<em>{{ title_em }}</em>{% endif %}</h2>
+      {%- endif -%}
+      {%- if lede %}<p class="section__lede">{{ lede }}</p>{% endif -%}
+    </div>
+  </div>
+
+  <div class="projects-grid">
+    {%- for p in items|default([]) -%}
+      {%- include 'byte:card-proyecto' with p only -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if cta_label -%}
+    <div style="margin-top: 48px; text-align: center;">
+      {%- include 'byte:button' with {
+        label: cta_label, href: cta_href|default('/proyectos'),
+        variant: 'ghost', arrow: true,
+      } only -%}
+    </div>
+  {%- endif -%}
+</section>

@@ -8,7 +8,7 @@
   <div class="section__head">
     <div>
       {%- if eyebrow_label -%}
-        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
       {%- endif -%}
     </div>
     <div>

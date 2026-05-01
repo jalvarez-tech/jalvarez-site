@@ -1,3 +1,11 @@
+jalvarez_site.home:
+  path: '/home'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\HomeController::index'
+    _title: 'jalvarez.tech'
+  requirements:
+    _permission: 'access content'
+
 jalvarez_site.styleguide:
   path: '/styleguide'
   defaults:

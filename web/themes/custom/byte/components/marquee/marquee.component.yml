@@ -1,0 +1,11 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Marquee
+status: stable
+description: 'Infinite-scrolling stack badges. Items separated by accent dots.'
+props:
+  type: object
+  properties:
+    items:
+      type: array
+      items: { type: string }
+      examples: [['WordPress', 'Drupal 11', 'n8n', 'Headless']]

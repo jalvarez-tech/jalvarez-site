@@ -16,6 +16,12 @@
 @use 'components/section';
 @use 'components/cta-final';
 @use 'components/banner-inicio';
+@use 'components/marquee';
+@use 'components/como-lo-hago';
+@use 'components/metodo';
+@use 'components/palabras-cliente';
+@use 'components/card-proyecto';
+@use 'components/phead';
 
 // ─── Reset (minimal) ───
 * { box-sizing: border-box; margin: 0; padding: 0; }

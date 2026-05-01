@@ -1,0 +1,26 @@
+{# Método — process steps #}
+<section class="section wrap" id="process">
+  <div class="section__head">
+    <div>
+      {%- if eyebrow_label -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if title -%}
+        <h2 class="section__title">{{ title }}{% if title_em %}<em>{{ title_em }}</em>{% endif %}</h2>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="process-list">
+    {%- for p in items|default([]) -%}
+      <div class="process-row">
+        <div class="process-num">{{ '%02d'|format(loop.index) }} — step</div>
+        <div class="process-title">{{ p.title }}</div>
+        <div class="process-body">{{ p.body }}</div>
+        {%- if p.tag %}<div class="process-tag">{{ p.tag }}</div>{% endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>

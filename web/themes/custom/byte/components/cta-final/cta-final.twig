@@ -22,14 +22,14 @@
             href: primary_href|default('#'),
             variant: 'primary',
             arrow: true,
-          } -%}
+          } only -%}
         {%- endif -%}
         {%- if secondary_label -%}
           {%- include 'byte:button' with {
             label: secondary_label,
             href: secondary_href|default('#'),
             variant: 'ghost',
-          } -%}
+          } only -%}
         {%- endif -%}
       </div>
     {%- endif -%}
