@@ -6,6 +6,14 @@ jalvarez_site.home:
   requirements:
     _permission: 'access content'
 
+jalvarez_site.projects:
+  path: '/proyectos'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\ProjectsController::index'
+    _title: 'Proyectos'
+  requirements:
+    _permission: 'access content'
+
 jalvarez_site.styleguide:
   path: '/styleguide'
   defaults:
