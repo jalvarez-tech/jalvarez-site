@@ -1,0 +1,28 @@
+# .deployignore — patterns relative to web/ when used with rsync ./web/ → public_html/
+# Excludes source files we DON'T want to ship to Hostinger.
+
+# Settings template (raw form with placeholders) — only the rendered settings.php is shipped
+sites/default/settings.hostinger.php.template
+
+# Drupal example settings (only used in dev)
+sites/default/example.settings.local.php
+sites/example.sites.php
+sites/development.services.yml
+
+# Theme: source files (compiled in CI)
+themes/custom/*/scss/
+themes/custom/*/scripts/
+themes/custom/*/package.json
+themes/custom/*/package-lock.json
+themes/custom/*/icons.manifest.json
+themes/custom/*/node_modules/
+
+# Source maps — keep payload small
+**/*.css.map
+**/*.js.map
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

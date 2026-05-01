@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Production settings for jalvarez.tech on Hostinger Cloud Startup.
+ *
+ * This file is a TEMPLATE. The CI pipeline (.github/workflows/deploy.yml)
+ * runs `envsubst` against it to render web/sites/default/settings.php with
+ * real secrets baked in BEFORE rsync. Hostinger PHP-FPM never reads env vars
+ * from the GitHub Actions runtime, so the rendered file ships with literal
+ * values.
+ *
+ * Layout assumed on Hostinger:
+ *   ~/domains/jalvarez.tech/
+ *   ├── vendor/                    (composer install --no-dev, deployed by CI)
+ *   ├── config/sync/               (Drupal config exported via drush cex)
+ *   ├── private/                   (file_private_path)
+ *   └── public_html/               (= contents of repo's web/, this docroot)
+ *       └── sites/default/
+ *           └── settings.php       (this file, rendered)
+ */
+
+$databases['default']['default'] = [
+  'database'  => '${DRUPAL_DB_NAME}',
+  'username'  => '${DRUPAL_DB_USER}',
+  'password'  => '${DRUPAL_DB_PASS}',
+  'host'      => '${DRUPAL_DB_HOST}',
+  'driver'    => 'mysql',
+  'prefix'    => '',
+  'charset'   => 'utf8mb4',
+  'collation' => 'utf8mb4_general_ci',
+];
+
+$settings['hash_salt'] = '${DRUPAL_HASH_SALT}';
+
+// Paths relative to public_html/sites/default/settings.php
+//   ../../../config/sync  →  ~/domains/jalvarez.tech/config/sync
+//   ../../../private      →  ~/domains/jalvarez.tech/private
+$settings['config_sync_directory'] = '../../../config/sync';
+$settings['file_private_path']     = '../../../private';
+
+$settings['trusted_host_patterns'] = [
+  '^jalvarez\.tech$',
+  '^www\.jalvarez\.tech$',
+];
+
+// Performance: aggregate CSS/JS in production
+$config['system.performance']['css']['preprocess'] = TRUE;
+$config['system.performance']['js']['preprocess']  = TRUE;
+$config['system.performance']['cache']['page']['max_age'] = 900;
+
+// Security
+$settings['rebuild_access']             = FALSE;
+$settings['skip_permissions_hardening'] = FALSE;
+$settings['update_free_access']         = FALSE;
+$settings['entity_update_batch_size']   = 50;
+
+// Logging
+$config['system.logging']['error_level'] = 'hide';
+
+// Reverse-proxy (Hostinger Cloud sits behind their CDN/edge)
+$settings['reverse_proxy'] = TRUE;
+$settings['reverse_proxy_addresses'] = [$_SERVER['REMOTE_ADDR'] ?? ''];

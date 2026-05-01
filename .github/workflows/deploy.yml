@@ -1,0 +1,168 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      THEME_DIR: web/themes/custom/byte
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ───── PHP + Composer ─────
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+          extensions: gd, mbstring, xml, curl, intl, pdo_mysql, zip, opcache
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Composer install (production)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      # ───── Node + theme build ─────
+      - name: Set up Node 20 (no cache — first run, no lock)
+        if: ${{ hashFiles('web/themes/custom/byte/package-lock.json') == '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Node 20 (with cache)
+        if: ${{ hashFiles('web/themes/custom/byte/package-lock.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/themes/custom/byte/package-lock.json
+
+      - name: Install theme dependencies
+        working-directory: ${{ env.THEME_DIR }}
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Build theme assets (SCSS → CSS, Lucide sprite)
+        working-directory: ${{ env.THEME_DIR }}
+        run: npm run build
+
+      # ───── Render production settings.php from template ─────
+      - name: Render settings.php
+        env:
+          DRUPAL_DB_NAME: ${{ secrets.DRUPAL_DB_NAME }}
+          DRUPAL_DB_USER: ${{ secrets.DRUPAL_DB_USER }}
+          DRUPAL_DB_PASS: ${{ secrets.DRUPAL_DB_PASS }}
+          DRUPAL_DB_HOST: ${{ secrets.DRUPAL_DB_HOST }}
+          DRUPAL_HASH_SALT: ${{ secrets.DRUPAL_HASH_SALT }}
+        run: |
+          envsubst < web/sites/default/settings.hostinger.php.template \
+            > web/sites/default/settings.php
+          chmod 644 web/sites/default/settings.php
+          # Quick sanity: verify no unsubstituted ${...} placeholders remain
+          if grep -n '\${' web/sites/default/settings.php; then
+            echo "::error::Unsubstituted placeholders remain in settings.php"
+            exit 1
+          fi
+
+      # ───── SSH setup ─────
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          name: hostinger
+          known_hosts: 'placeholder'
+          config: |
+            Host hostinger
+              HostName ${{ secrets.HOSTINGER_HOST }}
+              Port ${{ secrets.HOSTINGER_PORT }}
+              User ${{ secrets.HOSTINGER_USER }}
+              IdentityFile ~/.ssh/hostinger
+              IdentitiesOnly yes
+              StrictHostKeyChecking accept-new
+
+      - name: Add Hostinger to known_hosts
+        run: |
+          ssh-keyscan -p ${{ secrets.HOSTINGER_PORT }} -t ed25519 ${{ secrets.HOSTINGER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      # ───── Pre-deploy: relax permissions on remote sites/default ─────
+      - name: Pre-deploy permissions
+        run: |
+          ssh hostinger "
+            mkdir -p ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/files \
+                     ${{ secrets.HOSTINGER_PATH }}/private \
+                     ${{ secrets.HOSTINGER_PATH }}/config/sync
+            chmod -R u+w ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
+          "
+
+      # ───── Deploy: 3 rsync passes ─────
+      - name: Rsync web/ → public_html/
+        run: |
+          rsync -avz --delete \
+            --exclude-from=.deployignore \
+            --exclude='sites/default/files/' \
+            -e "ssh" \
+            ./web/ hostinger:${{ secrets.HOSTINGER_PATH }}/public_html/
+
+      - name: Rsync vendor/
+        run: |
+          rsync -avz --delete \
+            -e "ssh" \
+            ./vendor/ hostinger:${{ secrets.HOSTINGER_PATH }}/vendor/
+
+      - name: Rsync config/
+        run: |
+          rsync -avz --delete \
+            -e "ssh" \
+            ./config/ hostinger:${{ secrets.HOSTINGER_PATH }}/config/
+
+      # ───── Post-deploy: drush updb + cim + cr (only if installed) ─────
+      - name: Drupal post-deploy
+        run: |
+          ssh hostinger "
+            set -e
+            cd ${{ secrets.HOSTINGER_PATH }}
+            DRUSH=./vendor/bin/drush
+            if \$DRUSH --root=public_html status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+              echo '→ Site is installed. Running updb + cim + cr.'
+              \$DRUSH --root=public_html updb -y
+              \$DRUSH --root=public_html cim -y || echo '⚠ Config import skipped (no config to import).'
+              \$DRUSH --root=public_html cr
+            else
+              echo '⚠ Drupal not installed yet — skipping drush hooks.'
+              echo '   Run \`drush site:install\` manually once via SSH to bootstrap.'
+            fi
+          "
+
+      # ───── Post-deploy: re-harden permissions ─────
+      - name: Re-harden remote permissions
+        if: always()
+        run: |
+          ssh hostinger "
+            chmod 555 ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
+            chmod 444 ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/settings.php 2>/dev/null || true
+          "
+
+      - name: Done
+        run: echo "✅ Deploy completado · https://jalvarez.tech"

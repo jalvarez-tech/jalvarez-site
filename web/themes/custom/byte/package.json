@@ -1,0 +1,17 @@
+{
+  "name": "byte-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build pipeline for the Byte theme (jalvarez.tech). SCSS → CSS + Lucide icon sprite.",
+  "scripts": {
+    "dev": "sass --watch scss/main.scss:dist/css/main.css --style=expanded --source-map",
+    "build:css": "sass scss/main.scss:dist/css/main.css --style=compressed --no-source-map",
+    "build:icons": "node scripts/build-icons.mjs",
+    "build": "npm run build:css && npm run build:icons",
+    "clean": "rm -rf dist icons.svg"
+  },
+  "devDependencies": {
+    "lucide-static": "^0.460.0",
+    "sass": "^1.77.0"
+  }
+}

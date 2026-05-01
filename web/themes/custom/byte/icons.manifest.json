@@ -1,0 +1,23 @@
+{
+  "_doc": "List of Lucide icon names to bundle into icons.svg sprite. Edit and re-run `npm run build:icons`.",
+  "lucide": [
+    "gauge",
+    "layers",
+    "accessibility",
+    "workflow",
+    "arrow-right",
+    "arrow-up-right",
+    "mail",
+    "phone",
+    "message-circle",
+    "share-2",
+    "bookmark",
+    "copy",
+    "calendar",
+    "sun",
+    "moon",
+    "menu",
+    "x",
+    "check-circle-2"
+  ]
+}

@@ -1,0 +1,16 @@
+name: Byte
+type: theme
+description: 'Editorial-developer theme for jalvarez.tech — dark-first, dual accent (green static + orange hover), bilingual ES/EN.'
+package: Custom
+core_version_requirement: ^11
+
+libraries:
+  - byte/global
+
+regions:
+  header: 'Header'
+  primary_menu: 'Primary menu'
+  highlighted: 'Highlighted'
+  content: 'Content'
+  footer_top: 'Footer top'
+  footer_bottom: 'Footer bottom'

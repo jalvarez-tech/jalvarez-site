@@ -1,0 +1,49 @@
+// main.scss — Byte theme entry point.
+//
+// Build: `npm run build:css` → dist/css/main.css
+// Watch: `npm run dev`
+//
+// Architecture:
+//   _tokens.scss  → CSS custom properties (colors, fonts, spacing, radii)
+//   (future)      → fonts.scss, reset.scss, base.scss, layout.scss, components/...
+
+@use 'tokens';
+
+// ─── Reset (minimal) ───
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--f-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
+}
+
+a    { color: inherit; text-decoration: none; }
+img  { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+// ─── Utility primitives ───
+.mono { font-family: var(--f-mono); font-feature-settings: "ss02"; }
+.tab  { font-variant-numeric: tabular-nums; }
+.wrap { max-width: var(--container); margin: 0 auto; padding: 0 var(--pad); }
+.hair { height: 1px; background: var(--line); border: 0; margin: 0; }
+
+// ─── Page glow (D6: ON by default) ───
+.page-glow {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-glow);
+  pointer-events: none;
+  background:
+    radial-gradient(60vmax 50vmax at 80% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(50vmax 40vmax at -10% 100%, var(--accent-soft), transparent 65%);
+  opacity: 0.6;
+}

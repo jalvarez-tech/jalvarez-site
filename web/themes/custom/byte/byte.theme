@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Theme hooks for the Byte theme.
+ */
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ *
+ * Inlines a tiny script in <head> that applies the saved data-theme
+ * (dark/light) BEFORE the first paint, to avoid FOUC when the user has
+ * a non-default mode persisted in localStorage.
+ */
+function byte_preprocess_html(array &$variables): void {
+  $variables['#attached']['html_head'][] = [
+    [
+      '#tag' => 'script',
+      '#value' => <<<JS
+        (function(){
+          try {
+            var t = localStorage.getItem('jsa-theme');
+            if (!t) {
+              t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', t);
+            var l = localStorage.getItem('jsa-lang');
+            if (l) document.documentElement.setAttribute('lang', l);
+          } catch (e) {}
+        })();
+      JS,
+    ],
+    'byte_inline_theme_init',
+  ];
+}

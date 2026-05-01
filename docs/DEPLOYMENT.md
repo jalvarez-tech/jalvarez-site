@@ -445,33 +445,60 @@ git revert <hash> && git push   # CI re-deploya el estado previo
 
 ---
 
-## 10. Qué falta para arrancar
+## 10. Estado actual
 
-### Acciones del usuario (en hPanel + local)
+### Setup completado
 
-1. ⏳ **Activar PHP 8.3** en hPanel → Avanzado → Selector de PHP.
-2. ⏳ **Crear DB MySQL** en hPanel → Bases de datos → MySQL. Anotar name/user/pass.
-3. ⏳ **Generar SSH key local**:
-   ```bash
-   ssh-keygen -t ed25519 -f ~/.ssh/hostinger_jalvarez -C "deploy@github"
-   ```
-4. ⏳ **Subir pubkey a Hostinger**: hPanel → SSH Access → Manage SSH Keys → pegar contenido de `~/.ssh/hostinger_jalvarez.pub`.
-5. ⏳ **Probar conexión local** una vez:
-   ```bash
-   ssh -i ~/.ssh/hostinger_jalvarez -p 65002 <user>@<host>
-   ```
-6. ⏳ **Configurar GitHub Secrets** (10 secrets de §7) en `Settings → Secrets and variables → Actions`.
+- ✅ Plan Cloud Startup, PHP 8.3 activo
+- ✅ DB MySQL creada (`u211065173_jalvarez_site`)
+- ✅ SSH key generada, pubkey en hPanel, conexión validada (`191.101.32.187:65002`)
+- ✅ 10 GitHub Secrets configurados
+- ✅ Workflows: `.github/workflows/deploy.yml` + `ci.yml`
+- ✅ `.deployignore` con sources excluidos
+- ✅ `web/sites/default/settings.hostinger.php.template`
+- ✅ Theme `byte` scaffold mínimo (info, libraries, theme PHP, package.json, scripts, scss tokens + main)
 
-### Acciones de mi parte (cuando confirmes lo anterior)
+### Primer deploy — flujo automático
 
-7. ⏳ Crear:
-   - `.github/workflows/deploy.yml`
-   - `.github/workflows/ci.yml` (lint + build dry-run en PRs)
-   - `.deployignore`
-   - `web/sites/default/settings.hostinger.php`
-   - `web/themes/custom/byte/package.json`
-   - `web/themes/custom/byte/scripts/build-icons.mjs`
-   - `web/themes/custom/byte/icons.manifest.json`
-8. ⏳ Validar end-to-end con un primer deploy manual (`workflow_dispatch`).
+`git push origin main` dispara `deploy.yml`:
 
-> **No se hace push automático hasta que pasos 1–6 estén completos.**
+1. **Build:** composer install (sin dev) + npm ci + sass → CSS + sprite Lucide.
+2. **Render:** `envsubst` reemplaza placeholders en `settings.hostinger.php.template` → `settings.php` con secrets.
+3. **Rsync (3 pasadas):**
+   - `web/` → `~/domains/jalvarez.tech/public_html/` (excluye sources y `sites/default/files/`)
+   - `vendor/` → `~/domains/jalvarez.tech/vendor/`
+   - `config/` → `~/domains/jalvarez.tech/config/`
+4. **Post-deploy via SSH:**
+   - Si Drupal está instalado: `drush updb && cim && cr`.
+   - Si NO está instalado (primer deploy): warn y skip.
+
+### Primer deploy — `drush site:install` manual (una sola vez)
+
+Después del primer push exitoso (que mete el código), el sitio aún no tiene tablas en DB. Vía SSH:
+
+```bash
+ssh hostinger-jalvarez   # o el comando largo si no creaste el alias
+cd domains/jalvarez.tech
+./vendor/bin/drush --root=public_html site:install drupal_cms_installer \
+  --site-name="jalvarez.tech" \
+  --account-name=admin \
+  --account-mail=contacto@jalvarez.tech \
+  -y
+exit
+```
+
+> Validar el profile correcto con `ls public_html/profiles/`. Si el recipe inicial usa `minimal` o `standard`, cambiá ese argumento.
+
+A partir de ahí cada `git push` despliega solo.
+
+### Activar el theme `byte` (post site:install)
+
+```bash
+ssh hostinger-jalvarez
+cd domains/jalvarez.tech
+./vendor/bin/drush --root=public_html theme:install byte -y
+./vendor/bin/drush --root=public_html config:set system.theme default byte -y
+./vendor/bin/drush --root=public_html cr
+```
+
+O via `/admin/appearance` → "Install and set as default".

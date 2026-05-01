@@ -1,0 +1,7 @@
+global:
+  version: 1.x
+  css:
+    theme:
+      dist/css/main.css: { minified: true }
+  dependencies:
+    - core/drupal

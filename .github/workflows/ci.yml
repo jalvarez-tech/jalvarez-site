@@ -1,0 +1,73 @@
+name: CI (lint + build verify)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches-ignore: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-verify:
+    name: Build verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      THEME_DIR: web/themes/custom/byte
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Composer validate
+        run: composer validate --strict --no-check-publish
+
+      - name: Composer install (dev)
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Set up Node 20 (no cache — first run, no lock)
+        if: ${{ hashFiles('web/themes/custom/byte/package-lock.json') == '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Node 20 (with cache)
+        if: ${{ hashFiles('web/themes/custom/byte/package-lock.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/themes/custom/byte/package-lock.json
+
+      - name: Install theme dependencies
+        working-directory: ${{ env.THEME_DIR }}
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Build theme (SCSS + sprite)
+        working-directory: ${{ env.THEME_DIR }}
+        run: npm run build
+
+      - name: Lint settings template (envsubst dry-run)
+        env:
+          DRUPAL_DB_NAME: test
+          DRUPAL_DB_USER: test
+          DRUPAL_DB_PASS: test
+          DRUPAL_DB_HOST: localhost
+          DRUPAL_HASH_SALT: testsalt
+        run: |
+          envsubst < web/sites/default/settings.hostinger.php.template \
+            > /tmp/settings.rendered.php
+          php -l /tmp/settings.rendered.php
