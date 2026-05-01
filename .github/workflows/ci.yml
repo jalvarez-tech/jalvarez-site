@@ -68,6 +68,8 @@ jobs:
           DRUPAL_DB_HOST: localhost
           DRUPAL_HASH_SALT: testsalt
         run: |
-          envsubst < web/sites/default/settings.hostinger.php.template \
+          envsubst '${DRUPAL_DB_NAME} ${DRUPAL_DB_USER} ${DRUPAL_DB_PASS} ${DRUPAL_DB_HOST} ${DRUPAL_HASH_SALT}' \
+            < web/sites/default/settings.hostinger.php.template \
             > /tmp/settings.rendered.php
           php -l /tmp/settings.rendered.php
+          grep -q '^\$databases' /tmp/settings.rendered.php || (echo "ERROR: \$databases stripped" && exit 1)

@@ -68,6 +68,10 @@ jobs:
         run: npm run build
 
       # ───── Render production settings.php from template ─────
+      # IMPORTANT: envsubst is given an EXPLICIT variable list so it only
+      # substitutes our 5 placeholders. Without it, envsubst would also
+      # expand $databases, $settings, $config, $_SERVER, etc. (all PHP
+      # variables in the template), corrupting the file.
       - name: Render settings.php
         env:
           DRUPAL_DB_NAME: ${{ secrets.DRUPAL_DB_NAME }}
@@ -76,14 +80,22 @@ jobs:
           DRUPAL_DB_HOST: ${{ secrets.DRUPAL_DB_HOST }}
           DRUPAL_HASH_SALT: ${{ secrets.DRUPAL_HASH_SALT }}
         run: |
-          envsubst < web/sites/default/settings.hostinger.php.template \
+          envsubst '${DRUPAL_DB_NAME} ${DRUPAL_DB_USER} ${DRUPAL_DB_PASS} ${DRUPAL_DB_HOST} ${DRUPAL_HASH_SALT}' \
+            < web/sites/default/settings.hostinger.php.template \
             > web/sites/default/settings.php
           chmod 644 web/sites/default/settings.php
-          # Quick sanity: verify no unsubstituted ${...} placeholders remain
-          if grep -n '\${' web/sites/default/settings.php; then
+          # Sanity 1: no unsubstituted placeholders remain
+          if grep -n '\${DRUPAL_' web/sites/default/settings.php; then
             echo "::error::Unsubstituted placeholders remain in settings.php"
             exit 1
           fi
+          # Sanity 2: PHP variables ($settings, $databases, $config) intact
+          if ! grep -q '^\$databases' web/sites/default/settings.php; then
+            echo "::error::settings.php is missing \$databases — envsubst stripped PHP vars"
+            exit 1
+          fi
+          # Sanity 3: PHP syntax valid
+          php -l web/sites/default/settings.php
 
       # ───── SSH setup ─────
       - name: Install SSH key
@@ -111,6 +123,8 @@ jobs:
                      ${{ secrets.HOSTINGER_PATH }}/public_html/config/sync \
                      ${{ secrets.HOSTINGER_PATH }}/public_html/vendor
             chmod -R u+w ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
+            # Clean any sed-leftover backups from manual debug edits
+            rm -f ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/settings.php.bak 2>/dev/null || true
 
             # Symlink web → public_html. Composer autoloader bakes paths
             # like <project>/web/core/... at install time; on Hostinger our
