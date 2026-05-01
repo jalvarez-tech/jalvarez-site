@@ -165,6 +165,28 @@ jobs:
             -e "ssh" \
             ./config/ hostinger:${{ secrets.HOSTINGER_PATH }}/public_html/config/
 
+      # Drupal CMS installer (drupal_cms_installer profile) and Drupal core's
+      # recipe system look for composer.json + composer.lock at the project
+      # root (= dirname of DRUPAL_ROOT), and for installed recipes at
+      # <project_root>/recipes/. These files are NOT web-accessible (they
+      # sit one level above public_html alongside the web→public_html symlink).
+      - name: Rsync composer manifests → project root
+        run: |
+          rsync -avz \
+            -e "ssh" \
+            ./composer.json ./composer.lock \
+            hostinger:${{ secrets.HOSTINGER_PATH }}/
+
+      - name: Rsync recipes/ → project root
+        run: |
+          if [ -d ./recipes ]; then
+            rsync -avz --delete \
+              -e "ssh" \
+              ./recipes/ hostinger:${{ secrets.HOSTINGER_PATH }}/recipes/
+          else
+            echo "No ./recipes directory locally — skipping rsync."
+          fi
+
       # ───── Post-deploy: drush updb + cim + cr (only if installed) ─────
       - name: Drupal post-deploy
         run: |
