@@ -37,11 +37,10 @@ $databases['default']['default'] = [
 
 $settings['hash_salt'] = '${DRUPAL_HASH_SALT}';
 
-// Paths relative to public_html/sites/default/settings.php
-//   ../../config/sync  →  public_html/config/sync
-//   ../../private      →  public_html/private
-$settings['config_sync_directory'] = '../../config/sync';
-$settings['file_private_path']     = '../../private';
+// Paths are resolved by Drupal relative to DRUPAL_ROOT (= public_html/),
+// NOT relative to settings.php. So 'config/sync' = public_html/config/sync.
+$settings['config_sync_directory'] = 'config/sync';
+$settings['file_private_path']     = 'private';
 
 $settings['trusted_host_patterns'] = [
   '^jalvarez\.tech$',
