@@ -2,10 +2,14 @@ _core:
   default_config_hash: 4GIX5Esnc_umpXUBj4IIocRX7Mt5fPhm4AgXfE3E56E
 module:
   block: 0
+  config_translation: 0
   dblog: 0
   dynamic_page_cache: 0
   field: 0
+  file: 0
   filter: 0
+  language: 0
+  locale: 0
   mysql: 0
   node: 0
   page_cache: 0
@@ -14,6 +18,7 @@ module:
   text: 0
   update: 0
   user: 0
+  content_translation: 10
   minimal: 1000
 theme:
   stark: 0
