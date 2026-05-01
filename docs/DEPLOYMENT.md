@@ -281,22 +281,58 @@ web/themes/custom/*/dist/**/*.map
 
 ---
 
-## 6. Decisiones pendientes (Hostinger)
+## 6. Entorno Hostinger — confirmado
 
-Necesito esto para finalizar `deploy.yml`:
-
-| # | Pregunta | Notas |
+| # | Item | Valor |
 |---|---|---|
-| H1 | **Plan de Hostinger** (Premium / Business / Cloud / VPS) | Determina si hay SSH y cómo configurar docroot |
-| H2 | **Acceso SSH habilitado** | Premium+ lo soporta. Si no hay SSH, alternativa: deploy via FTP (SamKirkland/FTP-Deploy-Action). |
-| H3 | **Custom docroot** | Business+ permite cambiar docroot a `web/`. Si no, el plan es publicar contenido de `web/` directo en `public_html/` y dejar `vendor/` en un nivel superior. |
-| H4 | **Dominio en producción** | `jalvarez.tech` (asumido). Confirmar. |
-| H5 | **Base de datos MySQL** | Credenciales de Hostinger MySQL. Se inyectan vía GitHub Secrets. |
-| H6 | **Drush en servidor** | ¿Está accesible PHP CLI? Si sí, post-deploy ejecuta `drush updb && cim && cr`. Si no, hay que hacer estos pasos manualmente o vía cron. |
-| H7 | **Node version del CI** | Confirmar Node 20 LTS. |
-| H8 | **PHP version del servidor** | Hostinger normalmente 8.1–8.3. Drupal 11 requiere PHP 8.3+. Confirmar. |
-| H9 | **Estrategia de uploads (`sites/default/files`)** | Persistente en servidor, NUNCA se sobreescribe en deploy (rsync exclude). |
-| H10 | **Backup automatizado** | ¿Hostinger tiene backup nativo activo, o agregamos un job en CI que descargue dump + tar? |
+| H1 | Plan | **Cloud Startup** (incluye SSH, custom PHP, mayor RAM, recursos dedicados) |
+| H2 | SSH | **Activo**. Puerto 65002. |
+| H3 | Docroot | **`public_html/` fijo** (no se puede cambiar). Layout: contenido de `web/` se publica directo en `public_html/`; `vendor/`, `config/`, `drush/` viven un nivel arriba en `~/domains/jalvarez.tech/` (NO web-accessible). El `web/autoload.php` ya apunta a `../vendor/autoload.php`, así que el patrón funciona sin tocar core. |
+| H4 | Dominio | **jalvarez.tech** |
+| H5 | MySQL | Credenciales de hPanel → guardar en GitHub Secrets como `DRUPAL_DB_*` |
+| H6 | Drush | **Disponible vía SSH en Cloud Startup**. Se invoca por `~/domains/jalvarez.tech/vendor/bin/drush` post-deploy. Ref: https://www.hostinger.com/mx/tutoriales/tutorial-drupal |
+| H7 | Node | **NO se ejecuta en Hostinger**. Solo corre en GitHub Actions (Node 20 LTS, configurado en `deploy.yml`). En el servidor de Hostinger no necesitas Node — solo PHP. Si después necesitas Node para algo runtime (raro en Drupal clásico), Cloud Startup lo permite via NVM en SSH. |
+| H8 | PHP | **PHP 8.3** recomendado. Razones: (1) Drupal 11 requiere 8.3+; (2) 8.3 es el LTS más probado con la cadena de contribs actuales; (3) 8.4 es viable pero algunos módulos contrib aún no lo declaran. Activar en hPanel → Avanzado → Selector de PHP → 8.3. |
+| H9 | Uploads `sites/default/files` | **Persistente.** rsync usa `--exclude='public_html/sites/default/files/'` — los archivos del CMS nunca se tocan en deploy. |
+| H10 | Backup | **Backup nativo Hostinger Cloud Startup activo.** No agregamos backup en CI. Si en el futuro se requiere snapshot por deploy, se añade un step antes del rsync que dispare `mysqldump` y lo guarde como artefacto del run. |
+
+---
+
+## 6b. Layout final en Hostinger (Cloud Startup, docroot fijo en public_html)
+
+```
+/home/<user>/
+└── domains/jalvarez.tech/
+    ├── vendor/                   ← Composer deps (NO web-accessible)
+    ├── config/
+    │   └── sync/                 ← config exportada via drush cex
+    ├── drush/
+    │   └── drush.yml             ← config drush
+    ├── private/                  ← $settings['file_private_path']
+    └── public_html/              ← DOCROOT (= contenido de web/ del repo)
+        ├── core/
+        ├── modules/
+        │   ├── contrib/
+        │   └── custom/
+        ├── themes/
+        │   ├── contrib/
+        │   └── custom/byte/
+        │       ├── byte.theme
+        │       ├── components/
+        │       ├── dist/css/main.css      ← compilado por CI
+        │       ├── icons.svg              ← sprite generado por CI
+        │       ├── fonts/
+        │       └── byte.libraries.yml
+        ├── sites/default/
+        │   ├── settings.php               ← inyectado por CI
+        │   ├── services.yml
+        │   └── files/                     ← PERSISTENTE, no se sobrescribe
+        ├── autoload.php                   ← apunta a ../vendor/autoload.php (default Drupal)
+        ├── index.php
+        └── .htaccess
+```
+
+> Drupal viene preparado: el `web/autoload.php` por defecto hace `return require __DIR__ . '/../vendor/autoload.php';`. Como `web/ ≡ public_html/` y `vendor/` queda un nivel arriba, todo funciona sin parchar core.
 
 ---
 
@@ -304,28 +340,29 @@ Necesito esto para finalizar `deploy.yml`:
 
 A configurar en `Settings → Secrets and variables → Actions`:
 
-| Secret | Uso |
-|---|---|
-| `HOSTINGER_HOST` | IP o hostname SSH (ej: `srv123.hstgr.io`) |
-| `HOSTINGER_USER` | Usuario SSH (ej: `u123456789`) |
-| `HOSTINGER_PORT` | Puerto SSH (Hostinger usa 65002 en shared) |
-| `HOSTINGER_PATH` | Ruta absoluta destino (ej: `/home/u123456789/domains/jalvarez.tech`) |
-| `HOSTINGER_SSH_KEY` | Llave privada SSH ED25519 (generada localmente, pública en Hostinger) |
-| `DRUPAL_DB_NAME` | DB MySQL Hostinger |
-| `DRUPAL_DB_USER` | DB user |
-| `DRUPAL_DB_PASS` | DB password |
-| `DRUPAL_DB_HOST` | `localhost` o IP MySQL Hostinger |
-| `DRUPAL_HASH_SALT` | Salt único Drupal (generar con `drush php:eval "echo \Drupal\Component\Utility\Crypt::randomBytesBase64(55);"`) |
+| Secret | Uso | Cómo obtenerlo |
+|---|---|---|
+| `HOSTINGER_HOST` | Hostname SSH | hPanel → SSH Access → Host (ej: `srv123.hstgr.io`) |
+| `HOSTINGER_USER` | Usuario SSH | hPanel → SSH Access → Username (ej: `u123456789`) |
+| `HOSTINGER_PORT` | Puerto SSH | **65002** en Cloud Startup |
+| `HOSTINGER_PATH` | Ruta absoluta destino | `/home/u123456789/domains/jalvarez.tech` (sin `/public_html`) |
+| `HOSTINGER_SSH_KEY` | Llave privada SSH | Generar local: `ssh-keygen -t ed25519 -f ~/.ssh/hostinger_jalvarez -C "deploy@github"`. Subir la pública (`.pub`) a hPanel → SSH Access → Manage SSH Keys. Pegar la privada en GitHub Secret. |
+| `DRUPAL_DB_NAME` | DB MySQL | hPanel → Bases de datos → MySQL → DB name |
+| `DRUPAL_DB_USER` | DB user | hPanel → Bases de datos → MySQL → user |
+| `DRUPAL_DB_PASS` | DB password | hPanel → Bases de datos → MySQL → password |
+| `DRUPAL_DB_HOST` | `localhost` | En Hostinger Cloud Startup la DB es local al servidor PHP |
+| `DRUPAL_HASH_SALT` | Salt Drupal | Generar local: `openssl rand -base64 55` o `php -r "echo bin2hex(random_bytes(32));"` |
 
 ---
 
 ## 8. `settings.hostinger.php`
 
-Archivo plantilla en repo (sin valores reales). Lee env vars que CI inyecta:
+Archivo plantilla en repo (sin valores reales). Lee env vars que CI inyecta antes del rsync:
 
 ```php
 <?php
-// settings.hostinger.php — copiado a settings.php por CI antes del rsync.
+// settings.hostinger.php — copiado a sites/default/settings.php por CI antes del rsync.
+// Sirve cuando: docroot = public_html/, vendor/ y config/ viven en ../
 
 $databases['default']['default'] = [
   'database' => getenv('DRUPAL_DB_NAME'),
@@ -339,11 +376,26 @@ $databases['default']['default'] = [
 ];
 
 $settings['hash_salt'] = getenv('DRUPAL_HASH_SALT');
-$settings['config_sync_directory'] = '../config/sync';
-$settings['file_private_path'] = '../private';
-$settings['trusted_host_patterns'] = ['^jalvarez\.tech$', '^www\.jalvarez\.tech$'];
+
+// Rutas relativas al docroot public_html/
+//   public_html/sites/default/settings.php
+// + ../../../config/sync   →   ~/domains/jalvarez.tech/config/sync
+// + ../../../private       →   ~/domains/jalvarez.tech/private
+$settings['config_sync_directory'] = '../../../config/sync';
+$settings['file_private_path']     = '../../../private';
+
+$settings['trusted_host_patterns'] = [
+  '^jalvarez\.tech$',
+  '^www\.jalvarez\.tech$',
+];
+
+// Performance: agregación de CSS/JS activa en producción
 $config['system.performance']['css']['preprocess'] = TRUE;
 $config['system.performance']['js']['preprocess']  = TRUE;
+
+// Bloquear instalador en producción
+$settings['rebuild_access'] = FALSE;
+$settings['skip_permissions_hardening'] = FALSE;
 ```
 
 ---
@@ -385,9 +437,24 @@ git revert <hash> && git push   # CI re-deploya el estado previo
 
 ## 10. Qué falta para arrancar
 
-1. ⏳ Confirmar respuestas a §6 (H1–H10).
-2. ⏳ Crear cuenta de SSH en Hostinger + agregar pubkey de la máquina del CI.
-3. ⏳ Crear los archivos:
+### Acciones del usuario (en hPanel + local)
+
+1. ⏳ **Activar PHP 8.3** en hPanel → Avanzado → Selector de PHP.
+2. ⏳ **Crear DB MySQL** en hPanel → Bases de datos → MySQL. Anotar name/user/pass.
+3. ⏳ **Generar SSH key local**:
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/hostinger_jalvarez -C "deploy@github"
+   ```
+4. ⏳ **Subir pubkey a Hostinger**: hPanel → SSH Access → Manage SSH Keys → pegar contenido de `~/.ssh/hostinger_jalvarez.pub`.
+5. ⏳ **Probar conexión local** una vez:
+   ```bash
+   ssh -i ~/.ssh/hostinger_jalvarez -p 65002 <user>@<host>
+   ```
+6. ⏳ **Configurar GitHub Secrets** (10 secrets de §7) en `Settings → Secrets and variables → Actions`.
+
+### Acciones de mi parte (cuando confirmes lo anterior)
+
+7. ⏳ Crear:
    - `.github/workflows/deploy.yml`
    - `.github/workflows/ci.yml` (lint + build dry-run en PRs)
    - `.deployignore`
@@ -395,7 +462,6 @@ git revert <hash> && git push   # CI re-deploya el estado previo
    - `web/themes/custom/byte/package.json`
    - `web/themes/custom/byte/scripts/build-icons.mjs`
    - `web/themes/custom/byte/icons.manifest.json`
-4. ⏳ Configurar secrets en GitHub.
-5. ⏳ Primera ejecución manual del workflow para validar end-to-end.
+8. ⏳ Validar end-to-end con un primer deploy manual (`workflow_dispatch`).
 
-> **No se ejecuta nada hasta que H1–H10 estén respondidas.**
+> **No se hace push automático hasta que pasos 1–6 estén completos.**
