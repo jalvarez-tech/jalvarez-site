@@ -1,0 +1,120 @@
+uuid: c19beb2c-7b11-4d7b-bd40-62d7b0031179
+langcode: es
+status: true
+dependencies:
+  config:
+    - node.type.testimonial
+  module:
+    - node
+    - user
+id: featured_testimonials
+label: 'Testimonios destacados'
+module: views
+description: 'Citas de clientes marcadas como destacado.'
+tag: jalvarez
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'Testimonios destacados'
+      fields:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          entity_type: node
+          entity_field: title
+          plugin_id: field
+          label: ''
+          settings:
+            link_to_entity: true
+      pager:
+        type: some
+        options:
+          items_per_page: 5
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Filtrar
+          reset_button: true
+          reset_button_label: Limpiar
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      sorts:
+        field_weight_value:
+          id: field_weight_value
+          table: node__field_weight
+          field: field_weight_value
+          plugin_id: standard
+          order: ASC
+      arguments: {  }
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          value:
+            testimonial: testimonial
+        field_featured_value:
+          id: field_featured_value
+          table: node__field_featured
+          field: field_featured_value
+          plugin_id: boolean
+          value: '1'
+      style:
+        type: default
+        options:
+          grouping: {  }
+      row:
+        type: fields
+      query:
+        type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: false
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  block_1:
+    id: block_1
+    display_title: Block
+    display_plugin: block
+    position: 1
+    display_options:
+      display_extenders: {  }
+      block_description: 'Featured testimonials'
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }

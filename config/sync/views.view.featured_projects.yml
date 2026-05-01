@@ -1,0 +1,120 @@
+uuid: 443602ba-c8da-4930-9212-2b6fd6d9a83f
+langcode: es
+status: true
+dependencies:
+  config:
+    - node.type.project
+  module:
+    - node
+    - user
+id: featured_projects
+label: 'Proyectos destacados (home)'
+module: views
+description: 'Proyectos marcados como destacado en home.'
+tag: jalvarez
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'Proyectos destacados'
+      fields:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          entity_type: node
+          entity_field: title
+          plugin_id: field
+          label: ''
+          settings:
+            link_to_entity: true
+      pager:
+        type: some
+        options:
+          items_per_page: 3
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Filtrar
+          reset_button: true
+          reset_button_label: Limpiar
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      sorts:
+        field_sort_order_value:
+          id: field_sort_order_value
+          table: node__field_sort_order
+          field: field_sort_order_value
+          plugin_id: standard
+          order: ASC
+      arguments: {  }
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          value:
+            project: project
+        field_featured_home_value:
+          id: field_featured_home_value
+          table: node__field_featured_home
+          field: field_featured_home_value
+          plugin_id: boolean
+          value: '1'
+      style:
+        type: default
+        options:
+          grouping: {  }
+      row:
+        type: fields
+      query:
+        type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: false
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  block_1:
+    id: block_1
+    display_title: Block
+    display_plugin: block
+    position: 1
+    display_options:
+      display_extenders: {  }
+      block_description: 'Featured projects (home)'
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }

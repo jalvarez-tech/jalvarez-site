@@ -7,4 +7,10 @@ configEntityTypeId: component
 weight: 0
 items:
   - block.views_block.content_recent-block_1
+  - block.views_block.featured_projects-block_1
+  - block.views_block.featured_testimonials-block_1
+  - block.views_block.projects-block_1
+  - block.views_block.recent_notes-block_1
+  - block.views_block.related_notes-block_1
+  - block.views_block.related_projects-block_1
   - block.views_block.who_s_online-who_s_online_block
