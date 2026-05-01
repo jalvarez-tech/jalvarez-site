@@ -342,6 +342,8 @@ web/themes/custom/*/dist/**/*.map
 
 > La instalación de vendor adentro de web/ se controla via `composer.json` → `config.vendor-dir = "web/vendor"` y `bin-dir = "web/vendor/bin"`. **drupal-scaffold detecta automáticamente** que vendor-dir está dentro de web-root y genera `web/autoload.php` con `__DIR__ . '/vendor/autoload.php'` (en vez del default `'/../vendor/autoload.php'`). Esto permite que `public_html/` sea la docroot Y el project root al mismo tiempo — requisito de hostings con docroot fijo como Hostinger Cloud Startup.
 
+> **Symlink `web → public_html`.** El autoloader de Composer hardcodea rutas como `<project>/web/core/includes/bootstrap.inc` durante `composer install`. Como en CI la estructura es `<root>/web/...` pero en Hostinger es `<root>/public_html/...`, esos paths quedan rotos en server. **Solución:** `~/domains/jalvarez.tech/web → public_html` (symlink). Vive FUERA del docroot, no es web-accessible. El paso `Pre-deploy permissions` lo crea automáticamente si no existe.
+
 ---
 
 ## 7. Secrets en GitHub

@@ -111,6 +111,17 @@ jobs:
                      ${{ secrets.HOSTINGER_PATH }}/public_html/config/sync \
                      ${{ secrets.HOSTINGER_PATH }}/public_html/vendor
             chmod -R u+w ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
+
+            # Symlink web → public_html. Composer autoloader bakes paths
+            # like <project>/web/core/... at install time; on Hostinger our
+            # docroot is public_html, so without this symlink the autoloader
+            # (and drush) cannot find drupal/core. Symlink lives OUTSIDE
+            # public_html so it's not web-accessible.
+            if [ ! -e ${{ secrets.HOSTINGER_PATH }}/web ]; then
+              echo '→ Creating symlink web → public_html'
+              ln -s public_html ${{ secrets.HOSTINGER_PATH }}/web
+            fi
+
             # Clean up old layout (vendor/config one level above) if present
             if [ -d ${{ secrets.HOSTINGER_PATH }}/vendor ] && [ ! -L ${{ secrets.HOSTINGER_PATH }}/vendor ]; then
               echo '→ Removing legacy ~/vendor (now lives at public_html/vendor)'
