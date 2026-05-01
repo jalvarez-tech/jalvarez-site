@@ -3,6 +3,7 @@ type: theme
 description: 'Editorial-developer theme for jalvarez.tech — dark-first, dual accent (green static + orange hover), bilingual ES/EN.'
 package: Custom
 core_version_requirement: ^11
+base theme: false
 
 libraries:
   - byte/global
