@@ -210,6 +210,30 @@ jobs:
             ./vendor/bin/drush config:status 2>&1 | head -30
           " || true
 
+      # Force target site UUID to match source — Drupal cim refuses if they
+      # differ (source was exported from local DDEV; target was created by
+      # `drush si` on Hostinger). One-time alignment.
+      - name: Sync site UUID (source → target)
+        run: |
+          if [ ! -f config/sync/system.site.yml ]; then
+            echo "config/sync/system.site.yml not found — skipping UUID sync"
+            exit 0
+          fi
+          LOCAL_UUID=$(grep '^uuid:' config/sync/system.site.yml | awk '{print $2}' | tr -d '"')
+          echo "Local site UUID: $LOCAL_UUID"
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            REMOTE=\$(./vendor/bin/drush config:get system.site uuid --format=string 2>/dev/null)
+            echo \"Remote site UUID: \$REMOTE\"
+            if [ \"\$REMOTE\" != \"$LOCAL_UUID\" ]; then
+              ./vendor/bin/drush config:set system.site uuid $LOCAL_UUID -y
+              echo '✓ Forced target uuid to match source.'
+            else
+              echo '= UUIDs already match.'
+            fi
+          "
+
       - name: Drupal post-deploy
         run: |
           ssh hostinger "
