@@ -137,11 +137,19 @@ jobs:
           cache-dependency-path: web/themes/custom/byte/package-lock.json
       - run: cd web/themes/custom/byte && npm ci && npm run build
 
-      # Inject production settings.php
-      - name: Inject settings.php
+      # Render production settings.php from template (deploy-time substitution).
+      # Secrets are baked into the file BEFORE rsync — Hostinger PHP-FPM never sees env vars.
+      - name: Render settings.php
+        env:
+          DRUPAL_DB_NAME: ${{ secrets.DRUPAL_DB_NAME }}
+          DRUPAL_DB_USER: ${{ secrets.DRUPAL_DB_USER }}
+          DRUPAL_DB_PASS: ${{ secrets.DRUPAL_DB_PASS }}
+          DRUPAL_DB_HOST: ${{ secrets.DRUPAL_DB_HOST }}
+          DRUPAL_HASH_SALT: ${{ secrets.DRUPAL_HASH_SALT }}
         run: |
-          cp web/sites/default/settings.hostinger.php web/sites/default/settings.php
-        # Secrets (DB) inyectados via env y leídos en settings.hostinger.php
+          envsubst < web/sites/default/settings.hostinger.php.template \
+            > web/sites/default/settings.php
+          chmod 444 web/sites/default/settings.php
 
       # Deploy via rsync over SSH (or SFTP)
       - name: Deploy
@@ -185,7 +193,8 @@ web/themes/custom/byte/scripts/
 web/themes/custom/byte/package.json
 web/themes/custom/byte/package-lock.json
 web/themes/custom/byte/icons.manifest.json
-web/sites/default/settings.hostinger.php
+web/sites/default/settings.hostinger.php.template
+web/sites/default/example.settings.local.php
 *.log
 .DS_Store
 README.md
@@ -355,32 +364,33 @@ A configurar en `Settings → Secrets and variables → Actions`:
 
 ---
 
-## 8. `settings.hostinger.php`
+## 8. `settings.hostinger.php.template`
 
-Archivo plantilla en repo (sin valores reales). Lee env vars que CI inyecta antes del rsync:
+Plantilla en repo con placeholders `${VAR}`. **`envsubst` los reemplaza en CI** antes del rsync — el `settings.php` final que llega a Hostinger contiene los valores hardcoded, NO `getenv()`. Esto es necesario porque Hostinger PHP-FPM no expone las env vars de GitHub Actions al runtime.
 
 ```php
 <?php
-// settings.hostinger.php — copiado a sites/default/settings.php por CI antes del rsync.
-// Sirve cuando: docroot = public_html/, vendor/ y config/ viven en ../
+// settings.hostinger.php.template — fuente versionada (con placeholders ${...}).
+// CI ejecuta `envsubst` para producir sites/default/settings.php con valores reales.
+// Layout esperado en Hostinger:
+//   docroot       = public_html/
+//   vendor/       = ../vendor/
+//   config/sync   = ../../../config/sync (relativo a este archivo)
+//   private/      = ../../../private
 
 $databases['default']['default'] = [
-  'database' => getenv('DRUPAL_DB_NAME'),
-  'username' => getenv('DRUPAL_DB_USER'),
-  'password' => getenv('DRUPAL_DB_PASS'),
-  'host'     => getenv('DRUPAL_DB_HOST') ?: 'localhost',
+  'database' => '${DRUPAL_DB_NAME}',
+  'username' => '${DRUPAL_DB_USER}',
+  'password' => '${DRUPAL_DB_PASS}',
+  'host'     => '${DRUPAL_DB_HOST}',
   'driver'   => 'mysql',
   'prefix'   => '',
   'charset'  => 'utf8mb4',
   'collation'=> 'utf8mb4_general_ci',
 ];
 
-$settings['hash_salt'] = getenv('DRUPAL_HASH_SALT');
+$settings['hash_salt'] = '${DRUPAL_HASH_SALT}';
 
-// Rutas relativas al docroot public_html/
-//   public_html/sites/default/settings.php
-// + ../../../config/sync   →   ~/domains/jalvarez.tech/config/sync
-// + ../../../private       →   ~/domains/jalvarez.tech/private
 $settings['config_sync_directory'] = '../../../config/sync';
 $settings['file_private_path']     = '../../../private';
 
@@ -389,14 +399,14 @@ $settings['trusted_host_patterns'] = [
   '^www\.jalvarez\.tech$',
 ];
 
-// Performance: agregación de CSS/JS activa en producción
 $config['system.performance']['css']['preprocess'] = TRUE;
 $config['system.performance']['js']['preprocess']  = TRUE;
 
-// Bloquear instalador en producción
 $settings['rebuild_access'] = FALSE;
 $settings['skip_permissions_hardening'] = FALSE;
 ```
+
+> El archivo `settings.hostinger.php.template` está en `.deployignore` — solo se publica el `settings.php` ya renderizado.
 
 ---
 
