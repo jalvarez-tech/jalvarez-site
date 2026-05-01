@@ -1,0 +1,23 @@
+uuid: e98fa796-da36-4611-8c69-0f8e84b4ce47
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project_year
+    - node.type.project
+id: node.project.field_project_year
+field_name: field_project_year
+entity_type: node
+bundle: project
+label: Año
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

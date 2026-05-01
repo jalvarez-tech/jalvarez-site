@@ -1,0 +1,19 @@
+uuid: 7c2efdc0-79e6-4e94-b127-e2b7490b1f84
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_step_tag
+    - paragraphs.paragraphs_type.case_step
+id: paragraph.case_step.field_step_tag
+field_name: field_step_tag
+entity_type: paragraph
+bundle: case_step
+label: Tag
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

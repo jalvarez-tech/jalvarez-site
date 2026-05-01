@@ -1,0 +1,22 @@
+uuid: 2c9b1346-6ad1-4e7f-bd45-344809baaac3
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_summary
+    - node.type.project
+  module:
+    - text
+id: node.project.field_summary
+field_name: field_summary
+entity_type: node
+bundle: project
+label: 'Resumen (card)'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

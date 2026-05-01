@@ -1,0 +1,22 @@
+uuid: 5a9bb9a3-3084-451b-9c35-f393b52cc13d
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_lesson
+    - node.type.project
+  module:
+    - text
+id: node.project.field_lesson
+field_name: field_lesson
+entity_type: node
+bundle: project
+label: Aprendizaje
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

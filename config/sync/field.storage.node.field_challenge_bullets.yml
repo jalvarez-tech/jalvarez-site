@@ -1,0 +1,19 @@
+uuid: b93af7e3-26bf-417e-b2ef-aafd0d7f4ded
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_challenge_bullets
+field_name: field_challenge_bullets
+entity_type: node
+type: string_long
+settings:
+  case_sensitive: false
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

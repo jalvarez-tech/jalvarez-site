@@ -1,0 +1,24 @@
+uuid: ab9e5231-6d58-466d-9fc1-a5482020aa78
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_note_topic
+    - node.type.note
+    - taxonomy.vocabulary.note_topics
+id: node.note.field_note_topic
+field_name: field_note_topic
+entity_type: node
+bundle: note
+label: Tema
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      note_topics: note_topics
+field_type: entity_reference

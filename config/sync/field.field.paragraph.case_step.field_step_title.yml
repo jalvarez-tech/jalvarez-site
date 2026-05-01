@@ -1,0 +1,19 @@
+uuid: 291e362f-c053-431a-be26-7d5c1b7fa643
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_step_title
+    - paragraphs.paragraphs_type.case_step
+id: paragraph.case_step.field_step_title
+field_name: field_step_title
+entity_type: paragraph
+bundle: case_step
+label: Título
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

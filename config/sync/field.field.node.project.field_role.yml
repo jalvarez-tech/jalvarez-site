@@ -1,0 +1,19 @@
+uuid: 58364608-3828-4396-9962-068f56d21a0f
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_role
+    - node.type.project
+id: node.project.field_role
+field_name: field_role
+entity_type: node
+bundle: project
+label: Rol
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

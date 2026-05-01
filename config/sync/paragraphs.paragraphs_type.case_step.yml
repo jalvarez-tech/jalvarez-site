@@ -1,0 +1,10 @@
+uuid: 1faf65a3-efd6-4284-964b-363460310d95
+langcode: es
+status: true
+dependencies: {  }
+id: case_step
+label: 'Paso de caso (case_step)'
+icon_uuid: null
+icon_default: null
+description: null
+behavior_plugins: {  }

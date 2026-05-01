@@ -1,0 +1,21 @@
+uuid: ea686c55-0b4b-4158-a4ee-6e20ac518042
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_gallery
+    - node.type.project
+id: node.project.field_gallery
+field_name: field_gallery
+entity_type: node
+bundle: project
+label: Galería
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings: {  }
+field_type: entity_reference

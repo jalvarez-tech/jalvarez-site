@@ -1,5 +1,5 @@
 uuid: 0686135a-db81-44f0-81a2-22e6ebab4165
-langcode: en
+langcode: es
 status: true
 dependencies:
   module:
@@ -7,7 +7,7 @@ dependencies:
 _core:
   default_config_hash: TtD7OuGskOsQfoGyxXkrdtllBpR37J19d5BMQDZWJgA
 id: user.compact
-label: Compact
+label: Compacto
 description: ''
 targetEntityType: user
 cache: true

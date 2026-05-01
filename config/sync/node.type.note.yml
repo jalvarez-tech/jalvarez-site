@@ -1,0 +1,11 @@
+uuid: 904c88c7-c540-4b82-a183-a629cc452022
+langcode: es
+status: true
+dependencies: {  }
+name: Nota
+type: note
+description: 'Artículos técnicos del blog.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

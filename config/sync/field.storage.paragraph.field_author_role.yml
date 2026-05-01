@@ -1,0 +1,21 @@
+uuid: adea84e9-b376-4e87-b136-0c6643c16e5e
+langcode: es
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_author_role
+field_name: field_author_role
+entity_type: paragraph
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

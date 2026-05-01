@@ -1,0 +1,26 @@
+uuid: b7551295-a7db-4a87-a2f6-315b7470b8d5
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_approach_steps
+    - node.type.project
+    - paragraphs.paragraphs_type.case_step
+  module:
+    - entity_reference_revisions
+id: node.project.field_approach_steps
+field_name: field_approach_steps
+entity_type: node
+bundle: project
+label: 'Enfoque — pasos'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      case_step: case_step
+field_type: entity_reference_revisions

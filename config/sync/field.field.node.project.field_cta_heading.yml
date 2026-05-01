@@ -1,0 +1,19 @@
+uuid: 4da3b18e-69ec-4d04-bd47-6618f13b8abd
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cta_heading
+    - node.type.project
+id: node.project.field_cta_heading
+field_name: field_cta_heading
+entity_type: node
+bundle: project
+label: 'CTA heading'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,9 @@
+uuid: d6438650-6987-4101-a0fc-95bbf84474c1
+langcode: es
+status: true
+dependencies: {  }
+name: 'Temas de notas'
+vid: note_topics
+description: 'Temas para artículos del blog.'
+weight: 0
+new_revision: false

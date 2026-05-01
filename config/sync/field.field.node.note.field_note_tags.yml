@@ -1,0 +1,24 @@
+uuid: 9b8de05d-b28e-47c1-b1fc-6c3c92ca1d75
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_note_tags
+    - node.type.note
+    - taxonomy.vocabulary.note_topics
+id: node.note.field_note_tags
+field_name: field_note_tags
+entity_type: node
+bundle: note
+label: Etiquetas
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      note_topics: note_topics
+field_type: entity_reference

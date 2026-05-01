@@ -1,0 +1,22 @@
+uuid: e05201e2-63b2-4c14-bdb0-ec80afdeed1f
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_quote
+    - paragraphs.paragraphs_type.testimonial_embedded
+  module:
+    - text
+id: paragraph.testimonial_embedded.field_quote
+field_name: field_quote
+entity_type: paragraph
+bundle: testimonial_embedded
+label: Cita
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

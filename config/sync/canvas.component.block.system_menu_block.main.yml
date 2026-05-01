@@ -1,0 +1,27 @@
+uuid: 1e5015ed-6af5-462a-9d71-4a58708dbc72
+langcode: es
+status: true
+dependencies:
+  config:
+    - system.menu.main
+  module:
+    - system
+active_version: 3d6decf857a17c8e
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:main'
+        label: 'Navegación principal'
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: 'Navegación principal'
+id: block.system_menu_block.main
+provider: system
+source: block
+source_local_id: 'system_menu_block:main'

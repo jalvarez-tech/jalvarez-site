@@ -1,0 +1,10 @@
+uuid: 05e89311-40ff-4257-93c8-e5194960fc4b
+langcode: es
+status: true
+dependencies: {  }
+id: metric
+label: 'Métrica (metric)'
+icon_uuid: null
+icon_default: null
+description: null
+behavior_plugins: {  }

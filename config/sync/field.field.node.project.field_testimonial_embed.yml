@@ -1,0 +1,26 @@
+uuid: 34b2e0ba-8f4e-47c3-90c7-ba6a896dc47a
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_testimonial_embed
+    - node.type.project
+    - paragraphs.paragraphs_type.testimonial_embedded
+  module:
+    - entity_reference_revisions
+id: node.project.field_testimonial_embed
+field_name: field_testimonial_embed
+entity_type: node
+bundle: project
+label: 'Testimonio embebido'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      testimonial_embedded: testimonial_embedded
+field_type: entity_reference_revisions

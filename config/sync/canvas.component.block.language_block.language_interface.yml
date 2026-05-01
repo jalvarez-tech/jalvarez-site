@@ -1,0 +1,22 @@
+uuid: 953042f7-abf8-4436-a4fe-98b61d9050ce
+langcode: es
+status: true
+dependencies:
+  module:
+    - language
+active_version: b0f2a2fb0c7522f5
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'language_block:language_interface'
+        label: 'Alternador de idioma'
+        label_display: '0'
+        provider: language
+    fallback_metadata:
+      slot_definitions: null
+label: 'Alternador de idioma'
+id: block.language_block.language_interface
+provider: language
+source: block
+source_local_id: 'language_block:language_interface'

@@ -1,0 +1,16 @@
+uuid: 206f50dc-ae73-47a0-a98d-e91f57910200
+langcode: es
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.testimonial_embedded
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: paragraph.testimonial_embedded
+target_entity_type_id: paragraph
+target_bundle: testimonial_embedded
+default_langcode: site_default
+language_alterable: false

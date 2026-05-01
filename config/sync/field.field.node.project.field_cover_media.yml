@@ -1,0 +1,21 @@
+uuid: e47151cc-f070-458f-8fb3-e45fa935f033
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cover_media
+    - node.type.project
+id: node.project.field_cover_media
+field_name: field_cover_media
+entity_type: node
+bundle: project
+label: 'Cover media'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings: {  }
+field_type: entity_reference

@@ -1,0 +1,25 @@
+uuid: 6a8eb205-d8ad-4b0b-99e3-c4e21f4fb309
+langcode: es
+status: true
+dependencies:
+  module:
+    - system
+active_version: 7eb368c19ceec43b
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: system_branding_block
+        label: 'Marca del sitio'
+        label_display: '0'
+        provider: system
+        use_site_logo: true
+        use_site_name: true
+        use_site_slogan: true
+    fallback_metadata:
+      slot_definitions: null
+label: 'Marca del sitio'
+id: block.system_branding_block
+provider: system
+source: block
+source_local_id: system_branding_block

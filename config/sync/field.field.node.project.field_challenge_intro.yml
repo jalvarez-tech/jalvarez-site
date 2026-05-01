@@ -1,0 +1,22 @@
+uuid: 652ef8a6-4e85-4810-9a0e-f0f8bdf13f3b
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_challenge_intro
+    - node.type.project
+  module:
+    - text
+id: node.project.field_challenge_intro
+field_name: field_challenge_intro
+entity_type: node
+bundle: project
+label: 'Desafío — intro'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

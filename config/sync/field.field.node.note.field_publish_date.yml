@@ -1,0 +1,21 @@
+uuid: deccbf02-4f91-4a37-bc25-5142b13ff2ee
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_publish_date
+    - node.type.note
+  module:
+    - datetime
+id: node.note.field_publish_date
+field_name: field_publish_date
+entity_type: node
+bundle: note
+label: 'Fecha de publicación'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

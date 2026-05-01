@@ -1,0 +1,21 @@
+uuid: c7a99bc8-2704-4678-9f16-809a7a1dda57
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cover_hue
+    - node.type.project
+  module:
+    - options
+id: node.project.field_cover_hue
+field_name: field_cover_hue
+entity_type: node
+bundle: project
+label: 'Cover hue'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

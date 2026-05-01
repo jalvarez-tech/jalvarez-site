@@ -1,0 +1,21 @@
+uuid: 0b7dae82-9416-4a63-bd32-ddcf4ee32f9a
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_featured_home
+    - node.type.project
+id: node.project.field_featured_home
+field_name: field_featured_home
+entity_type: node
+bundle: project
+label: 'Destacado en home'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: Activado
+  off_label: Desactivado
+field_type: boolean

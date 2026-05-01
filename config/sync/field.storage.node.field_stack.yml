@@ -1,0 +1,20 @@
+uuid: 2cfd5dc2-b173-4a6a-9611-76d4779e6f01
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+    - taxonomy
+id: node.field_stack
+field_name: field_stack
+entity_type: node
+type: entity_reference
+settings:
+  target_type: taxonomy_term
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

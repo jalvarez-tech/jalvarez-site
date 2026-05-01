@@ -1,0 +1,19 @@
+uuid: cd055eb9-b39c-4b9b-a860-46088c80f941
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+    - text
+id: node.field_cta_sub
+field_name: field_cta_sub
+entity_type: node
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
