@@ -1,0 +1,26 @@
+uuid: b359e906-af5f-4512-a230-845fde85845e
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.related_projects
+  module:
+    - views
+active_version: 9e1c7fa5e1955958
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:related_projects-block_1'
+        label: 'Related projects'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Related projects'
+id: block.views_block.related_projects-block_1
+provider: views
+source: block
+source_local_id: 'views_block:related_projects-block_1'

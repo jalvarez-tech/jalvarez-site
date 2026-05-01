@@ -1,0 +1,22 @@
+uuid: a317807a-34bd-4c1a-b7a8-a1c5e80aa789
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_excerpt
+    - node.type.note
+  module:
+    - text
+id: node.note.field_excerpt
+field_name: field_excerpt
+entity_type: node
+bundle: note
+label: Excerpt
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

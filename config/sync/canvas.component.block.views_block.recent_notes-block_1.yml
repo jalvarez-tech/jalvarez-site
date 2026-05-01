@@ -1,0 +1,26 @@
+uuid: 2a916975-e222-4352-804a-0e55b1ae51bc
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.recent_notes
+  module:
+    - views
+active_version: aa2bb75e9b9c4a64
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:recent_notes-block_1'
+        label: 'Recent notes (home)'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Recent notes (home)'
+id: block.views_block.recent_notes-block_1
+provider: views
+source: block
+source_local_id: 'views_block:recent_notes-block_1'

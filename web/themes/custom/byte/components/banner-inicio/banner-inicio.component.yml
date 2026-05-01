@@ -1,0 +1,61 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+
+name: 'Banner inicio (Hero)'
+status: stable
+description: 'Home hero. Status pill + multi-line title with stroke + accent + muted fragments + sub + CTAs + 3 KPIs. Right column: portrait + terminal card.'
+
+props:
+  type: object
+  properties:
+    status:
+      type: string
+      examples: ['Disponible · Q3 2026 · 2 cupos']
+    title_a:
+      type: string
+      examples: ['Creo que una web']
+    title_accent:
+      type: string
+      title: 'Italic accent word'
+      examples: ['rápida']
+    title_punc:
+      type: string
+      title: 'Punctuation between fragments (e.g. ",")'
+      default: ','
+    title_stroke:
+      type: string
+      title: 'Stroke (outlined) word'
+      examples: ['honesta']
+    title_b:
+      type: string
+      examples: [' e inclusiva']
+    title_muted:
+      type: string
+      title: 'Closing muted fragment'
+      examples: ['es una forma de respeto.']
+    sub:
+      type: string
+    cta_primary_label:
+      type: string
+      examples: ['Agenda una llamada']
+    cta_primary_href:
+      type: string
+    cta_secondary_label:
+      type: string
+      examples: ['Ver el trabajo']
+    cta_secondary_href:
+      type: string
+    meta:
+      type: array
+      title: 'Hero KPI metrics (3 items)'
+      items:
+        type: object
+        properties:
+          value: { type: string }
+          unit: { type: string }
+          label: { type: string }
+    show_terminal:
+      type: boolean
+      default: true
+    show_portrait:
+      type: boolean
+      default: true

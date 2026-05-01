@@ -1,0 +1,23 @@
+uuid: edabebf1-c1ec-489f-abb3-08e89e49409a
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_external_url
+    - node.type.project
+  module:
+    - link
+id: node.project.field_external_url
+field_name: field_external_url
+entity_type: node
+bundle: project
+label: 'URL externa'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

@@ -1,0 +1,26 @@
+uuid: f75bfc74-9078-4ff6-8f09-2f05e74db788
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.related_notes
+  module:
+    - views
+active_version: 03bd158e3a7d22f9
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:related_notes-block_1'
+        label: 'Related notes'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Related notes'
+id: block.views_block.related_notes-block_1
+provider: views
+source: block
+source_local_id: 'views_block:related_notes-block_1'

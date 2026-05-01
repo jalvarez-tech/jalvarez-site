@@ -1,0 +1,16 @@
+uuid: bad9911e-9d4d-47b6-97bc-bd2a8e2e4964
+langcode: es
+status: true
+dependencies:
+  config:
+    - node.type.note
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.note
+target_entity_type_id: node
+target_bundle: note
+default_langcode: site_default
+language_alterable: false

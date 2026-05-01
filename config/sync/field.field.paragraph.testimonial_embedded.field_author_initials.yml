@@ -1,0 +1,19 @@
+uuid: 2bcf5676-88bc-4092-8a2d-70d4834b56d2
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_author_initials
+    - paragraphs.paragraphs_type.testimonial_embedded
+id: paragraph.testimonial_embedded.field_author_initials
+field_name: field_author_initials
+entity_type: paragraph
+bundle: testimonial_embedded
+label: 'Iniciales (avatar fallback)'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

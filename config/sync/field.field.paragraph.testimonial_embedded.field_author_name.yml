@@ -1,0 +1,19 @@
+uuid: 53f8a413-e92a-417e-afcb-37345db3b7db
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_author_name
+    - paragraphs.paragraphs_type.testimonial_embedded
+id: paragraph.testimonial_embedded.field_author_name
+field_name: field_author_name
+entity_type: paragraph
+bundle: testimonial_embedded
+label: Autor
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

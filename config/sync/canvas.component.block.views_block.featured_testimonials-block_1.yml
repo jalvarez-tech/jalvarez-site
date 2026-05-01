@@ -1,0 +1,26 @@
+uuid: 56d5baab-5418-46e3-9bc5-996358aa8315
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.featured_testimonials
+  module:
+    - views
+active_version: 2550065d536e4acc
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:featured_testimonials-block_1'
+        label: 'Featured testimonials'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Featured testimonials'
+id: block.views_block.featured_testimonials-block_1
+provider: views
+source: block
+source_local_id: 'views_block:featured_testimonials-block_1'

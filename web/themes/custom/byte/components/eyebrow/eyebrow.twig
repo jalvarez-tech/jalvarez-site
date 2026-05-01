@@ -1,0 +1,12 @@
+{#
+/**
+ * @file
+ * Eyebrow — § 0N · texto-mono editorial section header.
+ */
+#}
+<div class="eyebrow">
+  {%- if number is not null and number is defined -%}
+    <span class="eyebrow__num">§ {{ number < 10 ? '0' ~ number : number }}</span>
+  {%- endif -%}
+  <span>{{ label }}</span>
+</div>

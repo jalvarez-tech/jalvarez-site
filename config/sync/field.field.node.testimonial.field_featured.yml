@@ -1,0 +1,21 @@
+uuid: 6af9d1e0-8569-415d-9f18-a778390b74ef
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_featured
+    - node.type.testimonial
+id: node.testimonial.field_featured
+field_name: field_featured
+entity_type: node
+bundle: testimonial
+label: Destacado
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: Activado
+  off_label: Desactivado
+field_type: boolean

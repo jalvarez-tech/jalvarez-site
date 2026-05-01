@@ -1,0 +1,41 @@
+// _cta-final.scss
+.cta-band {
+  padding-top: clamp(80px, 11vw, 140px);
+  padding-bottom: clamp(80px, 11vw, 140px);
+  border-top: 1px solid var(--line);
+  position: relative;
+  text-align: center;
+
+  &__title {
+    font-family: var(--f-display);
+    font-size: clamp(40px, 6.5vw, 88px);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    margin: 0 0 24px;
+    text-wrap: balance;
+  }
+
+  &__italic {
+    font-style: italic;
+    color: var(--accent);
+    font-family: 'Instrument Serif', var(--f-display), serif;
+    font-weight: 400;
+  }
+
+  &__sub {
+    font-size: 17px;
+    color: var(--fg-muted);
+    max-width: 52ch;
+    margin: 0 auto 40px;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}

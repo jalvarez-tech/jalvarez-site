@@ -1,0 +1,11 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Card Testimonio'
+status: stable
+description: 'Testimonial card: serif quote with accent quote marks + author chip.'
+props:
+  type: object
+  properties:
+    quote: { type: string }
+    name: { type: string }
+    role: { type: string }
+    initials: { type: string }

@@ -1,0 +1,10 @@
+uuid: ae93655a-7b5f-40b5-87c1-5ce93d85fdb0
+langcode: es
+status: true
+dependencies: {  }
+id: testimonial_embedded
+label: 'Testimonio embebido (testimonial_embedded)'
+icon_uuid: null
+icon_default: null
+description: null
+behavior_plugins: {  }

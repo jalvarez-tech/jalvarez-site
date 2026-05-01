@@ -1,0 +1,24 @@
+uuid: 0a528aad-bdc2-4578-85d7-3ceee689a7f7
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_primary_technology
+    - node.type.project
+    - taxonomy.vocabulary.technologies
+id: node.project.field_primary_technology
+field_name: field_primary_technology
+entity_type: node
+bundle: project
+label: 'Tecnología principal'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      technologies: technologies
+field_type: entity_reference

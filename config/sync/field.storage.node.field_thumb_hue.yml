@@ -1,0 +1,33 @@
+uuid: 43f232f5-85ce-47ce-b395-87737f902505
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_thumb_hue
+field_name: field_thumb_hue
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: green
+      label: Verde
+    -
+      value: orange
+      label: Naranja
+    -
+      value: blue
+      label: Azul
+    -
+      value: purple
+      label: Púrpura
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

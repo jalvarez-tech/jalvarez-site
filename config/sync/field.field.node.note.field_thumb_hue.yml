@@ -1,0 +1,21 @@
+uuid: beaa8233-6d13-4151-9d0b-bc1455c62ac8
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_thumb_hue
+    - node.type.note
+  module:
+    - options
+id: node.note.field_thumb_hue
+field_name: field_thumb_hue
+entity_type: node
+bundle: note
+label: 'Thumb hue'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

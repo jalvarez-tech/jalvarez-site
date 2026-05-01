@@ -1,0 +1,20 @@
+uuid: 5d9d5ef6-4605-4901-95c5-3203593c7ff8
+langcode: es
+status: false
+dependencies: {  }
+active_version: 11237776580983ae
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: page_title_block
+        label: 'Título de la página'
+        label_display: '0'
+        provider: core
+    fallback_metadata:
+      slot_definitions: null
+label: 'Título de la página'
+id: block.page_title_block
+provider: core
+source: block
+source_local_id: page_title_block

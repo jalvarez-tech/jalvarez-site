@@ -1,0 +1,39 @@
+uuid: e4f7af6b-a650-480a-8f3d-8e0cf1f60ae8
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_cover_hue
+field_name: field_cover_hue
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: green
+      label: Verde
+    -
+      value: orange
+      label: Naranja
+    -
+      value: blue
+      label: Azul
+    -
+      value: purple
+      label: Púrpura
+    -
+      value: red
+      label: Rojo
+    -
+      value: amber
+      label: Ámbar
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

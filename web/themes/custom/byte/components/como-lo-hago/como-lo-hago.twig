@@ -1,0 +1,46 @@
+{#
+/**
+ * @file
+ * Como lo hago — 4 values grid (Section header + 4 value cards).
+ */
+#}
+<section class="section wrap" id="value">
+  <div class="section__head">
+    <div>
+      {%- if eyebrow_label -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if title -%}
+        <h2 class="section__title">{{ title }}{% if title_em %}<em>{{ title_em }}</em>{% endif %}</h2>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="values">
+    {%- for v in items|default([]) -%}
+      <div class="value">
+        <div class="value__num">
+          <span>{{ '%02d'|format(loop.index) }}</span>
+          {%- if v.tag %}<span class="value__tag">/ {{ v.tag }}</span>{% endif -%}
+        </div>
+        {%- if v.icon -%}
+          <div class="value__icon">
+            <svg width="32" height="32" aria-hidden="true">
+              <use href="/{{ active_theme_path() }}/icons.svg#i-{{ v.icon }}"></use>
+            </svg>
+          </div>
+        {%- endif -%}
+        {%- if v.title %}<h3 class="value__title">{{ v.title }}</h3>{% endif -%}
+        {%- if v.body %}<p class="value__body">{{ v.body }}</p>{% endif -%}
+        {%- if v.metric_value -%}
+          <div class="value__metric">
+            {{ v.metric_value }}{% if v.metric_unit %}<span class="value__metric-unit">{{ v.metric_unit }}</span>{% endif %}
+            {%- if v.caption %}<span class="value__metric-caption">{{ v.caption }}</span>{% endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>

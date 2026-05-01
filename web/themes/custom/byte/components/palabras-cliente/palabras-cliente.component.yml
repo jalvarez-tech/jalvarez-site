@@ -1,0 +1,19 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Palabras de cliente (Testimonials wrapper)'
+status: stable
+description: 'Section wrapper for 2 testimonial cards in a 2-col grid.'
+props:
+  type: object
+  properties:
+    eyebrow_label: { type: string }
+    eyebrow_number: { type: integer }
+    title: { type: string }
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          quote: { type: string }
+          name: { type: string }
+          role: { type: string }
+          initials: { type: string }

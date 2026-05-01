@@ -1,0 +1,22 @@
+uuid: e14fb92c-2b09-470c-b9af-9a1d6f96fe04
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_step_body
+    - paragraphs.paragraphs_type.case_step
+  module:
+    - text
+id: paragraph.case_step.field_step_body
+field_name: field_step_body
+entity_type: paragraph
+bundle: case_step
+label: Cuerpo
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

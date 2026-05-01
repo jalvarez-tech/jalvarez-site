@@ -1,0 +1,21 @@
+uuid: 6cc4dda5-b80f-479b-a159-55408fa4aac0
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_avatar
+    - node.type.testimonial
+id: node.testimonial.field_author_avatar
+field_name: field_author_avatar
+entity_type: node
+bundle: testimonial
+label: Avatar
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings: {  }
+field_type: entity_reference

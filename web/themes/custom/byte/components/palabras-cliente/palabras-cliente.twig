@@ -1,0 +1,18 @@
+{# Palabras de cliente #}
+<section class="section wrap">
+  <div class="section__head">
+    <div>
+      {%- if eyebrow_label -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if title %}<h2 class="section__title">{{ title }}</h2>{% endif -%}
+    </div>
+  </div>
+  <div class="tests">
+    {%- for t in items|default([]) -%}
+      {%- include 'byte:card-testimonio' with t only -%}
+    {%- endfor -%}
+  </div>
+</section>

@@ -1,0 +1,26 @@
+uuid: d2225856-5775-4713-a42c-5b0486215a24
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.projects
+  module:
+    - views
+active_version: 44c57b70978d697a
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:projects-block_1'
+        label: 'Listado de proyectos (block)'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Listado de proyectos (block)'
+id: block.views_block.projects-block_1
+provider: views
+source: block
+source_local_id: 'views_block:projects-block_1'

@@ -1,0 +1,17 @@
+jalvarez_site.home:
+  path: '/home'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\HomeController::index'
+    _title: 'jalvarez.tech'
+  requirements:
+    _permission: 'access content'
+
+jalvarez_site.styleguide:
+  path: '/styleguide'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\StyleguideController::index'
+    _title: 'Styleguide — byte components'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'

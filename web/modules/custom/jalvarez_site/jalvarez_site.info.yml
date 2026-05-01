@@ -1,0 +1,7 @@
+name: 'jalvarez.tech site'
+type: module
+description: 'Custom site logic and dev styleguide for the byte theme.'
+package: Custom
+core_version_requirement: ^11
+dependencies:
+  - drupal:system

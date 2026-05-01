@@ -1,0 +1,22 @@
+uuid: 9c92571e-8db3-4516-a215-29427026f516
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_quote
+    - node.type.testimonial
+  module:
+    - text
+id: node.testimonial.field_quote
+field_name: field_quote
+entity_type: node
+bundle: testimonial
+label: Cita
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

@@ -1,0 +1,9 @@
+uuid: 037f4f42-6cfb-4d55-bc3a-362003e41597
+langcode: es
+status: true
+dependencies: {  }
+name: Sistema
+configEntityTypeId: component
+weight: 0
+items:
+  - block.language_block.language_interface

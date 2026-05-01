@@ -1,0 +1,21 @@
+uuid: f79fbed0-edd2-48c8-9a4d-08315e6a244a
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_featured_media
+    - node.type.note
+id: node.note.field_featured_media
+field_name: field_featured_media
+entity_type: node
+bundle: note
+label: 'Imagen destacada'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings: {  }
+field_type: entity_reference

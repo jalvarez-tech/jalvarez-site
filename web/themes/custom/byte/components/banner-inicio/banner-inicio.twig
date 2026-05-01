@@ -1,0 +1,113 @@
+{#
+/**
+ * @file
+ * Banner inicio — Home hero with title (multi-fragment), CTAs, KPIs, and a
+ * right column with portrait + optional terminal card.
+ */
+#}
+<section class="hero wrap">
+  <div class="hero__grid">
+    <div>
+      {%- if status -%}
+        <div class="hero__status">
+          <span class="status-dot"></span>
+          <span>{{ status }}</span>
+        </div>
+      {%- endif -%}
+
+      <h1 class="hero__title">
+        {{ title_a }}
+        {%- if title_accent %} <span class="hero__accent">{{ title_accent }}</span>{% endif -%}
+        {{- title_punc|default(',') }}<br>
+        {%- if title_stroke %}<span class="hero__stroke">{{ title_stroke }}</span>{% endif -%}
+        {%- if title_b %}{{ title_b }}{% endif -%}<br>
+        {%- if title_muted %}<span class="hero__muted">{{ title_muted }}</span>{% endif -%}
+      </h1>
+
+      {%- if sub -%}
+        <p class="hero__sub">{{ sub }}</p>
+      {%- endif -%}
+
+      {%- if cta_primary_label or cta_secondary_label -%}
+        <div class="hero__ctas">
+          {%- if cta_primary_label -%}
+            {%- include 'byte:button' with {
+              label: cta_primary_label,
+              href: cta_primary_href|default('#'),
+              variant: 'primary',
+              arrow: true,
+            } only -%}
+          {%- endif -%}
+          {%- if cta_secondary_label -%}
+            {%- include 'byte:button' with {
+              label: cta_secondary_label,
+              href: cta_secondary_href|default('#'),
+              variant: 'ghost',
+            } only -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if meta -%}
+        <div class="hero__meta">
+          {%- for m in meta -%}
+            <div class="hero__meta-item">
+              <div class="hero__meta-val tab">
+                {{ m.value }}{% if m.unit %}<span class="hero__meta-unit">{{ m.unit }}</span>{% endif %}
+              </div>
+              <div class="hero__meta-label">{{ m.label }}</div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="hero__aside">
+      {%- if show_portrait|default(true) -%}
+        <div class="hero__portrait" aria-label="Portrait placeholder">
+          <div class="hp-frame">
+            <svg viewBox="0 0 200 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="hpBg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="var(--accent)" stop-opacity="0.18"/>
+                  <stop offset="1" stop-color="var(--accent)" stop-opacity="0.02"/>
+                </linearGradient>
+                <pattern id="hpStripes" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <rect width="1" height="4" fill="var(--fg)" opacity="0.06"/>
+                </pattern>
+              </defs>
+              <rect width="200" height="240" fill="url(#hpBg)"/>
+              <rect width="200" height="240" fill="url(#hpStripes)"/>
+              <circle cx="100" cy="92" r="36" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
+              <path d="M34 240c0-38 30-64 66-64s66 26 66 64" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
+            </svg>
+            <div class="hp-caption mono">[ portrait · drop jpg here ]</div>
+            <div class="hp-badge">
+              <span class="status-dot"></span>
+              <span class="mono">15+ años</span>
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if show_terminal|default(true) -%}
+        <div class="term" aria-hidden="true">
+          <div class="term__hd">
+            <div class="term__dots"><span></span><span></span><span></span></div>
+            <span class="term__path">~/clients/new-project</span>
+          </div>
+          <div class="term__body">
+            <div class="term__line"><span class="term__prompt">$</span><span class="term__cmd">whoami</span></div>
+            <div class="term__out"><b>john.alvarez</b> — web specialist</div>
+            <div class="term__line"><span class="term__prompt">$</span><span class="term__cmd">stack --list</span></div>
+            <div class="term__out">→ drupal 11, wordpress, react, n8n</div>
+            <div class="term__out">→ postgres, redis, cloudflare, vercel</div>
+            <div class="term__line"><span class="term__prompt">$</span><span class="term__cmd">deploy --ready</span></div>
+            <div class="term__comment"># 15 años. 80+ proyectos. 0 downtime.</div>
+            <div class="term__line"><span class="term__prompt">$</span><span class="term__caret"></span></div>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>

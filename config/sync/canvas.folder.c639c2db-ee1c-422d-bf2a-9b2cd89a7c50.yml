@@ -1,0 +1,9 @@
+uuid: c639c2db-ee1c-422d-bf2a-9b2cd89a7c50
+langcode: es
+status: true
+dependencies: {  }
+name: Otro(s)
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.byte.chip

@@ -1,0 +1,11 @@
+uuid: 3574ad31-4d6f-46ec-8d86-f8a1c35c7d9b
+langcode: es
+status: true
+dependencies: {  }
+name: Proyecto
+type: project
+description: 'Casos de estudio y proyectos del portafolio.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

@@ -1,0 +1,9 @@
+uuid: 81ac4f4e-4ade-41d8-bcb5-ba4f6ecad367
+langcode: es
+status: true
+dependencies: {  }
+name: Tecnologías
+vid: technologies
+description: 'Stack y tecnologías usadas en proyectos.'
+weight: 0
+new_revision: false

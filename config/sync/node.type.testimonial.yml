@@ -1,0 +1,11 @@
+uuid: 900fabc8-3977-4aeb-9844-e6798f79ff16
+langcode: es
+status: true
+dependencies: {  }
+name: Testimonio
+type: testimonial
+description: 'Citas de clientes reutilizables.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

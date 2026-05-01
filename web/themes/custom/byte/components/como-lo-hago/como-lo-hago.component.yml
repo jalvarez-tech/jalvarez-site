@@ -1,0 +1,31 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Cómo lo hago (Values)'
+status: stable
+description: '4 value cards with line-art Lucide icon, title, body, KPI metric + caption. Grid 1×4 mobile / 2×2 desktop.'
+props:
+  type: object
+  properties:
+    eyebrow_label:
+      type: string
+      examples: ['cómo lo hago']
+    eyebrow_number:
+      type: integer
+      examples: [1]
+    title:
+      type: string
+      examples: ['No vendo features. ']
+    title_em:
+      type: string
+      examples: ['Defiendo cuatro disciplinas no negociables.']
+    items:
+      type: array
+      items:
+        type: object
+        properties:
+          icon: { type: string, description: 'Lucide icon name' }
+          tag: { type: string, description: 'Mono tag like "performance"' }
+          title: { type: string }
+          body: { type: string }
+          metric_value: { type: string }
+          metric_unit: { type: string }
+          caption: { type: string }

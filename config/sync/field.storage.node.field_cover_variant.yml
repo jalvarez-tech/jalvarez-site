@@ -1,0 +1,30 @@
+uuid: 218e86b4-3b55-486e-8c20-67020ed561af
+langcode: es
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_cover_variant
+field_name: field_cover_variant
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: a
+      label: A
+    -
+      value: b
+      label: B
+    -
+      value: c
+      label: C
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

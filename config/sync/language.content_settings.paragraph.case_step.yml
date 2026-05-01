@@ -1,0 +1,16 @@
+uuid: 6df71227-8414-4b90-b2fe-e3038dd9820d
+langcode: es
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.case_step
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: paragraph.case_step
+target_entity_type_id: paragraph
+target_bundle: case_step
+default_langcode: site_default
+language_alterable: false

@@ -1,0 +1,21 @@
+uuid: 475cb3cb-bc4f-49e6-bf3c-40c0f4e12932
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cover_variant
+    - node.type.project
+  module:
+    - options
+id: node.project.field_cover_variant
+field_name: field_cover_variant
+entity_type: node
+bundle: project
+label: 'Cover variant'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

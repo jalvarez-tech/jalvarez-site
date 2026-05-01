@@ -1,0 +1,19 @@
+uuid: 83b4e098-118e-4e45-bda8-da7b5bcabc3b
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_role
+    - node.type.testimonial
+id: node.testimonial.field_author_role
+field_name: field_author_role
+entity_type: node
+bundle: testimonial
+label: 'Rol / empresa'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: 0fb55694-0054-4417-b6aa-71b71e62f919
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_initials
+    - node.type.testimonial
+id: node.testimonial.field_author_initials
+field_name: field_author_initials
+entity_type: node
+bundle: testimonial
+label: Iniciales
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

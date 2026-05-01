@@ -1,0 +1,26 @@
+uuid: 1ed3089d-b675-44ee-84e8-8bd587821e00
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_results_metrics
+    - node.type.project
+    - paragraphs.paragraphs_type.metric
+  module:
+    - entity_reference_revisions
+id: node.project.field_results_metrics
+field_name: field_results_metrics
+entity_type: node
+bundle: project
+label: 'Resultados — métricas'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      metric: metric
+field_type: entity_reference_revisions

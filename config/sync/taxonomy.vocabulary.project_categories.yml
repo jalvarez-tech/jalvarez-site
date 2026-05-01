@@ -1,0 +1,9 @@
+uuid: cf77339d-fdc9-41f3-bd95-bb9f5902b507
+langcode: es
+status: true
+dependencies: {  }
+name: 'Categorías de proyecto'
+vid: project_categories
+description: 'Categorías temáticas de proyectos.'
+weight: 0
+new_revision: false

@@ -1,0 +1,24 @@
+uuid: 5cd5b79b-c281-49d9-be16-6b7bb7a61e44
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_related_project
+    - node.type.project
+    - node.type.testimonial
+id: node.testimonial.field_related_project
+field_name: field_related_project
+entity_type: node
+bundle: testimonial
+label: 'Proyecto relacionado'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      project: project
+field_type: entity_reference

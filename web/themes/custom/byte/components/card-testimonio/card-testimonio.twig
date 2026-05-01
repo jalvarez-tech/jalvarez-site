@@ -1,0 +1,11 @@
+{# Card Testimonio #}
+<div class="test">
+  <p class="test__quote">{{ quote }}</p>
+  <div class="test__attr">
+    {%- if initials %}<div class="test__avatar">{{ initials }}</div>{% endif -%}
+    <div>
+      {%- if name %}<div class="test__name">{{ name }}</div>{% endif -%}
+      {%- if role %}<div class="test__role">{{ role }}</div>{% endif -%}
+    </div>
+  </div>
+</div>

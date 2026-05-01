@@ -1,0 +1,21 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Card Proyecto'
+status: stable
+description: 'Project teaser card: cover media (or browser-mock placeholder) + chips + name with arrow + desc + metrics row.'
+props:
+  type: object
+  properties:
+    name: { type: string }
+    href: { type: string }
+    category: { type: string, description: 'Stack / category chip (accent variant)' }
+    year: { type: string }
+    description: { type: string }
+    cover_url: { type: string, description: 'If present, used as background of the cover slot' }
+    hue: { type: integer, description: 'OKLCH hue 0-360 for placeholder mock' }
+    metrics:
+      type: array
+      items:
+        type: object
+        properties:
+          key: { type: string }
+          value: { type: string }

@@ -1,0 +1,19 @@
+uuid: 13b65ebf-1f90-4aef-b65c-8d571f57bf3a
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_challenge_bullets
+    - node.type.project
+id: node.project.field_challenge_bullets
+field_name: field_challenge_bullets
+entity_type: node
+bundle: project
+label: 'Desafío — bullets'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

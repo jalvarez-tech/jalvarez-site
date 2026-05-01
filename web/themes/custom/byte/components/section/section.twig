@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Section — editorial wrapper with eyebrow + title + lede + body slot.
+ */
+#}
+<section class="section wrap">
+  <div class="section__head">
+    <div>
+      {%- if eyebrow_label -%}
+        {%- include 'byte:eyebrow' with { label: eyebrow_label, number: eyebrow_number|default(null) } only -%}
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if title -%}
+        <h2 class="section__title">
+          {{ title }}{% if title_em %}<em>{{ title_em }}</em>{% endif %}
+        </h2>
+      {%- endif -%}
+      {%- if lede -%}
+        <p class="section__lede">{{ lede }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+  {% block default %}{{ default }}{% endblock %}
+</section>

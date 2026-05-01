@@ -1,0 +1,16 @@
+uuid: 194d1f41-c105-41a8-8f3f-e1aec7fea4b6
+langcode: es
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.metric
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: paragraph.metric
+target_entity_type_id: paragraph
+target_bundle: metric
+default_langcode: site_default
+language_alterable: false

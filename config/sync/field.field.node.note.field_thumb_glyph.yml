@@ -1,0 +1,21 @@
+uuid: fb8774a8-68c3-4ff2-a235-732bea726708
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_thumb_glyph
+    - node.type.note
+  module:
+    - options
+id: node.note.field_thumb_glyph
+field_name: field_thumb_glyph
+entity_type: node
+bundle: note
+label: 'Thumb glyph'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string
