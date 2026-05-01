@@ -17,6 +17,9 @@ themes/custom/*/package-lock.json
 themes/custom/*/icons.manifest.json
 themes/custom/*/node_modules/
 
+# Persistent runtime data on server (never overwrite)
+private/
+
 # Source maps — keep payload small
 **/*.css.map
 **/*.js.map

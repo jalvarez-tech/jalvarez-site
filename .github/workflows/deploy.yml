@@ -101,50 +101,57 @@ jobs:
               IdentitiesOnly yes
               StrictHostKeyChecking accept-new
 
-      # ───── Pre-deploy: relax permissions on remote sites/default ─────
+      # ───── Pre-deploy: relax permissions + ensure target dirs exist ─────
       - name: Pre-deploy permissions
         id: predeploy
         run: |
           ssh hostinger "
             mkdir -p ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/files \
-                     ${{ secrets.HOSTINGER_PATH }}/private \
-                     ${{ secrets.HOSTINGER_PATH }}/config/sync
+                     ${{ secrets.HOSTINGER_PATH }}/public_html/private \
+                     ${{ secrets.HOSTINGER_PATH }}/public_html/config/sync \
+                     ${{ secrets.HOSTINGER_PATH }}/public_html/vendor
             chmod -R u+w ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default 2>/dev/null || true
+            # Clean up old layout (vendor/config one level above) if present
+            if [ -d ${{ secrets.HOSTINGER_PATH }}/vendor ] && [ ! -L ${{ secrets.HOSTINGER_PATH }}/vendor ]; then
+              echo '→ Removing legacy ~/vendor (now lives at public_html/vendor)'
+              rm -rf ${{ secrets.HOSTINGER_PATH }}/vendor
+            fi
+            if [ -d ${{ secrets.HOSTINGER_PATH }}/config ]; then
+              echo '→ Removing legacy ~/config (now lives at public_html/config)'
+              rm -rf ${{ secrets.HOSTINGER_PATH }}/config
+            fi
           "
 
-      # ───── Deploy: 3 rsync passes ─────
+      # ───── Deploy: 2 rsync passes ─────
+      # web/ already contains web/vendor/ (composer vendor-dir = web/vendor),
+      # so a single rsync of web/ → public_html/ deploys app + vendor together.
       - name: Rsync web/ → public_html/
         run: |
           rsync -avz --delete \
             --exclude-from=.deployignore \
             --exclude='sites/default/files/' \
+            --exclude='private/' \
             -e "ssh" \
             ./web/ hostinger:${{ secrets.HOSTINGER_PATH }}/public_html/
 
-      - name: Rsync vendor/
+      - name: Rsync config/ → public_html/config/
         run: |
           rsync -avz --delete \
             -e "ssh" \
-            ./vendor/ hostinger:${{ secrets.HOSTINGER_PATH }}/vendor/
-
-      - name: Rsync config/
-        run: |
-          rsync -avz --delete \
-            -e "ssh" \
-            ./config/ hostinger:${{ secrets.HOSTINGER_PATH }}/config/
+            ./config/ hostinger:${{ secrets.HOSTINGER_PATH }}/public_html/config/
 
       # ───── Post-deploy: drush updb + cim + cr (only if installed) ─────
       - name: Drupal post-deploy
         run: |
           ssh hostinger "
             set -e
-            cd ${{ secrets.HOSTINGER_PATH }}
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
             DRUSH=./vendor/bin/drush
-            if \$DRUSH --root=public_html status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+            if \$DRUSH status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
               echo '→ Site is installed. Running updb + cim + cr.'
-              \$DRUSH --root=public_html updb -y
-              \$DRUSH --root=public_html cim -y || echo '⚠ Config import skipped (no config to import).'
-              \$DRUSH --root=public_html cr
+              \$DRUSH updb -y
+              \$DRUSH cim -y || echo '⚠ Config import skipped (no config to import).'
+              \$DRUSH cr
             else
               echo '⚠ Drupal not installed yet — skipping drush hooks.'
               echo '   Run \`drush site:install\` manually once via SSH to bootstrap.'

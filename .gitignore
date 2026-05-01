@@ -1,6 +1,6 @@
 # Dependencies managed by Composer.
 /recipes
-/vendor
+/web/vendor
 /web/core
 /web/libraries
 /web/modules/contrib

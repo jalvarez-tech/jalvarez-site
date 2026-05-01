@@ -109,6 +109,7 @@
         "platform": {
             "php": "8.4.0"
         },
+        "vendor-dir": "web/vendor",
         "allow-plugins": {
             "composer/installers": true,
             "drupal/core-composer-scaffold": true,
@@ -118,7 +119,7 @@
             "drupal/site_template_helper": true,
             "php-http/discovery": true
         },
-        "bin-dir": "vendor/bin",
+        "bin-dir": "web/vendor/bin",
         "sort-packages": true,
         "optimize-autoloader": true
     },

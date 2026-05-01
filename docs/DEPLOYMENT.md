@@ -296,7 +296,7 @@ web/themes/custom/*/dist/**/*.map
 |---|---|---|
 | H1 | Plan | **Cloud Startup** (incluye SSH, custom PHP, mayor RAM, recursos dedicados) |
 | H2 | SSH | **Activo**. Puerto 65002. |
-| H3 | Docroot | **`public_html/` fijo** (no se puede cambiar). Layout: contenido de `web/` se publica directo en `public_html/`; `vendor/`, `config/`, `drush/` viven un nivel arriba en `~/domains/jalvarez.tech/` (NO web-accessible). El `web/autoload.php` ya apunta a `../vendor/autoload.php`, así que el patrón funciona sin tocar core. |
+| H3 | Docroot | **`public_html/` fijo** (no se puede cambiar). Layout **flat**: todo dentro de `public_html/` — `vendor/`, `config/`, `private/`, core, modules, themes. `web/autoload.php` se sobreescribe vía `assets/autoload.php` (drupal-scaffold override) para que apunte a `./vendor/`. Composer `vendor-dir = web/vendor` fuerza la instalación dentro de la docroot. Drupal ships `vendor/.htaccess` + `core/.htaccess` para denegar acceso web directo. |
 | H4 | Dominio | **jalvarez.tech** |
 | H5 | MySQL | Credenciales de hPanel → guardar en GitHub Secrets como `DRUPAL_DB_*` |
 | H6 | Drush | **Disponible vía SSH en Cloud Startup**. Se invoca por `~/domains/jalvarez.tech/vendor/bin/drush` post-deploy. Ref: https://www.hostinger.com/mx/tutoriales/tutorial-drupal |
@@ -307,19 +307,13 @@ web/themes/custom/*/dist/**/*.map
 
 ---
 
-## 6b. Layout final en Hostinger (Cloud Startup, docroot fijo en public_html)
+## 6b. Layout final en Hostinger (Cloud Startup, docroot fijo en public_html, **flat**)
 
 ```
 /home/<user>/
 └── domains/jalvarez.tech/
-    ├── vendor/                   ← Composer deps (NO web-accessible)
-    ├── config/
-    │   └── sync/                 ← config exportada via drush cex
-    ├── drush/
-    │   └── drush.yml             ← config drush
-    ├── private/                  ← $settings['file_private_path']
-    └── public_html/              ← DOCROOT (= contenido de web/ del repo)
-        ├── core/
+    └── public_html/              ← DOCROOT (= contenido de web/ del repo) Y project root
+        ├── core/                  ← Drupal core (composer)
         ├── modules/
         │   ├── contrib/
         │   └── custom/
@@ -332,16 +326,21 @@ web/themes/custom/*/dist/**/*.map
         │       ├── icons.svg              ← sprite generado por CI
         │       ├── fonts/
         │       └── byte.libraries.yml
+        ├── vendor/                ← Composer deps (composer install vendor-dir = web/vendor)
+        │                             Web-accessible PERO Drupal ship vendor/.htaccess deny
+        ├── config/
+        │   └── sync/              ← config exportada via drush cex
+        ├── private/               ← $settings['file_private_path'], persistente
         ├── sites/default/
-        │   ├── settings.php               ← inyectado por CI
+        │   ├── settings.php       ← renderizado por CI desde template
         │   ├── services.yml
-        │   └── files/                     ← PERSISTENTE, no se sobrescribe
-        ├── autoload.php                   ← apunta a ../vendor/autoload.php (default Drupal)
+        │   └── files/             ← PERSISTENTE, no se sobrescribe en deploy
+        ├── autoload.php           ← override scaffold → require __DIR__ . '/vendor/autoload.php'
         ├── index.php
         └── .htaccess
 ```
 
-> Drupal viene preparado: el `web/autoload.php` por defecto hace `return require __DIR__ . '/../vendor/autoload.php';`. Como `web/ ≡ public_html/` y `vendor/` queda un nivel arriba, todo funciona sin parchar core.
+> La instalación de vendor adentro de web/ se controla via `composer.json` → `config.vendor-dir = "web/vendor"` y `bin-dir = "web/vendor/bin"`. **drupal-scaffold detecta automáticamente** que vendor-dir está dentro de web-root y genera `web/autoload.php` con `__DIR__ . '/vendor/autoload.php'` (en vez del default `'/../vendor/autoload.php'`). Esto permite que `public_html/` sea la docroot Y el project root al mismo tiempo — requisito de hostings con docroot fijo como Hostinger Cloud Startup.
 
 ---
 
@@ -478,8 +477,8 @@ Después del primer push exitoso (que mete el código), el sitio aún no tiene t
 
 ```bash
 ssh hostinger-jalvarez   # o el comando largo si no creaste el alias
-cd domains/jalvarez.tech
-./vendor/bin/drush --root=public_html site:install drupal_cms_installer \
+cd domains/jalvarez.tech/public_html
+./vendor/bin/drush site:install drupal_cms_installer \
   --site-name="jalvarez.tech" \
   --account-name=admin \
   --account-mail=contacto@jalvarez.tech \
@@ -487,7 +486,7 @@ cd domains/jalvarez.tech
 exit
 ```
 
-> Validar el profile correcto con `ls public_html/profiles/`. Si el recipe inicial usa `minimal` o `standard`, cambiá ese argumento.
+> Validar el profile correcto con `ls profiles/contrib/`. Si el recipe inicial usa `minimal` o `standard`, cambiá ese argumento.
 
 A partir de ahí cada `git push` despliega solo.
 
@@ -495,10 +494,10 @@ A partir de ahí cada `git push` despliega solo.
 
 ```bash
 ssh hostinger-jalvarez
-cd domains/jalvarez.tech
-./vendor/bin/drush --root=public_html theme:install byte -y
-./vendor/bin/drush --root=public_html config:set system.theme default byte -y
-./vendor/bin/drush --root=public_html cr
+cd domains/jalvarez.tech/public_html
+./vendor/bin/drush theme:install byte -y
+./vendor/bin/drush config:set system.theme default byte -y
+./vendor/bin/drush cr
 ```
 
 O via `/admin/appearance` → "Install and set as default".
