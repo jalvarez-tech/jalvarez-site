@@ -125,7 +125,7 @@ jobs:
       # PHP + Composer
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           tools: composer:v2
       - run: composer install --no-dev --optimize-autoloader --no-interaction
 
@@ -301,7 +301,7 @@ web/themes/custom/*/dist/**/*.map
 | H5 | MySQL | Credenciales de hPanel → guardar en GitHub Secrets como `DRUPAL_DB_*` |
 | H6 | Drush | **Disponible vía SSH en Cloud Startup**. Se invoca por `~/domains/jalvarez.tech/vendor/bin/drush` post-deploy. Ref: https://www.hostinger.com/mx/tutoriales/tutorial-drupal |
 | H7 | Node | **NO se ejecuta en Hostinger**. Solo corre en GitHub Actions (Node 20 LTS, configurado en `deploy.yml`). En el servidor de Hostinger no necesitas Node — solo PHP. Si después necesitas Node para algo runtime (raro en Drupal clásico), Cloud Startup lo permite via NVM en SSH. |
-| H8 | PHP | **PHP 8.3** recomendado. Razones: (1) Drupal 11 requiere 8.3+; (2) 8.3 es el LTS más probado con la cadena de contribs actuales; (3) 8.4 es viable pero algunos módulos contrib aún no lo declaran. Activar en hPanel → Avanzado → Selector de PHP → 8.3. |
+| H8 | PHP | **PHP 8.4** activo en Hostinger. CI usa misma versión. `composer.json` config.platform.php = `8.4.0`. |
 | H9 | Uploads `sites/default/files` | **Persistente.** rsync usa `--exclude='public_html/sites/default/files/'` — los archivos del CMS nunca se tocan en deploy. |
 | H10 | Backup | **Backup nativo Hostinger Cloud Startup activo.** No agregamos backup en CI. Si en el futuro se requiere snapshot por deploy, se añade un step antes del rsync que dispare `mysqldump` y lo guarde como artefacto del run. |
 
@@ -449,7 +449,7 @@ git revert <hash> && git push   # CI re-deploya el estado previo
 
 ### Setup completado
 
-- ✅ Plan Cloud Startup, PHP 8.3 activo
+- ✅ Plan Cloud Startup, PHP 8.4 activo
 - ✅ DB MySQL creada (`u211065173_jalvarez_site`)
 - ✅ SSH key generada, pubkey en hPanel, conexión validada (`191.101.32.187:65002`)
 - ✅ 10 GitHub Secrets configurados

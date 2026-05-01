@@ -107,7 +107,7 @@
     "prefer-stable": true,
     "config": {
         "platform": {
-            "php": "8.3.10"
+            "php": "8.4.0"
         },
         "allow-plugins": {
             "composer/installers": true,
