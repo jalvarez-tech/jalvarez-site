@@ -22,18 +22,23 @@ module:
   locale: 0
   media: 0
   media_library: 0
+  metatag: 0
   mysql: 0
   node: 0
   options: 0
   page_cache: 0
   path: 0
   path_alias: 0
+  redirect: 0
   system: 0
   taxonomy: 0
   text: 0
+  token: 0
   update: 0
   user: 0
   views_ui: 0
+  webform: 0
+  pathauto: 1
   content_translation: 10
   views: 10
   paragraphs: 11

@@ -1,0 +1,14 @@
+uuid: 206b00c2-aa46-4b66-b31a-ad2aab3b499e
+langcode: es
+status: true
+dependencies: {  }
+id: project_budgets
+label: 'Presupuesto aproximado (USD)'
+category: null
+likert: false
+options: |
+  low: '< $5k'
+  mid: '$5k - $15k'
+  high: '$15k - $40k'
+  enter: $40k+
+  unsure: 'Aún no estoy seguro'

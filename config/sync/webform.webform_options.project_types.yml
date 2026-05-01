@@ -1,0 +1,14 @@
+uuid: a5bd3490-c51d-4a2e-96d1-f37df54a1ff6
+langcode: es
+status: true
+dependencies: {  }
+id: project_types
+label: 'Tipo de proyecto'
+category: null
+likert: false
+options: |
+  web: 'Sitio corporativo'
+  ecom: E-commerce
+  custom: 'Plataforma custom'
+  migration: Migración
+  audit: Auditoría
