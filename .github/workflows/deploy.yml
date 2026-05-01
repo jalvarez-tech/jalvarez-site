@@ -188,10 +188,33 @@ jobs:
           fi
 
       # ───── Post-deploy: drush updb + cim + cr (only if installed) ─────
+      - name: Server diagnostics
+        run: |
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            echo '─── Path / size ───'
+            pwd
+            ls -la ${{ secrets.HOSTINGER_PATH }}/ | head -15
+            echo ''
+            echo '─── public_html/config/sync count ───'
+            ls ${{ secrets.HOSTINGER_PATH }}/public_html/config/sync/ 2>/dev/null | wc -l
+            echo ''
+            echo '─── public_html/sites/default/settings.php (top) ───'
+            head -30 ${{ secrets.HOSTINGER_PATH }}/public_html/sites/default/settings.php 2>/dev/null
+            echo ''
+            echo '─── drush status ───'
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            ./vendor/bin/drush status 2>&1 | head -20
+            echo ''
+            echo '─── drush config:status (differences) ───'
+            ./vendor/bin/drush config:status 2>&1 | head -30
+          " || true
+
       - name: Drupal post-deploy
         run: |
           ssh hostinger "
             set -e
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
             cd ${{ secrets.HOSTINGER_PATH }}/public_html
             DRUSH=./vendor/bin/drush
             if \$DRUSH status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
