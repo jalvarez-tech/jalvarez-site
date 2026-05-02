@@ -22,6 +22,14 @@ jalvarez_site.notes:
   requirements:
     _permission: 'access content'
 
+jalvarez_site.contact:
+  path: '/contacto'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\ContactController::index'
+    _title: 'Contacto'
+  requirements:
+    _permission: 'access content'
+
 jalvarez_site.styleguide:
   path: '/styleguide'
   defaults:

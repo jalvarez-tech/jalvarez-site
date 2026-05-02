@@ -1,0 +1,25 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Canal directo'
+status: stable
+description: 'Contact-page sidebar: direct channels (email/phone/whatsapp), availability strip, response-time card, and "Cómo va a ser" expectations list.'
+props:
+  type: object
+  properties:
+    channels_label: { type: string, default: 'Canales directos' }
+    channels:
+      type: array
+      items:
+        type: object
+        properties:
+          name:  { type: string }
+          value: { type: string }
+          href:  { type: string }
+    availability_label: { type: string, default: 'Disponibilidad' }
+    free_label:  { type: string, default: 'cupos libres' }
+    free_value:  { type: string, examples: ['2'] }
+    response_label: { type: string, default: 'Tiempo de respuesta' }
+    response_value: { type: string, examples: ['< 24h lun-vie'] }
+    expect_label: { type: string, default: 'Cómo va a ser' }
+    steps:
+      type: array
+      items: { type: string }

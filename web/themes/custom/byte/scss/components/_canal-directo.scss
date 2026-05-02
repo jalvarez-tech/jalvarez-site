@@ -1,0 +1,234 @@
+// Contact page layout + sidebar (canal-directo) + form chrome
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+
+  @media (min-width: 980px) {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 80px;
+  }
+}
+
+.contact-side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact-card {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg-elev);
+
+  h4 {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--fg-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+}
+
+.contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.channel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+
+  &:last-child { border-bottom: 0; }
+
+  &__name {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+
+  &__val {
+    font-family: var(--f-display);
+    font-size: 15px;
+    color: var(--fg);
+    text-decoration: none;
+    transition: color .15s;
+
+    &:hover { color: var(--accent-hover); }
+
+    strong { font-weight: 500; color: var(--accent); }
+  }
+}
+
+.availability {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: var(--fg-muted);
+
+  strong { color: var(--accent); font-weight: 500; }
+}
+
+.contact-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 32px;
+    color: var(--fg);
+    font-size: 14.5px;
+    line-height: 1.55;
+
+    &::before {
+      content: counter(step, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      padding-top: 2px;
+    }
+  }
+}
+
+// Webform chrome — match design's transparent inputs with border-bottom only
+.webform-submission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .form-item, .js-form-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    margin: 0;
+
+    &:focus-within { border-bottom-color: var(--accent); }
+  }
+
+  label {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--fg-muted);
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+    display: block;
+
+    &.option { color: var(--fg-muted); }
+  }
+
+  input[type="text"],
+  input[type="email"],
+  textarea {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--fg);
+    font: inherit;
+    font-size: 16px;
+    padding: 4px 0;
+    width: 100%;
+    resize: vertical;
+  }
+
+  textarea { min-height: 120px; line-height: 1.5; }
+
+  input::placeholder, textarea::placeholder { color: var(--fg-dim); }
+
+  // Radios as pills
+  .form-radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 0 2px;
+
+    .form-item {
+      padding: 0;
+      border: 0;
+
+      input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      label {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: var(--r-pill);
+        border: 1px solid var(--line-strong);
+        font-family: var(--f-mono);
+        font-size: 12px;
+        color: var(--fg-muted);
+        cursor: pointer;
+        margin: 0;
+        transition: all .15s;
+        text-transform: none;
+        letter-spacing: 0.01em;
+      }
+
+      label:hover { color: var(--fg); border-color: var(--fg-muted); }
+
+      input:checked + label {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0a0908;
+      }
+    }
+  }
+
+  .form-actions {
+    margin-top: 20px;
+    padding: 0;
+    border: 0;
+  }
+
+  .button.form-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-radius: var(--r-pill);
+    background: var(--accent);
+    color: #0a0908;
+    font-family: var(--f-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border: 0;
+    cursor: pointer;
+    transition: transform .15s, background .15s;
+
+    &:hover {
+      transform: translateY(-1px);
+      background: var(--accent-hover);
+    }
+  }
+
+  .description {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--fg-dim);
+    margin-top: 6px;
+  }
+}

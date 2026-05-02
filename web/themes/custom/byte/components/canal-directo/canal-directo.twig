@@ -1,0 +1,43 @@
+{# Canal directo — sidebar of /contacto #}
+<aside class="contact-side">
+  {%- if channels|length > 0 -%}
+    <div class="contact-card">
+      <h4>{{ channels_label|default('Canales directos') }}</h4>
+      <div class="contact-channels">
+        {%- for c in channels -%}
+          <div class="channel">
+            <span class="channel__name">{{ c.name }}</span>
+            {%- if c.href -%}
+              <a class="channel__val" href="{{ c.href }}">{{ c.value }}</a>
+            {%- else -%}
+              <span class="channel__val">{{ c.value }}</span>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="contact-card">
+    <h4>{{ availability_label|default('Disponibilidad') }}</h4>
+    <div class="availability">
+      <span class="status-dot"></span>
+      <span><strong>{{ free_value|default('2') }}</strong> {{ free_label|default('cupos libres') }}</span>
+    </div>
+    <div class="channel" style="margin-top: 16px;">
+      <span class="channel__name">{{ response_label|default('Tiempo de respuesta') }}</span>
+      <span class="channel__val">{{ response_value|default('< 24h lun-vie') }}</span>
+    </div>
+  </div>
+
+  {%- if steps|length > 0 -%}
+    <div class="contact-card">
+      <h4>{{ expect_label|default('Cómo va a ser') }}</h4>
+      <ol class="contact-steps">
+        {%- for s in steps -%}
+          <li>{{ s }}</li>
+        {%- endfor -%}
+      </ol>
+    </div>
+  {%- endif -%}
+</aside>
