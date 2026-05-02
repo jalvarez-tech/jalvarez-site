@@ -5,7 +5,7 @@
  */
 #}
 {% set lang = node.get('langcode').value|default('es') %}
-{% set t = lang == 'en' ? {
+{% set i18n = lang == 'en' ? {
   back: '← Back to writing',
   back_path: '/notes',
   role: 'Senior Web Specialist · jalvarez.tech',
@@ -56,7 +56,7 @@
 
 <article class="article">
   <div class="article__wrap">
-    <a class="article__back" href="/{{ lang }}{{ t.back_path }}">{{ t.back }}</a>
+    <a class="article__back" href="/{{ lang }}{{ i18n.back_path }}">{{ i18n.back }}</a>
 
     <header class="article__head">
       <div class="article__tags">
@@ -73,8 +73,8 @@
 
       <h1 class="article__title">{{ node.label }}</h1>
 
-      {% if not node.field_excerpt.isEmpty %}
-        <p class="article__sub">{{ node.field_excerpt.value }}</p>
+      {% if not node.field_excerpi18n.isEmpty %}
+        <p class="article__sub">{{ node.field_excerpi18n.value }}</p>
       {% endif %}
 
       <div class="article__byline">
@@ -82,17 +82,17 @@
           <div class="article__avatar">JA</div>
           <div>
             <div class="article__author-name">John Stevans Alvarez</div>
-            <div class="article__author-role">{{ t.role }}</div>
+            <div class="article__author-role">{{ i18n.role }}</div>
           </div>
         </div>
         <div class="article__actions">
-          <button class="article__action" aria-label="{{ t.share }}" type="button">
+          <button class="article__action" aria-label="{{ i18n.share }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-share-2"></use></svg>
           </button>
-          <button class="article__action" aria-label="{{ t.save }}" type="button">
+          <button class="article__action" aria-label="{{ i18n.save }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-bookmark"></use></svg>
           </button>
-          <button class="article__action" aria-label="{{ t.copy }}" type="button">
+          <button class="article__action" aria-label="{{ i18n.copy }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-copy"></use></svg>
           </button>
         </div>
@@ -116,11 +116,11 @@
     <hr class="article__divider">
 
     <section class="article__news">
-      <div class="article__news-eyebrow">{{ t.newsletter_eyebrow }}</div>
-      <h3>{{ t.newsletter_title_a }} <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">{{ t.newsletter_title_em }}</em>{{ t.newsletter_title_b }}</h3>
+      <div class="article__news-eyebrow">{{ i18n.newsletter_eyebrow }}</div>
+      <h3>{{ i18n.newsletter_title_a }} <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">{{ i18n.newsletter_title_em }}</em>{{ i18n.newsletter_title_b }}</h3>
       <form action="#" method="post" onsubmit="return false;">
-        <input type="email" placeholder="{{ t.newsletter_email }}" required>
-        <button class="btn btn--primary btn--sm" type="submit">{{ t.newsletter_submit }}</button>
+        <input type="email" placeholder="{{ i18n.newsletter_email }}" required>
+        <button class="btn btn--primary btn--sm" type="submit">{{ i18n.newsletter_submit }}</button>
       </form>
     </section>
   </div>
