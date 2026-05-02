@@ -1,0 +1,161 @@
+{#
+/**
+ * @file
+ * Project detail (case study) template — DESIGN.md §4.5.
+ *
+ * Composes:
+ *   case-back link → /proyectos
+ *   case-tags (chips for primary tech, year, role)
+ *   case-title + case-brief
+ *   case-meta (key/value: Cliente · Año · Rol · Duración · Stack · Live ↗)
+ *   case-hero (placeholder for now)
+ *   §01 Desafío (intro + bullets)
+ *   §02 Enfoque (loop case_step paragraphs)
+ *   §03 Resultados (loop metric paragraphs + embedded testimonial)
+ *   §04 Aprendizaje
+ *   related_projects view
+ *   cta-final
+ */
+#}
+{% set lang = node.get('langcode').value|default('es') %}
+{% set back_label = lang == 'en' ? '← Back to projects' : '← Volver a proyectos' %}
+
+<article class="case wrap">
+  <a class="case-back" href="/{{ lang }}/proyectos">{{ back_label }}</a>
+
+  <header class="case-head">
+    <div class="case-tags">
+      {% if node.field_primary_technology.entity %}
+        {% include 'byte:chip' with { label: node.field_primary_technology.entity.label, variant: 'accent' } only %}
+      {% endif %}
+      {% if not node.field_project_year.isEmpty %}
+        {% include 'byte:chip' with { label: node.field_project_year.value } only %}
+      {% endif %}
+      {% if not node.field_role.isEmpty %}
+        {% include 'byte:chip' with { label: node.field_role.value } only %}
+      {% endif %}
+    </div>
+
+    <h1 class="case-title">{{ node.label }}</h1>
+
+    {% if not node.field_intro.isEmpty %}
+      <p class="case-brief">{{ node.field_intro.value }}</p>
+    {% elseif not node.field_summary.isEmpty %}
+      <p class="case-brief">{{ node.field_summary.value }}</p>
+    {% endif %}
+
+    <dl class="case-meta">
+      {% if not node.field_role.isEmpty %}
+        <div><dt class="case-meta__k">Rol</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
+      {% endif %}
+      {% if not node.field_project_year.isEmpty %}
+        <div><dt class="case-meta__k">Año</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
+      {% endif %}
+      {% if not node.field_duration.isEmpty %}
+        <div><dt class="case-meta__k">Duración</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
+      {% endif %}
+      {% if node.field_primary_technology.entity %}
+        <div><dt class="case-meta__k">Stack</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
+      {% endif %}
+      {% if not node.field_external_url.isEmpty %}
+        <div><dt class="case-meta__k">Live</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default('Visitar ↗') }}</a></dd></div>
+      {% endif %}
+    </dl>
+  </header>
+
+  {# §01 Desafío #}
+  {% if not node.field_challenge_intro.isEmpty or not node.field_challenge_bullets.isEmpty %}
+    <section class="case-section">
+      <div class="case-section__num">§ 01 Desafío</div>
+      {% if not node.field_challenge_intro.isEmpty %}
+        <p class="case-section__lede">{{ node.field_challenge_intro.value }}</p>
+      {% endif %}
+      {% if not node.field_challenge_bullets.isEmpty %}
+        <ul class="case-bullets">
+          {% for item in node.field_challenge_bullets %}
+            <li>{{ item.value }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {# §02 Enfoque (case_step paragraphs) #}
+  {% if not node.field_approach_steps.isEmpty %}
+    <section class="case-section">
+      <div class="case-section__num">§ 02 Enfoque</div>
+      <h2 class="case-section__title">Cómo lo abordé</h2>
+      <div class="case-steps">
+        {% for delta, item in node.field_approach_steps %}
+          {% set step = item.entity %}
+          {% if step %}
+            {% include 'byte:case-step-card' with {
+              number: delta + 1,
+              tag: step.field_step_tag.value,
+              title: step.field_step_title.value,
+              body: step.field_step_body.value,
+            } only %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {# §03 Resultados (metric paragraphs + embedded testimonial) #}
+  {% if not node.field_results_metrics.isEmpty or not node.field_testimonial_embed.isEmpty %}
+    <section class="case-section">
+      <div class="case-section__num">§ 03 Resultados</div>
+      <h2 class="case-section__title">Lo que pasó después</h2>
+
+      {% if not node.field_results_metrics.isEmpty %}
+        <div class="medidores">
+          {% for item in node.field_results_metrics %}
+            {% set m = item.entity %}
+            {% if m %}
+              {% include 'byte:medidor' with {
+                value: m.field_metric_value.value,
+                key: m.field_metric_key.value,
+                note: m.field_metric_note.value,
+                variant: 'card',
+              } only %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if not node.field_testimonial_embed.isEmpty %}
+        {% set t = node.field_testimonial_embed.0.entity %}
+        {% if t %}
+          <div style="margin-top: 48px;">
+            {% include 'byte:card-testimonio' with {
+              quote: t.field_quote.value,
+              name: t.field_author_name.value,
+              role: t.field_author_role.value,
+              initials: t.field_author_initials.value,
+            } only %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {# §04 Aprendizaje #}
+  {% if not node.field_lesson.isEmpty %}
+    <section class="case-section">
+      <div class="case-section__num">§ 04 Aprendizaje</div>
+      <p class="case-section__body">{{ node.field_lesson.value }}</p>
+    </section>
+  {% endif %}
+</article>
+
+{# CTA final #}
+{% if not node.field_cta_heading.isEmpty %}
+  {% include 'byte:cta-final' with {
+    title: node.field_cta_heading.value,
+    sub: node.field_cta_sub.value,
+    primary_label: 'Iniciar tu proyecto',
+    primary_href: '/' ~ lang ~ '/contacto',
+    secondary_label: 'Ver más proyectos',
+    secondary_href: '/' ~ lang ~ '/proyectos',
+  } only %}
+{% endif %}

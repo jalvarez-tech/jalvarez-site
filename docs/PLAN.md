@@ -16,32 +16,21 @@
 
 ## Plan de cierre — 7 fases en orden
 
-### F1 — Form bullets polish ⏳
+### F1 — Form bullets polish ✅
 
-- ⬜ Override del wrapper `<fieldset>` y `<legend>` que Drupal Webform pone alrededor de radios.
-- ⬜ Hacer invisibles los `<input type="radio">` nativos.
-- ⬜ Aplicar pill style al `<label>` de cada radio.
-- ⬜ Estado checked: bg `--accent`, text `#0a0908`.
-- ⬜ Verificar visualmente en `/es/contacto` (selector "Tipo de proyecto" y "Presupuesto aproximado").
+- ✅ Selectores corregidos a `.js-webform-radios`, `.webform-type-radio`, `.js-form-type-radio`.
+- ✅ Native radio hidden con opacity:0 + position:absolute (sigue keyboard-accessible).
+- ✅ Pill labels: border outline → bg verde + text dark cuando checked.
+- ✅ focus-visible outline para a11y.
 
-### F2 — Detalle de Proyecto (case study) ⬜
+### F2 — Detalle de Proyecto (case study) ✅
 
-- ⬜ Crear `byte:case-step-card` SDC (mostrar paragraph case_step: tag + título + body).
-- ⬜ Crear `byte:medidor` SDC (mostrar paragraph metric: valor grande + key + nota).
-- ⬜ Crear template `node--project--full.html.twig` que componga:
-  - case-back link → `/proyectos`
-  - case tags (chips de stack + año + role)
-  - case-title display
-  - case-brief
-  - case-meta (key/value grid: Cliente · Año · Rol · Duración · Stack · Live ↗)
-  - cover/featured media (placeholder por ahora)
-  - § 01 Desafío (intro + bullets)
-  - § 02 Enfoque (loop case-step-card)
-  - § 03 Resultados (loop medidor + testimonio embebido)
-  - § 04 Aprendizaje
-  - related_projects (View block)
-  - cta-final
-- ⬜ Configurar Pathauto pattern para `proyectos/[node:title]`.
+- ✅ SDC `byte:case-step-card` (number + tag + title + body).
+- ✅ SDC `byte:medidor` (value + unit + key + note, variant flat/card).
+- ✅ Template `node--project--full.html.twig` con back link + tags + title + brief + meta + §01-04 + CTA.
+- ✅ `_case.scss` con todos los estilos editoriales del case study.
+- ✅ Script `enrich-sample-projects.php` para popular Maluma con challenge_intro + bullets + 4 case_step paragraphs + lesson + testimonial_embed + CTA.
+- ✅ Pathauto auto-genera `/es/proyectos/malumaonline`.
 
 ### F3 — Detalle de Nota (article) ⬜
 
