@@ -28,36 +28,32 @@
  * Run automatically: triggered by .github/workflows/deploy.yml AFTER `drush cim`.
  */
 
-use Drupal\canvas\Entity\Page;
-
 $canonical_name  = 'jalvarez.tech';
 $canonical_mail  = 'stevanswd@gmail.com';
-$home_title      = 'Inicio';
+$home_alias      = '/inicio';   // ES alias of the home canvas_page (seed-defined).
 
-// 1. Resolve the home canvas_page by title (portable across envs).
-$ids = \Drupal::entityQuery('canvas_page')
-  ->condition('title', $home_title)
-  ->accessCheck(FALSE)
-  ->range(0, 1)
-  ->execute();
+// 1. Resolve the home canvas_page by its public path alias.
+//
+// Why alias and not title? Canvas_page titles drift between snapshots
+// (currently "Inicio (Canvas)" in prod, but the suffix is implementation
+// trivia). The path alias is semantic + stable: it's the URL the editor
+// chose, exported to the entity's `path` field by the seed scripts.
+//
+// path_alias.manager resolves '/inicio' → '/page/{id}' regardless of which
+// numeric ID the home happens to have on this environment.
+$path_manager = \Drupal::service('path_alias.manager');
+$home_path = $path_manager->getPathByAlias($home_alias);
 
-if (empty($ids)) {
-  echo "✗ Could not find canvas_page with title '{$home_title}'. Aborting front-page fix.\n";
+if ($home_path === $home_alias) {
+  // No alias matched — getPathByAlias returns the input untouched on miss.
+  echo "✗ Could not resolve alias '{$home_alias}' to an internal path.\n";
   echo "  (system.site.name and .mail will still be repaired below.)\n";
   $home_path = NULL;
 }
-else {
-  $home_id = (int) reset($ids);
-  /** @var \Drupal\canvas\Entity\Page $home */
-  $home = Page::load($home_id);
-  if (!$home) {
-    echo "✗ canvas_page id={$home_id} could not be loaded. Aborting front-page fix.\n";
-    $home_path = NULL;
-  }
-  else {
-    // Canonical internal path is /page/{id} per canvas_page entity links.
-    $home_path = '/page/' . $home_id;
-  }
+elseif (!preg_match('#^/page/\d+$#', $home_path)) {
+  echo "✗ Alias '{$home_alias}' resolved to '{$home_path}' which is not a /page/{id} path.\n";
+  echo "  Refusing to set as front (canvas_page entities use /page/{id} as canonical).\n";
+  $home_path = NULL;
 }
 
 // 2. Compare current vs canonical and write only on drift.
@@ -76,7 +72,7 @@ if ($config->get('mail') !== $canonical_mail) {
 
 if ($home_path !== NULL && $config->get('page.front') !== $home_path) {
   $config->set('page.front', $home_path);
-  $changes[] = "page.front → '{$home_path}' (canvas_page '{$home_title}')";
+  $changes[] = "page.front → '{$home_path}' (resolved from alias '{$home_alias}')";
 }
 
 if ($changes) {
