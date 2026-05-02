@@ -2,24 +2,29 @@
 
 /**
  * @file
- * Disable the page_1 display of the projects view so our controller
- * at /proyectos doesn't conflict.
+ * Remove the page_1 display of one or more views so a custom controller
+ * can own the path. Idempotent.
+ *
+ * Edit the $views array below to add view IDs.
  */
 
 use Drupal\views\Entity\View;
 
-$view = View::load('projects');
-if (!$view) {
-  echo "view 'projects' not found\n";
-  return;
-}
+$views = ['projects', 'notes'];
 
-$displays = $view->get('display');
-if (isset($displays['page_1'])) {
-  unset($displays['page_1']);
-  $view->set('display', $displays);
-  $view->save();
-  echo "✓ removed page_1 display from view 'projects'\n";
-} else {
-  echo "= view 'projects' already has no page_1 display\n";
+foreach ($views as $vid) {
+  $view = View::load($vid);
+  if (!$view) {
+    echo "= view '{$vid}' not found (skipping)\n";
+    continue;
+  }
+  $displays = $view->get('display');
+  if (isset($displays['page_1'])) {
+    unset($displays['page_1']);
+    $view->set('display', $displays);
+    $view->save();
+    echo "✓ removed page_1 display from view '{$vid}'\n";
+  } else {
+    echo "= view '{$vid}' has no page_1 display\n";
+  }
 }

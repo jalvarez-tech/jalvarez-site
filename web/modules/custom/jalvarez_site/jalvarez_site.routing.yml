@@ -14,6 +14,14 @@ jalvarez_site.projects:
   requirements:
     _permission: 'access content'
 
+jalvarez_site.notes:
+  path: '/notas'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\NotesController::index'
+    _title: 'Notas'
+  requirements:
+    _permission: 'access content'
+
 jalvarez_site.styleguide:
   path: '/styleguide'
   defaults:

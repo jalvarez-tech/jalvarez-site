@@ -1,0 +1,18 @@
+{# Row Nota #}
+{%- set hue = hue|default('green') -%}
+<a class="post post--nota" href="{{ href|default('#') }}">
+  <div class="post__thumb post__thumb--{{ hue }}">
+    {%- if glyph -%}
+      <svg class="post__glyph" width="22" height="22" aria-hidden="true">
+        <use href="/{{ active_theme_path() }}/icons.svg#i-{{ glyph }}"></use>
+      </svg>
+    {%- endif -%}
+  </div>
+  {%- if date %}<div class="post__date mono">{{ date }}</div>{% endif -%}
+  <div class="post__main">
+    {%- if title %}<h3 class="post__title">{{ title }}</h3>{% endif -%}
+    {%- if excerpt %}<p class="post__excerpt">{{ excerpt }}</p>{% endif -%}
+  </div>
+  {%- if category %}<div class="post__cat mono">{{ category }}</div>{% endif -%}
+  {%- if read_time %}<div class="post__read mono">{{ read_time }}</div>{% endif -%}
+</a>
