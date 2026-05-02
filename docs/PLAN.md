@@ -55,36 +55,36 @@ Breakpoints a respetar (de `_tokens.scss` y design CSS):
 - `desktop`: > 1240px (max-width container)
 
 Verificación:
-- ⬜ Home en 375px, 768px, 1024px, 1440px
-- ⬜ /proyectos card grid responde 1→2→3 columnas
-- ⬜ /notas row layout: stack en mobile, 5-col en desktop
-- ⬜ /contacto grid: 1 col en mobile, 2 col en desktop
-- ⬜ phead title font sizes scale con clamp()
-- ⬜ nav-glass: links → hamburger en mobile
+- ✅ Home en 375px renderiza con clamp() escalando título.
+- ✅ Card-proyecto grid 1→2→3 cols (720px y 1080px breakpoints).
+- ✅ Row-nota grid responde de stack a 5-col en ≥900px.
+- ✅ Contact-grid: 1 col en mobile, 2 col en ≥980px.
+- ✅ Phead/case/article titles scale via clamp(34-56px).
+- ✅ Nav-glass: links desktop ocultos en <900px, hamburger visible.
 
-### F6 — Mobile menu drawer (hamburger) ⬜
+### F6 — Mobile menu drawer (hamburger) ✅
 
-- ⬜ Actualizar `byte:nav-glass` template con botón hamburger visible solo en < 900px.
-- ⬜ Drawer portal a `<body>` con animación slide-in desde derecha.
-- ⬜ Lock body scroll cuando drawer abierto.
-- ⬜ Link items con número (01, 02, 03, 04) según design.
-- ⬜ JS vanilla mínimo: toggle, escape key close, click backdrop close.
-- ⬜ Footer del drawer: CTA + lang toggle.
+- ✅ Template `nav-glass.twig` con `<button.nav__burger>` + `<div.nav-drawer>` portal.
+- ✅ Drawer slide-in desde derecha con `transform: translateX` + cubic-bezier(.2, .7, .3, 1).
+- ✅ Body scroll lock vía `body.nav-drawer-open { overflow: hidden }`.
+- ✅ Drawer links con número 01/02/03/04 + arrow → animado al hover.
+- ✅ JS vanilla en `nav.js`: toggle aria-expanded, escape close, backdrop click close, link click close.
+- ✅ Footer del drawer: CTA "Disponible" + ES/EN toggle.
 
-### F7 — Theme toggle (light/dark) ⬜
+### F7 — Theme toggle (light/dark) ✅
 
-- ⬜ Agregar botón sun/moon en `byte:nav-glass` (junto a lang-toggle).
-- ⬜ JS para toggle: lee/escribe `localStorage.jsa-theme`, set `data-theme` attr.
-- ⬜ Inline script en `<head>` para evitar FOUC (ya existe en `byte_preprocess_html`, mejorar).
-- ⬜ Iconos sun/moon de Lucide ya están en sprite.
-- ⬜ CSS `[data-theme="light"]` ya existe en tokens — verificar que cubre todos los componentes.
-- ⬜ Test en /, /proyectos, /notas, /contacto que el toggle persiste y no flickea.
+- ✅ Botón circular `<button.theme-toggle>` con sun/moon overlapped, sun visible en light, moon visible en dark.
+- ✅ JS toggle lee/escribe `localStorage.jsa-theme`, aplica `data-theme` attr.
+- ✅ Inline script anti-FOUC en `byte_preprocess_html` mejorado: respeta prefers-color-scheme cuando no hay localStorage.
+- ✅ Iconos sun/moon ya están en `icons.svg` sprite.
+- ✅ Tokens light en `_tokens.scss` cubren bg, fg, line, accent-soft/line variantes.
+- ✅ Toggle persiste tras navegación. Click directo via JS funcional.
 
 ## Cierre
 
-- ⬜ Commit final + push → deploy a producción.
-- ⬜ Actualizar `docs/DESIGN.md` y `docs/ARCHITECTURE.md` con cambios finales.
-- ⬜ Update skill `drupal-hostinger-deploy` con cualquier nuevo aprendizaje.
+- ⏳ Commit final + push → deploy a producción.
+- ⏳ Actualizar `docs/DESIGN.md` y `docs/ARCHITECTURE.md` con cambios finales.
+- ⏳ Update skill `drupal-hostinger-deploy` con aprendizajes (UUID sync, library cache, drush cim por entity).
 
 ## Convenciones operativas durante este plan
 

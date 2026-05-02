@@ -1,6 +1,6 @@
-{# Nav glass — fixed top liquid-glass nav #}
+{# Nav glass — fixed top liquid-glass nav with mobile drawer + theme toggle #}
 {%- set lang = current_lang|default('es') -%}
-<header class="nav">
+<header class="nav" data-nav-root>
   <div class="nav__inner">
     <a class="brand" href="/{{ lang }}">
       <span class="brand__mark">{{ brand_initial|default('J') }}</span>
@@ -8,7 +8,7 @@
     </a>
 
     {%- if links|length > 0 -%}
-      <nav class="nav__links">
+      <nav class="nav__links nav__links--desktop">
         {%- for l in links -%}
           <a href="{{ l.href }}" class="nav__link{{ l.active ? ' nav__link--active' : '' }}">
             {{ l.label }}
@@ -20,6 +20,15 @@
           {{ cta_label|default('Disponible') }}
         </a>
 
+        <button class="theme-toggle" type="button" aria-label="Cambiar tema" data-theme-toggle>
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" width="16" height="16" aria-hidden="true">
+            <use href="/{{ active_theme_path() }}/icons.svg#i-sun"></use>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" width="16" height="16" aria-hidden="true">
+            <use href="/{{ active_theme_path() }}/icons.svg#i-moon"></use>
+          </svg>
+        </button>
+
         {%- if show_lang_toggle|default(true) -%}
           <div class="lang-toggle" role="group" aria-label="language">
             <a href="/es" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
@@ -28,5 +37,33 @@
         {%- endif -%}
       </nav>
     {%- endif -%}
+
+    {# Mobile hamburger #}
+    <button class="nav__burger" type="button" aria-label="Menú" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+
+{# Mobile drawer #}
+<div class="nav-drawer" data-nav-drawer aria-hidden="true">
+  <nav class="nav-drawer__links">
+    {%- for l in links -%}
+      <a href="{{ l.href }}" class="nav-drawer__link{{ l.active ? ' nav-drawer__link--active' : '' }}">
+        <span class="nav-drawer__num">{{ '%02d'|format(loop.index) }}</span>
+        <span class="nav-drawer__label">{{ l.label }}</span>
+        <span class="nav-drawer__arrow" aria-hidden="true">→</span>
+      </a>
+    {%- endfor -%}
+  </nav>
+  <div class="nav-drawer__foot">
+    <a href="{{ cta_href|default('/contacto') }}" class="nav__cta">
+      <span class="status-dot"></span>
+      {{ cta_label|default('Disponible') }}
+    </a>
+    <div class="lang-toggle">
+      <a href="/es" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
+      <a href="/en" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
+    </div>
+  </div>
+</div>

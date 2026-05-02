@@ -13,6 +13,9 @@
  * a non-default mode persisted in localStorage.
  */
 function byte_preprocess_html(array &$variables): void {
+  // Inline script BEFORE first paint to prevent FOUC when user has
+  // a non-default theme persisted in localStorage. Reads jsa-theme
+  // (set by the theme toggle in the nav-glass), defaults to dark.
   $variables['#attached']['html_head'][] = [
     [
       '#tag' => 'script',
@@ -21,12 +24,12 @@ function byte_preprocess_html(array &$variables): void {
           try {
             var t = localStorage.getItem('jsa-theme');
             if (!t) {
-              t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark';
+              t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
             }
             document.documentElement.setAttribute('data-theme', t);
-            var l = localStorage.getItem('jsa-lang');
-            if (l) document.documentElement.setAttribute('lang', l);
-          } catch (e) {}
+          } catch (e) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
         })();
       JS,
     ],

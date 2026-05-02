@@ -3,5 +3,7 @@ global:
   css:
     theme:
       dist/css/main.css: { minified: true }
+  js:
+    js/nav.js: { defer: true }
   dependencies:
     - core/drupal
