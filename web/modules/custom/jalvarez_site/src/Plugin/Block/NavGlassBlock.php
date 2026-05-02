@@ -9,6 +9,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 
 /**
  * Renders the byte:nav-glass SDC as the site-wide top navigation.
@@ -93,33 +94,46 @@ class NavGlassBlock extends BlockBase {
   }
 
   /**
-   * Returns [es_href, en_href] for the current page. If the entity for the
-   * current route has a translation, point the toggle at the translated URL.
-   * Otherwise fall back to the language landing page.
+   * Returns [es_href, en_href] for the current page using Drupal core's
+   * native language-switcher API.
+   *
+   * `LanguageManager::getLanguageSwitchLinks()` invokes
+   * `hook_language_switch_links_alter()` and the URL alter pipeline, so:
+   *  - canvas_page entities resolve to their per-language path alias
+   *    (/es/inicio ↔ /en/home, /es/proyectos ↔ /en/projects, …)
+   *  - Translatable nodes resolve to their per-language alias
+   *    (/es/proyectos/malumaonline ↔ /en/projects/malumaonline)
+   *  - Untranslatable routes (admin, 404, etc.) keep the same path with
+   *    only the language prefix swapped
+   *
+   * This is the same mechanism Drupal core's `language_block:language_interface`
+   * uses internally — we just consume the result and feed two hrefs into the
+   * SDC instead of rendering a separate block.
    */
   private function computeLanguageSwitcherHrefs(string $current_lang): array {
-    $es = '/es';
-    $en = '/en';
+    $defaults = ['es' => '/es', 'en' => '/en'];
     try {
-      $route_match = \Drupal::routeMatch();
-      // Iterate route parameters looking for a content entity.
-      foreach ($route_match->getParameters() as $param) {
-        if ($param instanceof \Drupal\Core\Entity\ContentEntityInterface) {
-          $langs = array_keys($param->getTranslationLanguages());
-          if (in_array('es', $langs, TRUE)) {
-            $es = $param->getTranslation('es')->toUrl()->toString();
+      $url = Url::fromRouteMatch(\Drupal::routeMatch());
+      $links = \Drupal::languageManager()
+        ->getLanguageSwitchLinks(LanguageInterface::TYPE_INTERFACE, $url);
+      $hrefs = $defaults;
+      if (!empty($links->links)) {
+        foreach ($links->links as $langcode => $link) {
+          if (isset($link['url']) && $link['url'] instanceof Url) {
+            // Force the language option so the URL generator picks the
+            // alias for that language even when the current request is in
+            // the other one.
+            $link_url = clone $link['url'];
+            $link_url->setOption('language', \Drupal::languageManager()->getLanguage($langcode));
+            $hrefs[$langcode] = $link_url->toString();
           }
-          if (in_array('en', $langs, TRUE)) {
-            $en = $param->getTranslation('en')->toUrl()->toString();
-          }
-          break;
         }
       }
+      return [$hrefs['es'], $hrefs['en']];
     }
     catch (\Throwable) {
-      // Keep defaults.
+      return [$defaults['es'], $defaults['en']];
     }
-    return [$es, $en];
   }
 
   public function getCacheContexts(): array {

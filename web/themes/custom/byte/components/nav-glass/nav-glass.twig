@@ -31,8 +31,8 @@
 
         {%- if show_lang_toggle|default(true) -%}
           <div class="lang-toggle" role="group" aria-label="language">
-            <a href="/es" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
-            <a href="/en" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
+            <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
+            <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
           </div>
         {%- endif -%}
       </nav>
