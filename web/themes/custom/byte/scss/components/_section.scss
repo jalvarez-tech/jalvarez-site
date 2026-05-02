@@ -1,7 +1,6 @@
 // _section.scss
 .section {
-  padding-top: clamp(72px, 10vw, 140px);
-  padding-bottom: clamp(72px, 10vw, 140px);
+  padding-block: var(--section-pad-y);
   position: relative;
 
   &__head {

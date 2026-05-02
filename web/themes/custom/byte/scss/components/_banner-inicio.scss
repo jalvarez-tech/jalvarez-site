@@ -1,7 +1,7 @@
 // _banner-inicio.scss — Hero
 .hero {
-  padding-top: clamp(80px, 11vw, 160px);
-  padding-bottom: clamp(60px, 8vw, 110px);
+  padding-top: var(--hero-pad-top);
+  padding-bottom: var(--hero-pad-bottom);
   position: relative;
   overflow: hidden;
 

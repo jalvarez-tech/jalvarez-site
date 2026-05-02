@@ -1,11 +1,19 @@
-// Nav glass — fixed top liquid-glass nav
+// Nav glass — fixed top liquid-glass nav.
+// Respects Drupal core's displace offsets so it doesn't hide behind the
+// admin Navigation sidebar (left) or its top bar. Defaults to 0 for
+// anonymous visitors so behavior is unchanged when no admin UI is present.
 .nav {
+  --byte-nav-displace-x: var(--drupal-displace-offset-left, 0px);
+  --byte-nav-displace-y: var(--drupal-displace-offset-top, 0px);
+  --byte-nav-gap-y: 14px;
+  --byte-nav-gap-x: 28px;
+
   position: fixed;
-  top: 14px;
-  left: 50%;
+  top: calc(var(--byte-nav-gap-y) + var(--byte-nav-displace-y));
+  left: calc(50% + var(--byte-nav-displace-x) / 2);
   transform: translateX(-50%);
   z-index: var(--z-nav);
-  width: min(1240px, calc(100vw - 28px));
+  width: min(1240px, calc(100vw - var(--byte-nav-gap-x) - var(--byte-nav-displace-x)));
   border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--bg-elev) 45%, transparent);
   -webkit-backdrop-filter: blur(26px) saturate(180%);
@@ -192,8 +200,10 @@
   }
 }
 
-// Body must have padding-top so content isn't hidden under fixed nav
-body { padding-top: 86px; }
+// Body must have padding-top so content isn't hidden under the fixed nav.
+// Adds the displace top offset so admin top bar (when present) is also
+// accounted for.
+body { padding-top: calc(86px + var(--drupal-displace-offset-top, 0px)); }
 
 // Theme toggle
 .theme-toggle {
@@ -244,7 +254,7 @@ body { padding-top: 86px; }
 // Mobile drawer
 .nav-drawer {
   position: fixed;
-  top: 0;
+  top: var(--drupal-displace-offset-top, 0px);
   right: 0;
   bottom: 0;
   width: min(360px, 90vw);
@@ -332,7 +342,10 @@ body.nav-drawer-open {
 body.nav-drawer-open::after {
   content: "";
   position: fixed;
-  inset: 0;
+  top: var(--drupal-displace-offset-top, 0px);
+  left: var(--drupal-displace-offset-left, 0px);
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, .5);
   z-index: var(--z-nav);
   -webkit-backdrop-filter: blur(4px);

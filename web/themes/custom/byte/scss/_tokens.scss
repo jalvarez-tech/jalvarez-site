@@ -34,6 +34,14 @@
   --container: 1240px;
   --pad: clamp(20px, 4vw, 48px);
 
+  // Vertical rhythm between page sections.
+  // Used by .section, .hero, .cta-band — produces ~120-240px gaps between
+  // consecutive sections (clamp scales with viewport).
+  --section-pad-y: clamp(64px, 8vw, 120px);
+  // Hero opens with extra breathing room above.
+  --hero-pad-top: clamp(80px, 11vw, 144px);
+  --hero-pad-bottom: clamp(56px, 7vw, 96px);
+
   // ─── Radii ───
   --r-card:  14px;
   --r-pill:  999px;

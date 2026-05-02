@@ -1,7 +1,6 @@
 // _cta-final.scss
 .cta-band {
-  padding-top: clamp(80px, 11vw, 140px);
-  padding-bottom: clamp(80px, 11vw, 140px);
+  padding-block: var(--section-pad-y);
   border-top: 1px solid var(--line);
   position: relative;
   text-align: center;

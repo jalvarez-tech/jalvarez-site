@@ -52,7 +52,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 // ─── Utility primitives ───
 .mono { font-family: var(--f-mono); font-feature-settings: "ss02"; }
 .tab  { font-variant-numeric: tabular-nums; }
-.wrap { max-width: var(--container); margin: 0 auto; padding: 0 var(--pad); }
+// Horizontal-only — uses logical properties so it does NOT collide with the
+// vertical padding declared by .section, .hero, .cta-band, etc.
+.wrap { max-width: var(--container); margin-inline: auto; padding-inline: var(--pad); }
+
+// Canvas wraps each component instance in <div id="block-{uuid}">. When such
+// a wrapper sits inside a CSS-grid/flex container that styles its children
+// directly (e.g. .projects-grid > .project), make the wrapper transparent so
+// the inner cards become real grid/flex items. Applies to all jalvarez SDC
+// list containers.
+.projects-grid > div[id^="block-"],
+.notes-list > div[id^="block-"],
+.values > div[id^="block-"],
+.process-list > div[id^="block-"],
+.tests > div[id^="block-"] {
+  display: contents;
+}
 .hair { height: 1px; background: var(--line); border: 0; margin: 0; }
 
 // ─── Page glow (D6: ON by default) ───
