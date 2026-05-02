@@ -522,3 +522,87 @@ El handoff bundle está extraído en:
 10. ⏳ Crear SDC `icon` consumiendo el sprite via `<use href="...icons.svg#i-name">`.
 
 > Ver `ARCHITECTURE.md §14` para el roadmap completo de Drupal.
+
+---
+
+## 15. Accesibilidad (WCAG 2.2 AA)
+
+El sitio cumple WCAG 2.2 nivel AA. Esta sección lista las decisiones de diseño que hay que mantener al añadir componentes nuevos.
+
+### 15.1 Indicadores de foco
+
+- **`:focus-visible` siempre visible.** Ring base: `outline: 3px solid var(--accent); outline-offset: 2px`. Definido en [scss/main.scss](../web/themes/custom/byte/scss/main.scss).
+- **Variantes por forma del componente:**
+  - Pill (`.btn`, `.nav__cta`, `.lang-toggle__btn`, `.theme-toggle`, `.chip`, `.nav__link`) → `border-radius: var(--r-pill)` + offset 3px.
+  - Card (`.project`, `.post`, `.case-step`, `.contact-card`) → `border-radius: var(--r-card)` + offset 4px.
+- **Skip-link visible al focus** con estilo byte (background acento, pill). Drupal core inyecta el HTML; el theme provee la presentación.
+
+> Cualquier nuevo botón/link/card debe heredar el ring base o añadir su variante específica al bloque "Pill-shaped buttons" / "Cards" en main.scss.
+
+### 15.2 Reduced motion
+
+Bloque `@media (prefers-reduced-motion: reduce)` en [scss/main.scss](../web/themes/custom/byte/scss/main.scss):
+- Animaciones y transiciones a `0.01ms` (no `0` para evitar que algunos bugs de browser las omitan completamente).
+- `.marquee__track` → `animation: none`.
+- Hover transforms (cards, nav links) → `transform: none`.
+
+> Animaciones nuevas: añadir su override aquí. Hovers que dependan de `transform`: añadirlos al bloque de excepciones.
+
+### 15.3 Contraste
+
+Tokens calibrados por contrast ratio sobre los backgrounds reales del theme:
+
+| Token | Dark sobre `--bg #0a0908` | Light sobre `--bg #faf8f4` |
+|---|---|---|
+| `--fg` | `#f5f2ed` — 17.4:1 ✓ AAA | `#14120f` — 17.4:1 ✓ AAA |
+| `--fg-muted` | `#a8a39a` — 7.80:1 ✓ AAA | `#575249` — 7.27:1 ✓ AAA |
+| `--fg-dim` | `#80796f` — 4.68:1 ✓ AA | `#6e6a60` — 5.03:1 ✓ AA |
+
+> **No usar `--fg-dim` en texto < 12px** — está justo sobre el umbral AA (4.5:1) para texto normal, no para texto pequeño que requeriría AAA (7:1).
+> Cualquier color nuevo de texto debe verificarse con la fórmula WCAG (luminance relativa) sobre AMBOS backgrounds (`--bg` dark y light).
+
+### 15.4 Touch targets (WCAG 2.2 SC 2.5.5/2.5.8)
+
+- **Mínimo absoluto:** 24×24 CSS px (SC 2.5.8 AA).
+- **Mobile / drawer:** 44×44 (best practice / SC 2.5.5 AAA). Aplica a `.nav__burger` y `.lang-toggle__btn` cuando vive dentro de `.nav-drawer`.
+- **Patrón:** `min-height` + `display: inline-flex; align-items: center; justify-content: center;` para extender el hit area sin cambiar el padding visual.
+
+### 15.5 Jerarquía de headings
+
+- **Una sola `<h1>` por página** — siempre el título principal.
+- **No saltar niveles** (h2 → h4 sin h3 = error). Importante en SDCs reutilizables: si un componente puede aparecer en contextos sin h2/h3 padre, sus headings internos deben empezar en h2.
+- **Caso resuelto:** `canal-directo` (Contacto) — sus titulares de card pasaron de `<h4>` a `<h2 class="contact-card__title">` porque la página no tiene heading h3 padre.
+
+### 15.6 Forms
+
+- **Todo `<input>` necesita `<label>`.** Si visualmente solo aparece un placeholder, usar `<label class="visually-hidden">`. Placeholder NO sustituye label (desaparece al escribir, contraste insuficiente, a11y tools no lo asocian).
+- **`autocomplete` hint** (`email`, `name`, `tel`) — ayuda a usuarios de password managers y mejora UX general.
+- **`.visually-hidden`** está declarada en main.scss porque el theme depende solo de `core/drupal`, no de `system/base`. Si en algún momento se añade `system/base` como dependencia, eliminar la declaración local para evitar duplicado.
+
+### 15.7 ARIA en navegación
+
+- **`aria-current="page"`** en el link de la página actual (desktop nav + mobile drawer).
+- **`aria-current="true"`** en el botón de idioma activo del `lang-toggle`. Añadir también `lang` y `hreflang` al `<a>` del idioma alternativo.
+- **`aria-label`** en `<nav>` cuando hay más de un nav en la página (caso del drawer mobile que duplica los links del desktop).
+- **`role="group" aria-label="Idioma"`** en el wrapper del lang-toggle.
+- **Mobile drawer:**
+  - Burger: `aria-controls="nav-drawer"` + `aria-expanded` toggle + `aria-label` dinámico Open/Close vía JS (strings en `data-label-open` / `data-label-close` para que el twig posea la i18n).
+  - Drawer: atributo `inert` cuando está oculto (no solo `aria-hidden`) — `inert` sí remueve los elementos del tab order, `aria-hidden` solo del accessibility tree.
+  - JS sincroniza `aria-expanded`, `aria-label`, `aria-hidden` e `inert` en cada toggle ([js/nav.js](../web/themes/custom/byte/js/nav.js)).
+
+### 15.8 SVGs e iconos
+
+- **Decorativos** (al lado de un label visible): `aria-hidden="true"` + `focusable="false"`.
+- **Funcionales** (sin texto adyacente): `<svg role="img"><title>Etiqueta</title>...</svg>`. Si es un botón, basta con `aria-label` en el `<button>` y `aria-hidden="true"` en el svg.
+
+### 15.9 Cómo verificar después de deploy
+
+```bash
+# 1. CSS agregado contiene los tokens nuevos
+curl -s https://jalvarez.tech/es | grep -oE 'css_[A-Za-z0-9_-]+\.css' | sort -u
+
+# 2. ARIA renderiza en HTML
+curl -s https://jalvarez.tech/es | grep -E 'aria-current|aria-controls|inert|data-label-'
+```
+
+Esperado: 2× `aria-current="page"` + 2× `aria-current="true"` + 1× `aria-controls="nav-drawer"` + 1× `inert` + `data-label-open/close`.

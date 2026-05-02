@@ -1,7 +1,7 @@
 # PLAN — completar el sitio jalvarez.tech
 
 > Plan en ejecución autónoma. Marcas: ✅ hecho · ⏳ en curso · ⬜ pendiente.
-> Última actualización: 2026-05-02 (Canvas: las 4 páginas principales migradas a canvas_page entities)
+> Última actualización: 2026-05-02 (Pase WCAG 2.2 AA site-wide: focus-visible, prefers-reduced-motion, contraste --fg-dim, ARIA, touch targets)
 
 ## Estado actual del sitio (referencia rápida)
 
@@ -340,10 +340,86 @@ Ahora cuando el editor crea/edita un proyecto y marca el checkbox "Destacado en 
 - Reemplaza al que estaba antes
 - El editor NO toca el Canvas tree del home — solo edita el proyecto en `/admin/content`
 
+### F12 — Accesibilidad WCAG 2.2 AA site-wide ✅
+
+Auditoría completa + fixes aplicados en commit `a5ea40f`. Producción verificada (CSS agregado contiene los nuevos tokens, HTML renderiza los nuevos atributos ARIA en `/es` y `/en`).
+
+**Indicadores de foco** ([scss/main.scss](web/themes/custom/byte/scss/main.scss))
+
+- `:focus-visible` ring global (3px `var(--accent)`, offset 2px) — usa `:focus-visible` para que mouse users no lo vean.
+- Variantes:
+  - `.btn`, `.nav__cta`, `.lang-toggle__btn`, `.theme-toggle`, `.chip`, `.nav__link` → `border-radius: var(--r-pill)` + offset 3px.
+  - `.project`, `.post`, `.case-step`, `.contact-card` → `border-radius: var(--r-card)` + offset 4px.
+- Skip-link de Drupal core (`.visually-hidden.focusable:focus`) ahora visible al focus con estilo byte (`background: var(--accent)`, `border-radius: var(--r-pill)`).
+- `.visually-hidden` redeclarada en main.scss porque el theme depende solo de `core/drupal` (no de `system/base`).
+
+**Reduced motion** ([scss/main.scss](web/themes/custom/byte/scss/main.scss))
+
+```scss
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .marquee__track { animation: none !important; }
+  .project:hover .project__media, .post:hover { transform: none !important; }
+}
+```
+
+**Jerarquía de headings** ([components/canal-directo/canal-directo.twig](web/themes/custom/byte/components/canal-directo/canal-directo.twig))
+
+`<h4>` → `<h2 class="contact-card__title">` en las 3 cards. La página Contacto (canvas_page id=7) no tiene h3 padre en el árbol, así que h4 era heading huérfano. SCSS migrado de selector `h4` a `&__title`.
+
+**Newsletter form** ([templates/node--note--full.html.twig](web/themes/custom/byte/templates/node--note--full.html.twig))
+
+`<input type="email">` con solo `placeholder` → ahora con `<label class="visually-hidden">` real + `autocomplete="email"`. Strings nuevos `newsletter_label` en ambos i18n maps (ES/EN).
+
+**Contraste de color** ([scss/_tokens.scss](web/themes/custom/byte/scss/_tokens.scss))
+
+Calculado vía fórmula WCAG (luminance relativa) sobre los backgrounds reales del theme:
+
+| Token | Antes | Después | Tema |
+|---|---|---|---|
+| `--fg-dim` | `#6b6760` (3.49:1 ❌) | `#80796f` (4.68:1 ✓ AA) | Dark sobre `#0a0908` |
+| `--fg-dim` | `#8a8478` (3.48:1 ❌) | `#6e6a60` (5.03:1 ✓ AA) | Light sobre `#faf8f4` |
+
+`--fg-muted` ya pasaba AAA en ambos temas (7.80:1 dark, 7.27:1 light).
+
+**Touch targets (WCAG 2.2 SC 2.5.5/2.5.8)** ([scss/components/_nav-glass.scss](web/themes/custom/byte/scss/components/_nav-glass.scss))
+
+| Elemento | Antes | Después |
+|---|---|---|
+| `.nav__burger` (mobile) | 36×36 | **44×44** |
+| `.lang-toggle__btn` (desktop) | ~21×30 (fail AA min) | `min-height: 26px` + flex centering ≥ 24×24 |
+| `.lang-toggle__btn` (drawer mobile) | ~21×30 | **44×44** (`min-width` + `min-height`) |
+
+**ARIA states en navegación** ([components/nav-glass/nav-glass.twig](web/themes/custom/byte/components/nav-glass/nav-glass.twig) + [js/nav.js](web/themes/custom/byte/js/nav.js))
+
+- `aria-current="page"` en link activo (desktop nav + drawer).
+- `aria-current="true"` + `lang/hreflang` en `.lang-toggle__btn.is-on`.
+- `<nav aria-label="Principal/Primary">` en desktop y drawer.
+- `<div role="group" aria-label="Idioma/Language">` envolviendo lang-toggle.
+- Burger: `aria-controls="nav-drawer"` + `aria-label` dinámico Open/Close vía JS (`data-label-open` + `data-label-close` para i18n sin tocar JS).
+- Drawer: atributo `inert` cuando está oculto (skip total de tab-focus en lugar de solo `aria-hidden`). JS sincroniza `aria-expanded`, `aria-label`, `aria-hidden` e `inert` en cada toggle.
+- SVGs con `aria-hidden="true"` + `focusable="false"` (los íconos del theme-toggle).
+
+**Verificación post-deploy**
+
+```bash
+# CSS agregado en producción
+curl -s https://jalvarez.tech/es | grep css_ | sed 's/&amp;/\&/g'
+# → grep --fg-dim, focus-visible, nav__burger 44px
+
+# ARIA en HTML
+curl -s https://jalvarez.tech/es | grep -E 'aria-current|aria-controls|inert|data-label-'
+# → 2× aria-current="page", 2× aria-current="true", inert, data-label-open/close
+```
+
 ## Cierre
 
-- ⏳ Commit final + push → deploy a producción.
-- ⏳ Actualizar `docs/DESIGN.md` y `docs/ARCHITECTURE.md` con cambios finales.
+- ✅ Commit final + push → deploy a producción.
+- ✅ Actualizar `docs/DESIGN.md` y `docs/PLAN.md` con cambios finales (incluida sección a11y).
 - ⏳ Update skill `drupal-hostinger-deploy` con aprendizajes (UUID sync, library cache, drush cim por entity).
 
 ## Convenciones operativas durante este plan
