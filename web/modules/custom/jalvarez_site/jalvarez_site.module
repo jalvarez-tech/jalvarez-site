@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * jalvarez_site module hooks.
+ */
+
+/**
+ * Implements hook_pathauto_alias_alter().
+ *
+ * Rewrites the language prefix of generated aliases for translated content
+ * so EN translations get the right URL segment. Pathauto's per-language
+ * patterns have buggy context resolution; this hook is the simplest correct
+ * approach.
+ *
+ *   ES (default): proyectos/* · notas/*
+ *   EN:           projects/*  · notes/*
+ */
+function jalvarez_site_pathauto_alias_alter(string &$alias, array &$context): void {
+  // PathautoGenerator builds context with key 'language' (a reference to
+  // $langcode). @see Drupal\pathauto\PathautoGenerator::createEntityAlias()
+  $lang = $context['language'] ?? '';
+  if ($lang !== 'en') {
+    return;
+  }
+  // Pathauto generates aliases WITH a leading slash (e.g. "/notas/foo"),
+  // depending on `cleanAlias` output. Match either form.
+  $rewrites = [
+    '/proyectos/' => '/projects/',
+    '/notas/'     => '/notes/',
+    'proyectos/'  => 'projects/',
+    'notas/'      => 'notes/',
+  ];
+  foreach ($rewrites as $from => $to) {
+    if (str_starts_with($alias, $from)) {
+      $alias = $to . substr($alias, strlen($from));
+      return;
+    }
+  }
+}

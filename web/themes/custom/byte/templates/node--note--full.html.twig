@@ -5,7 +5,35 @@
  */
 #}
 {% set lang = node.get('langcode').value|default('es') %}
-{% set back_label = lang == 'en' ? '← Back to writing' : '← Volver a notas' %}
+{% set t = lang == 'en' ? {
+  back: '← Back to writing',
+  back_path: '/notes',
+  role: 'Senior Web Specialist · jalvarez.tech',
+  share: 'Share',
+  save: 'Save',
+  copy: 'Copy link',
+  hero_alt: 'Featured image',
+  newsletter_eyebrow: 'NEWSLETTER — ONE PER MONTH, ONLY THE USEFUL',
+  newsletter_title_a: 'If anything I',
+  newsletter_title_em: 'shared here',
+  newsletter_title_b: 'helped, take what comes next too.',
+  newsletter_email: 'you@email.com',
+  newsletter_submit: 'Subscribe',
+} : {
+  back: '← Volver a notas',
+  back_path: '/notas',
+  role: 'Senior Web Specialist · jalvarez.tech',
+  share: 'Compartir',
+  save: 'Guardar',
+  copy: 'Copiar enlace',
+  hero_alt: 'Imagen destacada',
+  newsletter_eyebrow: 'NEWSLETTER — UNA POR MES, LO MÁS ÚTIL',
+  newsletter_title_a: 'Si te sirvió algo de lo que',
+  newsletter_title_em: 'compartí aquí',
+  newsletter_title_b: ', llévate también lo que viene.',
+  newsletter_email: 'tu@email.com',
+  newsletter_submit: 'Suscribirme',
+} %}
 
 {# Read time estimate #}
 {% set body_text = node.body.value|default('')|striptags %}
@@ -28,7 +56,7 @@
 
 <article class="article">
   <div class="article__wrap">
-    <a class="article__back" href="/{{ lang }}/notas">{{ back_label }}</a>
+    <a class="article__back" href="/{{ lang }}{{ t.back_path }}">{{ t.back }}</a>
 
     <header class="article__head">
       <div class="article__tags">
@@ -54,17 +82,17 @@
           <div class="article__avatar">JA</div>
           <div>
             <div class="article__author-name">John Stevans Alvarez</div>
-            <div class="article__author-role">Senior Web Specialist · jalvarez.tech</div>
+            <div class="article__author-role">{{ t.role }}</div>
           </div>
         </div>
         <div class="article__actions">
-          <button class="article__action" aria-label="Compartir" type="button">
+          <button class="article__action" aria-label="{{ t.share }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-share-2"></use></svg>
           </button>
-          <button class="article__action" aria-label="Guardar" type="button">
+          <button class="article__action" aria-label="{{ t.save }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-bookmark"></use></svg>
           </button>
-          <button class="article__action" aria-label="Copiar enlace" type="button">
+          <button class="article__action" aria-label="{{ t.copy }}" type="button">
             <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-copy"></use></svg>
           </button>
         </div>
@@ -88,11 +116,11 @@
     <hr class="article__divider">
 
     <section class="article__news">
-      <div class="article__news-eyebrow">NEWSLETTER — UNA POR MES, LO MÁS ÚTIL</div>
-      <h3>Si te sirvió algo de lo que <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">compartí aquí</em>, llévate también lo que viene.</h3>
+      <div class="article__news-eyebrow">{{ t.newsletter_eyebrow }}</div>
+      <h3>{{ t.newsletter_title_a }} <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">{{ t.newsletter_title_em }}</em>{{ t.newsletter_title_b }}</h3>
       <form action="#" method="post" onsubmit="return false;">
-        <input type="email" placeholder="tu@email.com" required>
-        <button class="btn btn--primary btn--sm" type="submit">Suscribirme</button>
+        <input type="email" placeholder="{{ t.newsletter_email }}" required>
+        <button class="btn btn--primary btn--sm" type="submit">{{ t.newsletter_submit }}</button>
       </form>
     </section>
   </div>

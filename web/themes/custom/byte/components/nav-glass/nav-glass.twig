@@ -20,7 +20,7 @@
           {{ cta_label|default('Disponible') }}
         </a>
 
-        <button class="theme-toggle" type="button" aria-label="Cambiar tema" data-theme-toggle>
+        <button class="theme-toggle" type="button" aria-label="{{ lang == 'en' ? 'Toggle theme' : 'Cambiar tema' }}" data-theme-toggle>
           <svg class="theme-toggle__icon theme-toggle__icon--sun" width="16" height="16" aria-hidden="true">
             <use href="/{{ active_theme_path() }}/icons.svg#i-sun"></use>
           </svg>
@@ -39,7 +39,7 @@
     {%- endif -%}
 
     {# Mobile hamburger #}
-    <button class="nav__burger" type="button" aria-label="Menú" aria-expanded="false" data-nav-toggle>
+    <button class="nav__burger" type="button" aria-label="{{ lang == 'en' ? 'Menu' : 'Menú' }}" aria-expanded="false" data-nav-toggle>
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -62,8 +62,8 @@
       {{ cta_label|default('Disponible') }}
     </a>
     <div class="lang-toggle">
-      <a href="/es" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
-      <a href="/en" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
+      <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
+      <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
     </div>
   </div>
 </div>

@@ -47,3 +47,11 @@ props:
         - es
         - en
       default: es
+    lang_es_href:
+      type: string
+      title: 'Spanish toggle href'
+      default: /es
+    lang_en_href:
+      type: string
+      title: 'English toggle href'
+      default: /en

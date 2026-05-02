@@ -18,10 +18,48 @@
  */
 #}
 {% set lang = node.get('langcode').value|default('es') %}
-{% set back_label = lang == 'en' ? '← Back to projects' : '← Volver a proyectos' %}
+{% set t = lang == 'en' ? {
+  back: '← Back to projects',
+  back_path: '/projects',
+  rol: 'Role',
+  year: 'Year',
+  duration: 'Duration',
+  stack: 'Stack',
+  live: 'Live',
+  visit: 'Visit ↗',
+  s1: '§ 01 Challenge',
+  s2: '§ 02 Approach',
+  s2_title: 'How I tackled it',
+  s3: '§ 03 Results',
+  s3_title: 'What happened next',
+  s4: '§ 04 Lesson',
+  cta_primary: 'Start your project',
+  cta_primary_path: '/contact',
+  cta_secondary: 'See more projects',
+  cta_secondary_path: '/projects',
+} : {
+  back: '← Volver a proyectos',
+  back_path: '/proyectos',
+  rol: 'Rol',
+  year: 'Año',
+  duration: 'Duración',
+  stack: 'Stack',
+  live: 'Live',
+  visit: 'Visitar ↗',
+  s1: '§ 01 Desafío',
+  s2: '§ 02 Enfoque',
+  s2_title: 'Cómo lo abordé',
+  s3: '§ 03 Resultados',
+  s3_title: 'Lo que pasó después',
+  s4: '§ 04 Aprendizaje',
+  cta_primary: 'Iniciar tu proyecto',
+  cta_primary_path: '/contacto',
+  cta_secondary: 'Ver más proyectos',
+  cta_secondary_path: '/proyectos',
+} %}
 
 <article class="case wrap">
-  <a class="case-back" href="/{{ lang }}/proyectos">{{ back_label }}</a>
+  <a class="case-back" href="/{{ lang }}{{ t.back_path }}">{{ t.back }}</a>
 
   <header class="case-head">
     <div class="case-tags">
@@ -46,19 +84,19 @@
 
     <dl class="case-meta">
       {% if not node.field_role.isEmpty %}
-        <div><dt class="case-meta__k">Rol</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
+        <div><dt class="case-meta__k">{{ t.rol }}</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
       {% endif %}
       {% if not node.field_project_year.isEmpty %}
-        <div><dt class="case-meta__k">Año</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
+        <div><dt class="case-meta__k">{{ t.year }}</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
       {% endif %}
       {% if not node.field_duration.isEmpty %}
-        <div><dt class="case-meta__k">Duración</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
+        <div><dt class="case-meta__k">{{ t.duration }}</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
       {% endif %}
       {% if node.field_primary_technology.entity %}
-        <div><dt class="case-meta__k">Stack</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
+        <div><dt class="case-meta__k">{{ t.stack }}</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
       {% endif %}
       {% if not node.field_external_url.isEmpty %}
-        <div><dt class="case-meta__k">Live</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default('Visitar ↗') }}</a></dd></div>
+        <div><dt class="case-meta__k">{{ t.live }}</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default(t.visit) }}</a></dd></div>
       {% endif %}
     </dl>
   </header>
@@ -66,7 +104,7 @@
   {# §01 Desafío #}
   {% if not node.field_challenge_intro.isEmpty or not node.field_challenge_bullets.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">§ 01 Desafío</div>
+      <div class="case-section__num">{{ t.s1 }}</div>
       {% if not node.field_challenge_intro.isEmpty %}
         <p class="case-section__lede">{{ node.field_challenge_intro.value }}</p>
       {% endif %}
@@ -83,8 +121,8 @@
   {# §02 Enfoque (case_step paragraphs) #}
   {% if not node.field_approach_steps.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">§ 02 Enfoque</div>
-      <h2 class="case-section__title">Cómo lo abordé</h2>
+      <div class="case-section__num">{{ t.s2 }}</div>
+      <h2 class="case-section__title">{{ t.s2_title }}</h2>
       <div class="case-steps">
         {% for delta, item in node.field_approach_steps %}
           {% set step = item.entity %}
@@ -104,8 +142,8 @@
   {# §03 Resultados (metric paragraphs + embedded testimonial) #}
   {% if not node.field_results_metrics.isEmpty or not node.field_testimonial_embed.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">§ 03 Resultados</div>
-      <h2 class="case-section__title">Lo que pasó después</h2>
+      <div class="case-section__num">{{ t.s3 }}</div>
+      <h2 class="case-section__title">{{ t.s3_title }}</h2>
 
       {% if not node.field_results_metrics.isEmpty %}
         <div class="medidores">
@@ -142,7 +180,7 @@
   {# §04 Aprendizaje #}
   {% if not node.field_lesson.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">§ 04 Aprendizaje</div>
+      <div class="case-section__num">{{ t.s4 }}</div>
       <p class="case-section__body">{{ node.field_lesson.value }}</p>
     </section>
   {% endif %}
@@ -153,9 +191,9 @@
   {% include 'byte:cta-final' with {
     title: node.field_cta_heading.value,
     sub: node.field_cta_sub.value,
-    primary_label: 'Iniciar tu proyecto',
-    primary_href: '/' ~ lang ~ '/contacto',
-    secondary_label: 'Ver más proyectos',
-    secondary_href: '/' ~ lang ~ '/proyectos',
+    primary_label: t.cta_primary,
+    primary_href: '/' ~ lang ~ t.cta_primary_path,
+    secondary_label: t.cta_secondary,
+    secondary_href: '/' ~ lang ~ t.cta_secondary_path,
   } only %}
 {% endif %}
