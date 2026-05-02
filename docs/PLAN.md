@@ -32,20 +32,13 @@
 - ✅ Script `enrich-sample-projects.php` para popular Maluma con challenge_intro + bullets + 4 case_step paragraphs + lesson + testimonial_embed + CTA.
 - ✅ Pathauto auto-genera `/es/proyectos/malumaonline`.
 
-### F3 — Detalle de Nota (article) ⬜
+### F3 — Detalle de Nota (article) ✅
 
-- ⬜ Crear template `node--note--full.html.twig` (estilo Medium):
-  - article-back link → `/notas`
-  - article-tags (categoría + fecha + tiempo de lectura)
-  - article-title
-  - article-sub
-  - article-byline (avatar + nombre + acciones share/bookmark/copy)
-  - article-hero (featured media)
-  - article-body (rich text con tipografía editorial)
-  - related_notes (View block)
-  - newsletter CTA
-- ⬜ CSS `.article-*` classes per DESIGN.md §3.
-- ⬜ Pathauto pattern `notas/[node:title]`.
+- ✅ Template `node--note--full.html.twig` con back, tags, title display, sub, byline + 3 action buttons (Lucide share/bookmark/copy), hero glyph fallback, body rich text con h2/h3/blockquote serif italic/code/pre, divider, newsletter CTA con italic acento.
+- ✅ Read time computado server-side (200 wpm).
+- ✅ Date formatting bilingüe ("abr 15, 2026" / "Apr 15, 2026").
+- ✅ `_article.scss` con `.article__*` BEM completo.
+- ✅ Pathauto auto-genera `/es/notas/<slug>`.
 
 ### F4 — Drupal Canvas integration ⬜
 

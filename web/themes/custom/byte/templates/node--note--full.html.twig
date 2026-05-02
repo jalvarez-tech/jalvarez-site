@@ -1,0 +1,99 @@
+{#
+/**
+ * @file
+ * Note (article) detail template — Medium-style editorial.
+ */
+#}
+{% set lang = node.get('langcode').value|default('es') %}
+{% set back_label = lang == 'en' ? '← Back to writing' : '← Volver a notas' %}
+
+{# Read time estimate #}
+{% set body_text = node.body.value|default('')|striptags %}
+{% set words = body_text|split(' ')|length %}
+{% set read_min = max(1, (words / 200)|round(0, 'ceil')) %}
+
+{# Format date #}
+{% set raw_date = node.field_publish_date.value %}
+{% set months_es = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'] %}
+{% set months_en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+{% set date_str = '' %}
+{% if raw_date %}
+  {% set parts = raw_date|split('-') %}
+  {% if parts|length >= 3 %}
+    {% set m = (parts[1]|number_format) - 1 %}
+    {% set month = lang == 'en' ? months_en[m] : months_es[m] %}
+    {% set date_str = month ~ ' ' ~ parts[2] ~ ', ' ~ parts[0] %}
+  {% endif %}
+{% endif %}
+
+<article class="article">
+  <div class="article__wrap">
+    <a class="article__back" href="/{{ lang }}/notas">{{ back_label }}</a>
+
+    <header class="article__head">
+      <div class="article__tags">
+        {% if node.field_note_topic.entity %}
+          <span class="article__cat">{{ node.field_note_topic.entity.label }}</span>
+          <span class="article__meta-dot">·</span>
+        {% endif %}
+        {% if date_str %}
+          <span class="article__meta-item">{{ date_str }}</span>
+          <span class="article__meta-dot">·</span>
+        {% endif %}
+        <span class="article__meta-item">{{ read_min }} min</span>
+      </div>
+
+      <h1 class="article__title">{{ node.label }}</h1>
+
+      {% if not node.field_excerpt.isEmpty %}
+        <p class="article__sub">{{ node.field_excerpt.value }}</p>
+      {% endif %}
+
+      <div class="article__byline">
+        <div class="article__author">
+          <div class="article__avatar">JA</div>
+          <div>
+            <div class="article__author-name">John Stevans Alvarez</div>
+            <div class="article__author-role">Senior Web Specialist · jalvarez.tech</div>
+          </div>
+        </div>
+        <div class="article__actions">
+          <button class="article__action" aria-label="Compartir" type="button">
+            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-share-2"></use></svg>
+          </button>
+          <button class="article__action" aria-label="Guardar" type="button">
+            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-bookmark"></use></svg>
+          </button>
+          <button class="article__action" aria-label="Copiar enlace" type="button">
+            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-copy"></use></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    {% if not node.field_featured_media.isEmpty %}
+      <div class="article__hero">
+        {{ node.field_featured_media.entity ? node.field_featured_media.0 : 'IMAGEN DESTACADA' }}
+      </div>
+    {% else %}
+      <div class="article__hero">{% if node.field_thumb_glyph.value %}
+        <svg width="80" height="80" aria-hidden="true" style="opacity:.5;color:var(--accent);"><use href="/{{ active_theme_path() }}/icons.svg#i-{{ node.field_thumb_glyph.value }}"></use></svg>
+      {% endif %}</div>
+    {% endif %}
+
+    <div class="article__body">
+      {{ node.body.value|raw }}
+    </div>
+
+    <hr class="article__divider">
+
+    <section class="article__news">
+      <div class="article__news-eyebrow">NEWSLETTER — UNA POR MES, LO MÁS ÚTIL</div>
+      <h3>Si te sirvió algo de lo que <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">compartí aquí</em>, llévate también lo que viene.</h3>
+      <form action="#" method="post" onsubmit="return false;">
+        <input type="email" placeholder="tu@email.com" required>
+        <button class="btn btn--primary btn--sm" type="submit">Suscribirme</button>
+      </form>
+    </section>
+  </div>
+</article>
