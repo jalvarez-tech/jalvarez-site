@@ -1,0 +1,112 @@
+# PLAN — completar el sitio jalvarez.tech
+
+> Plan en ejecución autónoma. Marcas: ✅ hecho · ⏳ en curso · ⬜ pendiente.
+> Última actualización: 2026-05-02
+
+## Estado actual del sitio (referencia rápida)
+
+| URL | Status |
+|---|---|
+| `/` (home) | ✅ Hero + values + featured + process + tests + CTA |
+| `/es/proyectos` | ✅ phead + 3 cards + CTA |
+| `/es/notas` | ✅ phead + 5 rows + CTA |
+| `/es/contacto` | ✅ phead + form ES + canal-directo |
+| `/admin/*` | ✅ Gin + Navigation core sidebar |
+| Top nav (`byte:nav-glass`) | ✅ Liquid glass, brand + 4 links + CTA + ES/EN |
+
+## Plan de cierre — 7 fases en orden
+
+### F1 — Form bullets polish ⏳
+
+- ⬜ Override del wrapper `<fieldset>` y `<legend>` que Drupal Webform pone alrededor de radios.
+- ⬜ Hacer invisibles los `<input type="radio">` nativos.
+- ⬜ Aplicar pill style al `<label>` de cada radio.
+- ⬜ Estado checked: bg `--accent`, text `#0a0908`.
+- ⬜ Verificar visualmente en `/es/contacto` (selector "Tipo de proyecto" y "Presupuesto aproximado").
+
+### F2 — Detalle de Proyecto (case study) ⬜
+
+- ⬜ Crear `byte:case-step-card` SDC (mostrar paragraph case_step: tag + título + body).
+- ⬜ Crear `byte:medidor` SDC (mostrar paragraph metric: valor grande + key + nota).
+- ⬜ Crear template `node--project--full.html.twig` que componga:
+  - case-back link → `/proyectos`
+  - case tags (chips de stack + año + role)
+  - case-title display
+  - case-brief
+  - case-meta (key/value grid: Cliente · Año · Rol · Duración · Stack · Live ↗)
+  - cover/featured media (placeholder por ahora)
+  - § 01 Desafío (intro + bullets)
+  - § 02 Enfoque (loop case-step-card)
+  - § 03 Resultados (loop medidor + testimonio embebido)
+  - § 04 Aprendizaje
+  - related_projects (View block)
+  - cta-final
+- ⬜ Configurar Pathauto pattern para `proyectos/[node:title]`.
+
+### F3 — Detalle de Nota (article) ⬜
+
+- ⬜ Crear template `node--note--full.html.twig` (estilo Medium):
+  - article-back link → `/notas`
+  - article-tags (categoría + fecha + tiempo de lectura)
+  - article-title
+  - article-sub
+  - article-byline (avatar + nombre + acciones share/bookmark/copy)
+  - article-hero (featured media)
+  - article-body (rich text con tipografía editorial)
+  - related_notes (View block)
+  - newsletter CTA
+- ⬜ CSS `.article-*` classes per DESIGN.md §3.
+- ⬜ Pathauto pattern `notas/[node:title]`.
+
+### F4 — Drupal Canvas integration ⬜
+
+- ⬜ Agregar `field_canvas` al CT `page` (drupal/canvas field type).
+- ⬜ Verificar que SDCs creadas (chip, button, banner-inicio, etc.) aparecen disponibles en el editor de Canvas.
+- ⬜ Crear página Canvas "Sobre mí" como prueba de concepto.
+
+### F5 — Responsive verification ⬜
+
+Breakpoints a respetar (de `_tokens.scss` y design CSS):
+- `mobile`: < 720px (1 col)
+- `tablet`: 720-1080px (2 col en grids)
+- `laptop`: 1080-1240px (3 col en projects-grid, etc.)
+- `desktop`: > 1240px (max-width container)
+
+Verificación:
+- ⬜ Home en 375px, 768px, 1024px, 1440px
+- ⬜ /proyectos card grid responde 1→2→3 columnas
+- ⬜ /notas row layout: stack en mobile, 5-col en desktop
+- ⬜ /contacto grid: 1 col en mobile, 2 col en desktop
+- ⬜ phead title font sizes scale con clamp()
+- ⬜ nav-glass: links → hamburger en mobile
+
+### F6 — Mobile menu drawer (hamburger) ⬜
+
+- ⬜ Actualizar `byte:nav-glass` template con botón hamburger visible solo en < 900px.
+- ⬜ Drawer portal a `<body>` con animación slide-in desde derecha.
+- ⬜ Lock body scroll cuando drawer abierto.
+- ⬜ Link items con número (01, 02, 03, 04) según design.
+- ⬜ JS vanilla mínimo: toggle, escape key close, click backdrop close.
+- ⬜ Footer del drawer: CTA + lang toggle.
+
+### F7 — Theme toggle (light/dark) ⬜
+
+- ⬜ Agregar botón sun/moon en `byte:nav-glass` (junto a lang-toggle).
+- ⬜ JS para toggle: lee/escribe `localStorage.jsa-theme`, set `data-theme` attr.
+- ⬜ Inline script en `<head>` para evitar FOUC (ya existe en `byte_preprocess_html`, mejorar).
+- ⬜ Iconos sun/moon de Lucide ya están en sprite.
+- ⬜ CSS `[data-theme="light"]` ya existe en tokens — verificar que cubre todos los componentes.
+- ⬜ Test en /, /proyectos, /notas, /contacto que el toggle persiste y no flickea.
+
+## Cierre
+
+- ⬜ Commit final + push → deploy a producción.
+- ⬜ Actualizar `docs/DESIGN.md` y `docs/ARCHITECTURE.md` con cambios finales.
+- ⬜ Update skill `drupal-hostinger-deploy` con cualquier nuevo aprendizaje.
+
+## Convenciones operativas durante este plan
+
+- Cada fase: trabajo local → build CSS → verificación visual → commit + push → seed prod si requiere data.
+- Workflow `seed-content.yml` reusable para cualquier `.php` script en producción.
+- Si un cambio no aplica vía `drush cim` (UUID mismatch), se ejecuta script directo en prod.
+- Mantener idempotencia en todos los scripts.

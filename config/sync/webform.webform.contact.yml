@@ -15,33 +15,43 @@ template: false
 archive: false
 id: contact
 title: Contacto
-description: 'Basic email contact webform.'
+description: 'Formulario de contacto para nuevos proyectos.'
 categories: {  }
-elements: |
+elements: |-
   name:
-    '#title': 'Your Name'
+    '#title': 'Nombre'
     '#type': textfield
     '#required': true
-    '#default_value': '[current-user:display-name]'
+    '#placeholder': 'John Doe'
   email:
-    '#title': 'Your Email'
+    '#title': 'Correo'
     '#type': email
     '#required': true
-    '#default_value': '[current-user:mail]'
-  subject:
-    '#title': Subject
+    '#placeholder': 'john@empresa.com'
+  company:
+    '#title': 'Empresa / proyecto'
     '#type': textfield
-    '#required': true
-    '#test': 'Testing contact webform from [site:name]'
+    '#placeholder': 'Nombre de tu marca o startup'
+  project_type:
+    '#title': 'Tipo de proyecto'
+    '#type': radios
+    '#options': project_types
+    '#default_value': 'web'
+  budget:
+    '#title': 'Presupuesto aproximado (USD)'
+    '#type': radios
+    '#options': project_budgets
+    '#default_value': 'mid'
   message:
-    '#title': Message
+    '#title': 'Cuéntame'
     '#type': textarea
     '#required': true
-    '#test': 'Please ignore this email.'
+    '#description': 'Mientras más contexto, mejor.'
+    '#placeholder': "Qué intentas resolver, qué te frena hoy, qué pasaría si no lo resuelves. El cómo lo discutimos después..."
+    '#rows': 6
   actions:
     '#type': webform_actions
-    '#title': 'Submit button(s)'
-    '#submit__label': 'Send message'
+    '#submit__label': 'Enviar mensaje'
 css: ''
 javascript: ''
 settings:

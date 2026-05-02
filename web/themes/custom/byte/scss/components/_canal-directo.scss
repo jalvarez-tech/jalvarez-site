@@ -154,46 +154,108 @@
 
   input::placeholder, textarea::placeholder { color: var(--fg-dim); }
 
-  // Radios as pills
-  .form-radios {
+  // Strip Drupal Webform fieldset wrapper around radios
+  .fieldset-wrapper,
+  .form-composite {
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+  }
+
+  fieldset.form-composite,
+  fieldset.webform-options-display-one-column {
+    border: 0;
+    padding: 0;
+    margin: 0;
+
+    > legend {
+      font-family: var(--f-mono);
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      letter-spacing: 0.02em;
+      padding: 0;
+      margin: 0 0 10px;
+      text-transform: none;
+      float: none;
+      width: auto;
+    }
+  }
+
+  // Radios as pills — Webform 6.x uses js-webform-radios + webform-options-display-* wrappers.
+  .js-webform-radios,
+  .form-radios,
+  .form-checkboxes,
+  .webform-options-display-one-column,
+  .webform-options-display-two-columns,
+  .webform-options-display-three-columns {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 6px 0 2px;
+    padding: 4px 0 2px;
+    border: 0;
+  }
 
-    .form-item {
-      padding: 0;
-      border: 0;
+  // Each radio/checkbox option becomes a pill
+  .js-webform-type-radio,
+  .webform-type-radio,
+  .form-type-radio,
+  .js-form-type-radio,
+  .form-radios .form-item,
+  .form-checkboxes .form-item,
+  .form-type-checkbox,
+  .js-form-type-checkbox {
+    padding: 0;
+    border: 0;
+    margin: 0;
+    position: relative;
+    display: inline-flex;
 
-      input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
+    // Hide native circle but keep input keyboard-accessible
+    input[type="radio"],
+    input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      height: 0;
+    }
 
-      label {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 14px;
-        border-radius: var(--r-pill);
-        border: 1px solid var(--line-strong);
-        font-family: var(--f-mono);
-        font-size: 12px;
-        color: var(--fg-muted);
-        cursor: pointer;
-        margin: 0;
-        transition: all .15s;
-        text-transform: none;
-        letter-spacing: 0.01em;
-      }
+    label {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line-strong);
+      font-family: var(--f-mono);
+      font-size: 12px;
+      color: var(--fg-muted);
+      cursor: pointer;
+      margin: 0;
+      transition: all .15s;
+      text-transform: none;
+      letter-spacing: 0.01em;
+      background: transparent;
 
-      label:hover { color: var(--fg); border-color: var(--fg-muted); }
+      &::before { content: none !important; }
+    }
 
-      input:checked + label {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #0a0908;
-      }
+    label:hover {
+      color: var(--fg);
+      border-color: var(--fg-muted);
+    }
+
+    input:checked + label,
+    input:checked ~ label {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0a0908;
+    }
+
+    input:focus-visible + label,
+    input:focus-visible ~ label {
+      outline: 2px solid var(--accent-hover);
+      outline-offset: 2px;
     }
   }
 
