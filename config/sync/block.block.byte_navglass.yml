@@ -1,0 +1,20 @@
+uuid: 946f5e6c-ae7a-4f39-9cca-75de685b27e4
+langcode: es
+status: true
+dependencies:
+  module:
+    - jalvarez_site
+  theme:
+    - byte
+id: byte_navglass
+theme: byte
+region: header
+weight: -10
+provider: null
+plugin: jalvarez_nav_glass
+settings:
+  id: jalvarez_nav_glass
+  label: 'Byte top navigation'
+  label_display: '0'
+  provider: jalvarez_site
+visibility: {  }

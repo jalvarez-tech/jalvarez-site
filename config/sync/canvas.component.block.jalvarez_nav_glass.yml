@@ -1,0 +1,22 @@
+uuid: 5c774de7-ff8f-42bf-9775-c2b33312966d
+langcode: es
+status: true
+dependencies:
+  module:
+    - jalvarez_site
+active_version: bd18dbc209d74f61
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: jalvarez_nav_glass
+        label: 'Byte top navigation'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+label: 'Byte top navigation'
+id: block.jalvarez_nav_glass
+provider: jalvarez_site
+source: block
+source_local_id: jalvarez_nav_glass

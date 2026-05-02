@@ -1,0 +1,9 @@
+uuid: f47336fb-ab6c-4188-8f18-ada367040242
+langcode: es
+status: true
+dependencies: {  }
+name: Jalvarez
+configEntityTypeId: component
+weight: 0
+items:
+  - block.jalvarez_nav_glass
