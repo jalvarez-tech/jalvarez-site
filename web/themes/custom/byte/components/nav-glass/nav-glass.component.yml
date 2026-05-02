@@ -1,0 +1,38 @@
+'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: 'Nav glass (top)'
+status: stable
+description: 'Liquid-glass fixed top nav: brand monogram + nav links + CTA + lang toggle. Floats centered with backdrop-filter blur.'
+props:
+  type: object
+  properties:
+    brand_initial:
+      type: string
+      default: 'J'
+    brand_name:
+      type: string
+      default: 'jalvarez'
+    brand_tld:
+      type: string
+      default: '.tech'
+    links:
+      type: array
+      description: 'Menu links to render in the nav'
+      items:
+        type: object
+        properties:
+          label:  { type: string }
+          href:   { type: string }
+          active: { type: boolean }
+    cta_label:
+      type: string
+      default: 'Disponible'
+    cta_href:
+      type: string
+      default: '/contacto'
+    show_lang_toggle:
+      type: boolean
+      default: true
+    current_lang:
+      type: string
+      enum: [es, en]
+      default: es

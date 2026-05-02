@@ -1,0 +1,32 @@
+{# Nav glass — fixed top liquid-glass nav #}
+{%- set lang = current_lang|default('es') -%}
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="/{{ lang }}">
+      <span class="brand__mark">{{ brand_initial|default('J') }}</span>
+      <span class="brand__name">{{ brand_name|default('jalvarez') }}<span class="brand__tld">{{ brand_tld|default('.tech') }}</span></span>
+    </a>
+
+    {%- if links|length > 0 -%}
+      <nav class="nav__links">
+        {%- for l in links -%}
+          <a href="{{ l.href }}" class="nav__link{{ l.active ? ' nav__link--active' : '' }}">
+            {{ l.label }}
+          </a>
+        {%- endfor -%}
+
+        <a href="{{ cta_href|default('/contacto') }}" class="nav__cta">
+          <span class="status-dot"></span>
+          {{ cta_label|default('Disponible') }}
+        </a>
+
+        {%- if show_lang_toggle|default(true) -%}
+          <div class="lang-toggle" role="group" aria-label="language">
+            <a href="/es" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}">ES</a>
+            <a href="/en" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}">EN</a>
+          </div>
+        {%- endif -%}
+      </nav>
+    {%- endif -%}
+  </div>
+</header>
