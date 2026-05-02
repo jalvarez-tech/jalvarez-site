@@ -7,7 +7,9 @@ fetch:
   url: null
   max_attempts: 2
   timeout: 30
+# NOTE: notification.emails is repaired post-cim by
+# scripts/fix-prod-system-site.php. Value below is the prod canonical.
 notification:
   emails:
-    - admin@example.com
+    - stevanswd@gmail.com
   threshold: all

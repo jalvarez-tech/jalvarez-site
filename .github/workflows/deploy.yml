@@ -234,6 +234,15 @@ jobs:
             fi
           "
 
+      # Ship the post-cim repair script to /tmp on the server so the next
+      # step can run it via drush php:script. We don't deploy scripts/
+      # permanently because they're maintenance tooling, not runtime code.
+      - name: Send post-cim repair script
+        run: |
+          REMOTE_FIX=/tmp/jalvarez-fix-system-site.php
+          echo "REMOTE_FIX=$REMOTE_FIX" >> $GITHUB_ENV
+          scp scripts/fix-prod-system-site.php "hostinger:$REMOTE_FIX"
+
       - name: Drupal post-deploy
         run: |
           ssh hostinger "
@@ -246,6 +255,19 @@ jobs:
               \$DRUSH updb -y
               \$DRUSH cim -y || echo '⚠ Config import skipped (no config to import).'
               \$DRUSH cr
+
+              # Defensive repair: drush cim sometimes overwrites system.site
+              # (name, mail, page.front) with stale values from local config
+              # exports — page.front in particular points to a canvas_page
+              # ID that doesn't exist in prod, taking down /, /es, /en.
+              # See scripts/fix-prod-system-site.php for the repair logic.
+              if [ -f $REMOTE_FIX ]; then
+                echo '→ Running post-cim system.site repair.'
+                \$DRUSH php:script $REMOTE_FIX
+                rm -f $REMOTE_FIX
+              else
+                echo '⚠ Repair script not found at $REMOTE_FIX — skipping.'
+              fi
             else
               echo '⚠ Drupal not installed yet — skipping drush hooks.'
               echo '   Run \`drush site:install\` manually once via SSH to bootstrap.'

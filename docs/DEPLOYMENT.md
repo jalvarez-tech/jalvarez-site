@@ -488,6 +488,25 @@ Después del primer deploy con Canvas, corra estos scripts vía `seed-content.ym
 
 Lo mismo para los aliases (`/inicio`, `/home`, `/proyectos`, etc.): son parte del `path` field de cada canvas_page y se crean junto con la entidad.
 
+### Defensa contra el bug "drush cim contamina prod"
+
+**Síntoma observado (2026-05-02):** después de un `git push`, las URLs `/`, `/es`, `/en` empezaron a devolver 404 con title `"jalvarez.tech (local)"`. El resto de URLs (`/es/proyectos`, etc.) seguían funcionando porque tienen alias propios.
+
+**Causa raíz:** `config/sync/system.site.yml` traía valores de un export local con `name: 'jalvarez.tech (local)'`, `mail: admin@example.com` y `page.front: /page/8` (ID que existía en local pero no en prod). El step `drush cim` del workflow re-aplicó esos valores en producción, rompiendo la home.
+
+**Fix permanente** (vive en el repo):
+
+1. **`scripts/fix-prod-system-site.php`** — script defensivo que:
+   - Resuelve la home dinámicamente vía `path_alias.manager->getPathByAlias('/inicio')` → `/page/{id}` (sin asumir IDs entre envs).
+   - Fuerza `system.site.name`, `system.site.mail`, `system.site.page.front` y `update.settings.notification.emails` a sus valores canónicos.
+   - Idempotente (solo escribe si hay drift).
+
+2. **`.github/workflows/deploy.yml` — paso post-cim:** después de `drush updb && cim && cr`, el workflow hace `scp` del script a `/tmp` del server y lo ejecuta con `drush php:script`. Así, aunque alguien re-exporte config local sin sanitizar, el deploy lo repara automáticamente.
+
+3. **`config/sync/system.site.yml` y `update.settings.yml`** — los valores `name`, `mail`, `front`, `notification.emails` quedaron con los valores canónicos de prod (no de local), y un comentario YAML pide explícitamente restaurarlos antes de hacer `drush cex && git push`.
+
+**Prevención manual**: si haces `drush cex` desde local con un dump de DB diferente, **revisa el diff** de `config/sync/system.site.yml` antes de commitear y restaura `name/mail/front` a sus valores prod-canon.
+
 ### Primer deploy — flujo automático
 
 `git push origin main` dispara `deploy.yml`:
