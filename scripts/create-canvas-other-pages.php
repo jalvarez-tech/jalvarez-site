@@ -13,8 +13,67 @@
  */
 
 use Drupal\canvas\Entity\Page;
+use Drupal\canvas\Entity\Component;
 
-require_once __DIR__ . '/lib/canvas-tree.inc.php';
+// Helpers inlined so this script runs standalone via seed-content.yml
+// (the workflow scp's only this single file to /tmp/, so the lib/
+// include path doesn't resolve in production).
+
+if (!function_exists('canvas_tree_uuid')) {
+  function canvas_tree_uuid(): string {
+    return \Drupal::service('uuid')->generate();
+  }
+}
+
+if (!function_exists('canvas_tree_sdc_item')) {
+  function canvas_tree_sdc_item(string $uuid, string $component_id, array $values, ?string $parent_uuid = NULL, ?string $slot = NULL): array {
+    $component = Component::load($component_id);
+    if (!$component) {
+      throw new \RuntimeException("Component config entity '{$component_id}' not found. Re-run scripts/canvas-discover-sdcs.php.");
+    }
+    $version = $component->getActiveVersion();
+    $defs = ($component->getSettings()['prop_field_definitions'] ?? []);
+    $inputs = [];
+    foreach ($values as $prop_name => $value) {
+      if (!isset($defs[$prop_name])) continue;
+      $field_type = $defs[$prop_name]['field_type'];
+      $entry = [
+        'sourceType' => "static:field_item:{$field_type}",
+        'value' => $value,
+        'expression' => $defs[$prop_name]['expression'],
+      ];
+      if ($field_type === 'list_string') {
+        $entry['sourceTypeSettings'] = ['storage' => ['allowed_values_function' => 'canvas_load_allowed_values_for_component_prop']];
+      }
+      $inputs[$prop_name] = $entry;
+    }
+    return [
+      'uuid' => $uuid,
+      'component_id' => $component_id,
+      'component_version' => $version,
+      'inputs' => json_encode($inputs, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+      'parent_uuid' => $parent_uuid,
+      'slot' => $slot,
+    ];
+  }
+}
+
+if (!function_exists('canvas_tree_block_item')) {
+  function canvas_tree_block_item(string $uuid, string $component_id, array $settings = [], ?string $parent_uuid = NULL, ?string $slot = NULL): array {
+    $component = Component::load($component_id);
+    if (!$component) {
+      throw new \RuntimeException("Component config entity '{$component_id}' not found.");
+    }
+    return [
+      'uuid' => $uuid,
+      'component_id' => $component_id,
+      'component_version' => $component->getActiveVersion(),
+      'inputs' => json_encode($settings, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+      'parent_uuid' => $parent_uuid,
+      'slot' => $slot,
+    ];
+  }
+}
 
 /**
  * Delete any existing canvas_page with the given title (idempotent helper).
