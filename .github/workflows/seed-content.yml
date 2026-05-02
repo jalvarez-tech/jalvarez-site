@@ -1,0 +1,47 @@
+name: Seed sample content (one-shot)
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: 'Path of the PHP script to execute on the production server (relative to project root).'
+        required: true
+        default: 'scripts/build-sample-projects.php'
+
+jobs:
+  seed:
+    name: Run drush php:script on Hostinger
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          name: hostinger
+          known_hosts: 'placeholder'
+          config: |
+            Host hostinger
+              HostName ${{ secrets.HOSTINGER_HOST }}
+              Port ${{ secrets.HOSTINGER_PORT }}
+              User ${{ secrets.HOSTINGER_USER }}
+              IdentityFile ~/.ssh/hostinger
+              IdentitiesOnly yes
+              StrictHostKeyChecking accept-new
+
+      - name: Verify script exists in repo
+        run: |
+          if [ ! -f "${{ inputs.script }}" ]; then
+            echo "::error::Script not found: ${{ inputs.script }}"
+            exit 1
+          fi
+          echo "Will run: ${{ inputs.script }}"
+
+      - name: Execute script via drush php:script
+        run: |
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            ./vendor/bin/drush php:script ../${{ inputs.script }}
+          "
