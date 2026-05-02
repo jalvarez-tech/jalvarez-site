@@ -10,11 +10,23 @@
   const drawer = document.querySelector('[data-nav-drawer]');
   const body = document.body;
 
+  // i18n labels for the burger button — read from data attrs so the twig
+  // owns the strings (keeps ES/EN parity automatic).
+  const burgerLabelOpen  = burger ? (burger.getAttribute('data-label-open')  || 'Open menu')  : '';
+  const burgerLabelClose = burger ? (burger.getAttribute('data-label-close') || 'Close menu') : '';
+
   function setDrawer(open) {
     if (!burger || !drawer) return;
     burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? burgerLabelClose : burgerLabelOpen);
     drawer.classList.toggle('is-open', open);
     drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+    // Inert prevents focus from reaching the drawer when it's hidden.
+    if (open) {
+      drawer.removeAttribute('inert');
+    } else {
+      drawer.setAttribute('inert', '');
+    }
     body.classList.toggle('nav-drawer-open', open);
   }
 

@@ -11,8 +11,8 @@
   --bg-elev:      #111110;
   --bg-sunk:      #060605;
   --fg:           #f5f2ed;
-  --fg-muted:     #a8a39a;
-  --fg-dim:       #6b6760;
+  --fg-muted:     #a8a39a;  // 7.80:1 on --bg ✓ AAA
+  --fg-dim:       #80796f;  // 4.68:1 on --bg ✓ AA (was #6b6760 → 3.49:1, failed)
   --line:         #1f1d1a;
   --line-strong:  #2a2724;
 
@@ -60,8 +60,8 @@
   --bg-elev:      #f2efe9;
   --bg-sunk:      #ebe7df;
   --fg:           #14120f;
-  --fg-muted:     #575249;
-  --fg-dim:       #8a8478;
+  --fg-muted:     #575249;  // 7.27:1 on --bg ✓ AAA
+  --fg-dim:       #6e6a60;  // 5.03:1 on --bg ✓ AA (was #8a8478 → 3.48:1, failed)
   --line:         #e3ded4;
   --line-strong:  #d4cfc3;
 

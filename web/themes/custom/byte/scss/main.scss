@@ -49,6 +49,95 @@ a    { color: inherit; text-decoration: none; }
 img  { max-width: 100%; display: block; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
+// ─── Accessibility: focus styles ───
+// Keyboard-only focus indicator. Uses :focus-visible so mouse users don't see
+// the ring (browsers handle that distinction natively). 3px ring at 2px offset
+// gives clear separation regardless of underlying background.
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// Pill-shaped buttons get a matching pill-shaped focus ring.
+.btn:focus-visible,
+.nav__cta:focus-visible,
+.lang-toggle__btn:focus-visible,
+.theme-toggle:focus-visible,
+.chip:focus-visible,
+.nav__link:focus-visible {
+  outline-offset: 3px;
+  border-radius: var(--r-pill);
+}
+
+// Cards get a card-shaped ring matching their corner radius.
+.project:focus-visible,
+.post:focus-visible,
+.case-step:focus-visible,
+.contact-card:focus-visible {
+  outline-offset: 4px;
+  border-radius: var(--r-card);
+}
+
+// .visually-hidden — Drupal core's `system/base` library provides this, but
+// our theme only depends on `core/drupal` (no system/base), so we re-declare it.
+// Standard pattern from core/themes/stable9/css/system/components/hidden.module.css.
+.visually-hidden {
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  width: 1px;
+  height: 1px;
+  word-wrap: normal;
+}
+
+// Drupal core skip-to-content link — make it visible on focus with byte styling.
+.visually-hidden.focusable:focus,
+.visually-hidden.focusable:active {
+  position: fixed !important;
+  top: 8px !important;
+  left: 8px !important;
+  z-index: 1000 !important;
+  padding: 12px 18px !important;
+  background: var(--accent) !important;
+  color: #0a0908 !important;
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: nowrap;
+}
+
+// ─── Accessibility: reduced motion ───
+// Respect users who set "Reduce motion" in OS preferences.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // Marquee infinito → estático.
+  .marquee__track {
+    animation: none !important;
+  }
+
+  // Hover transforms en cards y links → desactivar.
+  .project:hover .project__media,
+  .post:hover,
+  a:hover .nav-drawer__arrow,
+  .nav__link:hover {
+    transform: none !important;
+  }
+}
+
 // ─── Utility primitives ───
 .mono { font-family: var(--f-mono); font-feature-settings: "ss02"; }
 .tab  { font-variant-numeric: tabular-nums; }

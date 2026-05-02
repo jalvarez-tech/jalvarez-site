@@ -9,7 +9,7 @@
 <aside class="contact-side">
   {%- if _channels|length > 0 -%}
     <div class="contact-card">
-      <h4>{{ channels_label|default('Canales directos') }}</h4>
+      <h2 class="contact-card__title">{{ channels_label|default('Canales directos') }}</h2>
       <div class="contact-channels">
         {%- for c in _channels -%}
           <div class="channel">
@@ -26,7 +26,7 @@
   {%- endif -%}
 
   <div class="contact-card">
-    <h4>{{ availability_label|default('Disponibilidad') }}</h4>
+    <h2 class="contact-card__title">{{ availability_label|default('Disponibilidad') }}</h2>
     <div class="availability">
       <span class="status-dot"></span>
       <span><strong>{{ free_value|default('2') }}</strong> {{ free_label|default('cupos libres') }}</span>
@@ -39,7 +39,7 @@
 
   {%- if _steps|length > 0 -%}
     <div class="contact-card">
-      <h4>{{ expect_label|default('Cómo va a ser') }}</h4>
+      <h2 class="contact-card__title">{{ expect_label|default('Cómo va a ser') }}</h2>
       <ol class="contact-steps">
         {%- for s in _steps -%}
           <li>{{ s }}</li>

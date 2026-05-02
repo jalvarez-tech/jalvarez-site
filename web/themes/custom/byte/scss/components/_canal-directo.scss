@@ -65,10 +65,13 @@
   border-radius: var(--r-card);
   background: var(--bg-elev);
 
-  h4 {
+  // Was h4; promoted to h2 (with __title modifier) to keep the document
+  // outline tidy (Contacto page has no h3 wrapper, so h4 was an orphan).
+  &__title {
     font-family: var(--f-mono);
     font-size: 11.5px;
-    color: var(--fg-dim);
+    font-weight: 500;
+    color: var(--fg-muted); // upgraded from --fg-dim for AA contrast.
     letter-spacing: 0.04em;
     text-transform: uppercase;
     margin: 0 0 16px;
