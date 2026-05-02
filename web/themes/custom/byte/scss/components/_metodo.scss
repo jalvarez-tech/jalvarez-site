@@ -5,20 +5,38 @@
 
 .process-row {
   display: grid;
+  // Mobile: 2 cols, 3 rows. Tag stacks below body in col 2.
+  //   ┌─────────┬───────────────┐
+  //   │ num     │ title         │
+  //   │         │ body          │
+  //   │         │ tag           │
+  //   └─────────┴───────────────┘
   grid-template-columns: 80px 1fr;
-  gap: 24px;
+  grid-template-areas:
+    "num title"
+    "num body"
+    "num tag";
+  column-gap: 24px;
+  row-gap: 8px;
   padding: 32px 0;
   border-bottom: 1px solid var(--line);
   align-items: start;
 
   @media (min-width: 900px) {
+    // Desktop: 4 cols, 1 row inline
+    //   ┌──────┬───────┬────────┬─────┐
+    //   │ num  │ title │ body   │ tag │
+    //   └──────┴───────┴────────┴─────┘
     grid-template-columns: 100px 2fr 3fr 1fr;
-    gap: 48px;
+    grid-template-areas: "num title body tag";
+    column-gap: 48px;
+    row-gap: 0;
     align-items: baseline;
   }
 }
 
 .process-num {
+  grid-area: num;
   font-family: var(--f-mono);
   font-size: 12px;
   color: var(--fg-dim);
@@ -26,6 +44,7 @@
 }
 
 .process-title {
+  grid-area: title;
   font-family: var(--f-display);
   font-size: 24px;
   font-weight: 500;
@@ -34,6 +53,7 @@
 }
 
 .process-body {
+  grid-area: body;
   color: var(--fg-muted);
   font-size: 15px;
   line-height: 1.6;
@@ -42,8 +62,16 @@
 }
 
 .process-tag {
+  grid-area: tag;
   font-family: var(--f-mono);
   font-size: 11.5px;
   color: var(--accent);
-  text-align: right;
+  // Mobile: align with body content (left). Add small breathing room.
+  text-align: left;
+  margin-top: 4px;
+
+  @media (min-width: 900px) {
+    text-align: right;
+    margin-top: 0;
+  }
 }
