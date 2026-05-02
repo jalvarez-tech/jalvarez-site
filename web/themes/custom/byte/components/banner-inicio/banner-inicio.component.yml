@@ -1,61 +1,102 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
-
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Banner inicio (Hero)'
 status: stable
 description: 'Home hero. Status pill + multi-line title with stroke + accent + muted fragments + sub + CTAs + 3 KPIs. Right column: portrait + terminal card.'
-
 props:
   type: object
   properties:
     status:
       type: string
-      examples: ['Disponible · Q3 2026 · 2 cupos']
+      title: Status
+      examples:
+        - 'Disponible · Q3 2026 · 2 cupos'
     title_a:
       type: string
-      examples: ['Creo que una web']
+      title: 'Title — first fragment'
+      examples:
+        - 'Creo que una web'
     title_accent:
       type: string
-      title: 'Italic accent word'
-      examples: ['rápida']
+      title: 'Title — italic accent word'
+      examples:
+        - rápida
     title_punc:
       type: string
-      title: 'Punctuation between fragments (e.g. ",")'
+      title: 'Title — punctuation between fragments'
       default: ','
     title_stroke:
       type: string
-      title: 'Stroke (outlined) word'
-      examples: ['honesta']
+      title: 'Title — stroke (outlined) word'
+      examples:
+        - honesta
     title_b:
       type: string
-      examples: [' e inclusiva']
+      title: 'Title — second fragment'
+      examples:
+        - ' e inclusiva'
     title_muted:
       type: string
-      title: 'Closing muted fragment'
-      examples: ['es una forma de respeto.']
+      title: 'Title — closing muted fragment'
+      examples:
+        - 'es una forma de respeto.'
     sub:
       type: string
+      title: 'Subtitle'
     cta_primary_label:
       type: string
-      examples: ['Agenda una llamada']
+      title: 'CTA primary label'
+      examples:
+        - 'Agenda una llamada'
     cta_primary_href:
       type: string
+      title: 'CTA primary URL'
     cta_secondary_label:
       type: string
-      examples: ['Ver el trabajo']
+      title: 'CTA secondary label'
+      examples:
+        - 'Ver el trabajo'
     cta_secondary_href:
       type: string
-    meta:
-      type: array
-      title: 'Hero KPI metrics (3 items)'
-      items:
-        type: object
-        properties:
-          value: { type: string }
-          unit: { type: string }
-          label: { type: string }
+      title: 'CTA secondary URL'
+    m1_value:
+      type: string
+      title: 'KPI 1 — value'
+      examples: ['15+']
+    m1_unit:
+      type: string
+      title: 'KPI 1 — unit'
+      examples: ['años']
+    m1_label:
+      type: string
+      title: 'KPI 1 — label'
+      examples: ['en producción']
+    m2_value:
+      type: string
+      title: 'KPI 2 — value'
+      examples: ['80+']
+    m2_unit:
+      type: string
+      title: 'KPI 2 — unit'
+    m2_label:
+      type: string
+      title: 'KPI 2 — label'
+      examples: ['proyectos']
+    m3_value:
+      type: string
+      title: 'KPI 3 — value'
+      examples: ['0']
+    m3_unit:
+      type: string
+      title: 'KPI 3 — unit'
+    m3_label:
+      type: string
+      title: 'KPI 3 — label'
+      examples: ['downtime']
     show_terminal:
       type: boolean
+      title: 'Show terminal card'
       default: true
     show_portrait:
       type: boolean
+      title: 'Show portrait'
       default: true

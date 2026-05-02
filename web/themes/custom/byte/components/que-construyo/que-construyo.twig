@@ -1,4 +1,4 @@
-{# Qué construyo — featured projects #}
+{# Qué construyo — featured projects, slot-driven. #}
 <section class="section wrap" id="featured">
   <div class="section__head">
     <div>
@@ -15,9 +15,7 @@
   </div>
 
   <div class="projects-grid">
-    {%- for p in items|default([]) -%}
-      {%- include 'byte:card-proyecto' with p only -%}
-    {%- endfor -%}
+    {% block projects %}{{ projects }}{% endblock %}
   </div>
 
   {%- if cta_label -%}

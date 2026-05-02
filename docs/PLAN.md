@@ -1,18 +1,22 @@
 # PLAN — completar el sitio jalvarez.tech
 
 > Plan en ejecución autónoma. Marcas: ✅ hecho · ⏳ en curso · ⬜ pendiente.
-> Última actualización: 2026-05-02
+> Última actualización: 2026-05-02 (Canvas: las 4 páginas principales migradas a canvas_page entities)
 
 ## Estado actual del sitio (referencia rápida)
 
-| URL | Status |
+| URL | Render |
 |---|---|
-| `/` (home) | ✅ Hero + values + featured + process + tests + CTA |
-| `/es/proyectos` | ✅ phead + 3 cards + CTA |
-| `/es/notas` | ✅ phead + 5 rows + CTA |
-| `/es/contacto` | ✅ phead + form ES + canal-directo |
-| `/admin/*` | ✅ Gin + Navigation core sidebar |
-| Top nav (`byte:nav-glass`) | ✅ Liquid glass, brand + 4 links + CTA + ES/EN |
+| `/`, `/es`, `/es/inicio` | **canvas_page id=1 (Inicio)** — banner-inicio + marquee + values/process/testimonials slot-driven + **`que-construyo` con `block.jalvarez_projects_grid` (only_featured=1, limit=3) en su slot** + cta-final |
+| `/en`, `/en/home` | canvas_page id=1 (translation EN) |
+| `/es/proyectos`, `/en/projects` | **canvas_page id=5 (Proyectos)** — phead + `block.jalvarez_projects_grid` + cta-final |
+| `/es/notas`, `/en/notes` | **canvas_page id=6 (Notas)** — phead + `block.jalvarez_notes_grid` + cta-final |
+| `/es/contacto`, `/en/contact` | **canvas_page id=7 (Contacto)** — phead + `block.webform_block` + `byte:canal-directo` |
+| `/es/proyectos/{slug}`, `/en/projects/{slug}` | Node Project + `node--project--full.html.twig` (Twig + SDC, NO Canvas) |
+| `/es/notas/{slug}`, `/en/notes/{slug}` | Node Note + `node--note--full.html.twig` |
+| `/admin/*` | Gin admin theme + Drupal Navigation core sidebar |
+| Top nav | Block `jalvarez_nav_glass` → SDC `byte:nav-glass` (active state per ruta + idioma) |
+| Editor visual de cualquier canvas_page | `/canvas/editor/canvas_page/{id}` — accesible desde el toolbar Drupal Navigation > "Editar" |
 
 ## Plan de cierre — 7 fases en orden
 
@@ -40,11 +44,48 @@
 - ✅ `_article.scss` con `.article__*` BEM completo.
 - ✅ Pathauto auto-genera `/es/notas/<slug>`.
 
-### F4 — Drupal Canvas integration ⬜
+### F4 — Drupal Canvas integration ✅
 
-- ⬜ Agregar `field_canvas` al CT `page` (drupal/canvas field type).
-- ⬜ Verificar que SDCs creadas (chip, button, banner-inicio, etc.) aparecen disponibles en el editor de Canvas.
-- ⬜ Crear página Canvas "Sobre mí" como prueba de concepto.
+Migración completa a Canvas como mecanismo de composición de la home + páginas estáticas.
+
+**SDCs registrados como Canvas Component config entities (19 total)**
+
+Atómicos (8): `chip`, `button`, `eyebrow`, `phead`, `medidor`, `case-step-card`, `value-card`, `process-row`.
+Sección molecules (5, slot-driven): `section`, `como-lo-hago` (slot `values`), `metodo` (slot `steps`), `palabras-cliente` (slot `testimonials`), `que-construyo` (slot `projects`).
+Cards (3): `card-proyecto` (props planos `m1_key/m1_value`…`m3_key/m3_value`), `card-testimonio`, `row-nota`.
+Hero/CTA (2): `banner-inicio` (props planos `m1_value/m1_unit/m1_label`…`m3_*`), `cta-final`.
+Marquee (1): `marquee` (props planos `item_1`…`item_9`).
+
+**SDCs marcados `noUi: true` (no aparecen en el editor Canvas, renderizados programáticamente)**
+
+- `nav-glass` — renderizado por `jalvarez_nav_glass` block (links derivan de la ruta + idioma).
+- `canal-directo` — renderizado por `ContactController` en `/contacto`.
+
+**Razón técnica de la refactorización**
+
+Canvas 1.3.x no soporta props `array of object` en su UI editor (sólo strings/integers/booleans/list_string). Decisiones aplicadas:
+- Donde el array tiene 3 items fijos (KPIs hero, métricas card-proyecto): aplanar a `m1_*/m2_*/m3_*`.
+- Donde el array tiene N items que pueden variar (cards en values/process/testimonials/projects grids): convertir el padre a slot, extraer el item-template a su propio SDC atómico.
+- Donde el componente es de "una sola instancia" y no necesita edición visual (nav-glass, canal-directo): `noUi: true`.
+
+**Render**
+
+- Editor → `field_canvas` (component_tree) en nodos de tipo `page` → vista renderiza vía formatter `canvas_naive_render_sdc_tree` (configurado en `core.entity_view_display.node.page.default`).
+- Front page del sitio = `/node/{nid}` (language-aware), donde nid corresponde al nodo "Inicio (Canvas)" creado por `scripts/create-canvas-home.php`.
+
+**Scripts utilitarios (en orden de ejecución)**
+
+1. `scripts/add-sdc-prop-titles.php` — Añade `title` a cada prop de los SDCs (Canvas lo exige).
+2. `scripts/canvas-discover-sdcs.php` — Llama `ComponentSourceManager::generateComponents('sdc')` y registra los Component config entities.
+3. `scripts/list-canvas-components.php` — Lista todos los Canvas Component config entities por source.
+4. `scripts/create-canvas-home.php` — Crea el nodo "Inicio (Canvas)" con tree ES + traducción EN, y setea `system.site.page.front = /node/{nid}`.
+
+**Deploy a producción**
+
+El workflow `.github/workflows/seed-content.yml` ejecuta cualquier `scripts/*.php` en prod. En el primer deploy post-migración:
+1. `composer install`/`drush cim` traen los `canvas.component.sdc.byte.*.yml` y el `field_canvas`.
+2. Correr `seed-content` → `scripts/canvas-discover-sdcs.php` (idempotente, registra los Components si la sync no los trajo).
+3. Correr `seed-content` → `scripts/create-canvas-home.php` (idempotente, regenera el nodo "Inicio (Canvas)" y el page.front).
 
 ### F5 — Responsive verification ⬜
 
@@ -79,6 +120,225 @@ Verificación:
 - ✅ Iconos sun/moon ya están en `icons.svg` sprite.
 - ✅ Tokens light en `_tokens.scss` cubren bg, fg, line, accent-soft/line variantes.
 - ✅ Toggle persiste tras navegación. Click directo via JS funcional.
+
+### F10 — Migración completa de Proyectos, Notas y Contacto a canvas_page ✅
+
+Tras lograr que el editor de Canvas funcione (F9), las páginas Proyectos, Notas y Contacto seguían en controllers (ProjectsController, NotesController, ContactController). Esta fase las migra a `canvas_page` entities idénticas a Inicio, manteniendo el mismo render visual.
+
+**Estrategia: block plugins custom como puente Canvas ↔ datos dinámicos**
+
+Las Views block (`block.views_block.projects-block_1`) renderizaban Lista plana (`<a href="...">Title</a>`), no las cards SDC. Para conservar el rendering original de los SDC `card-proyecto` y `row-nota`, creé dos block plugins que cargan los nodos y renderizan los SDCs como `'#type' => 'component'`:
+
+- [ProjectsGridBlock](web/modules/custom/jalvarez_site/src/Plugin/Block/ProjectsGridBlock.php) — id `jalvarez_projects_grid`. Reusa el mapeo de fields del antiguo ProjectsController (category, year, hue, m1_*..m3_*).
+- [NotesGridBlock](web/modules/custom/jalvarez_site/src/Plugin/Block/NotesGridBlock.php) — id `jalvarez_notes_grid`. Reusa lógica del antiguo NotesController, incluyendo cálculo de read_time a 200 wpm y formato de fecha bilingüe ("abr · 2026" / "Apr · 2026").
+
+Canvas los registra automáticamente como `block.jalvarez_projects_grid` y `block.jalvarez_notes_grid` (block source plugin discover los detecta vía `#[Block]` attribute y `cache_clear`).
+
+**Refactor de canal-directo (de noUi a Canvas-editable)**
+
+`canal-directo` tenía `noUi: true` por sus props `array of object` (channels) y `array of string` (steps). Para que apareciera en el editor de Contacto, lo refactoricé:
+
+- `channels[]` → `c1_name/c1_value/c1_href` … `c3_*` (3 canales máximo)
+- `steps[]` → `step_1` … `step_5` (5 pasos máximo)
+- Eliminado `noUi: true` de canal-directo.component.yml
+- Twig usa `|filter(c => c.name or c.value)` para construir un array virtual sólo con los canales/pasos no vacíos
+
+**Webform incrustado vía `block.webform_block`**
+
+Para `Contacto`, el formulario se incrusta como Canvas component con settings `webform_id: 'contact'`, `lazy: false`. Canvas registra automáticamente `block.webform_block` cuando el módulo Webform está habilitado.
+
+**Eliminado**
+
+- `web/modules/custom/jalvarez_site/src/Controller/{Projects,Notes,Contact,CanvasEditController}.php`
+- `web/modules/custom/jalvarez_site/jalvarez_site.links.task.yml`
+- 3 rutas en `jalvarez_site.routing.yml` (queda solo `/styleguide`)
+- Campo `field_canvas` de `node.page` (junto con su FieldStorage) — Canvas vive ahora en su entity nativa `canvas_page`
+
+**Estado final del sitio**
+
+| URL | Render | Editor visual |
+|---|---|---|
+| `/`, `/es`, `/es/inicio` | canvas_page id=1 (Inicio) | `/canvas/editor/canvas_page/1` |
+| `/en`, `/en/home` | canvas_page id=1 (translation EN) | mismo |
+| `/es/proyectos` | canvas_page id=5 → phead + `block.jalvarez_projects_grid` + cta-final | `/canvas/editor/canvas_page/5` |
+| `/en/projects` | canvas_page id=5 (translation EN) | mismo |
+| `/es/notas` | canvas_page id=6 → phead + `block.jalvarez_notes_grid` + cta-final | `/canvas/editor/canvas_page/6` |
+| `/en/notes` | canvas_page id=6 (translation EN) | mismo |
+| `/es/contacto` | canvas_page id=7 → phead + `block.webform_block` (contact) + canal-directo SDC | `/canvas/editor/canvas_page/7` |
+| `/en/contact` | canvas_page id=7 (translation EN) | mismo |
+| `/es/proyectos/{slug}` | Node Project + `node--project--full.html.twig` (Twig + SDC, NO Canvas) | n/a (entidades dinámicas) |
+| `/es/notas/{slug}` | Node Note + `node--note--full.html.twig` | n/a |
+
+**Componentes Canvas finales (registrados como Component config entities)**
+
+- 20 SDC Byte (`sdc.byte.*`)
+- 30+ blocks: sistema (`system_branding_block`, `system_menu_block.*`, etc.), Views (`featured_projects`, `featured_testimonials`, `recent_notes`, etc.), webform (`webform_block`), nav (`jalvarez_nav_glass`), grids custom (`jalvarez_projects_grid`, `jalvarez_notes_grid`)
+
+**Scripts añadidos / modificados**
+
+- `scripts/lib/canvas-tree.inc.php` — Helpers `canvas_tree_uuid()`, `canvas_tree_sdc_item()`, `canvas_tree_block_item()` reutilizables.
+- `scripts/create-canvas-other-pages.php` — Crea las 3 canvas_pages (Proyectos + Notas + Contacto) ES+EN. Idempotente.
+- `scripts/add-notes-block-display.php` — Añade `block_1` display a la View `notes` (idempotente, aunque ya no se usa porque vamos con `jalvarez_notes_grid`).
+- `scripts/cleanup-node-page-field-canvas.php` — Elimina FieldConfig + FieldStorage de field_canvas del bundle node.page.
+- `scripts/list-views.php`, `list-notes.php`, `test-notes-block.php` — Diagnostics.
+
+**Deploy a producción**
+
+`seed-content.yml` correr en orden:
+1. `scripts/canvas-discover-sdcs.php` (registra SDCs)
+2. `scripts/create-media-image-type.php` (Canvas requirement)
+3. `scripts/create-canvas-home.php` (Inicio + setea page.front)
+4. `scripts/create-canvas-other-pages.php` (Proyectos + Notas + Contacto)
+5. (opcional) `scripts/cleanup-node-page-field-canvas.php` (limpia field obsoleto)
+
+### F9 — Editor visual de Canvas accesible desde la UI ✅
+
+Diagnóstico revelado al validar `https://jalvarez-site.ddev.site/`: el botón "Editar" abría una pantalla blanca. Tres bugs encadenados de Canvas 1.3.x:
+
+**Bug 1: Canvas 1.3.x solo edita `canvas_page` entities, NO `node.page` con `field_canvas`**
+
+`/canvas/api/v0/layout/node/13` retornaba HTTP 500: `"For now Canvas only works if the entity is a canvas_page! Other entity types and bundles must use content templates for now, see https://drupal.org/i/3498525"`. La storage class `ComponentTreeLoader::getCanvasFieldName()` rechaza cualquier entity que no sea `canvas_page`.
+
+**Fix:** Migrado el contenido de Inicio de `node.page` a `canvas_page` (entity nativa de Canvas con campos base `title`, `description`, `components`, `path`, `image`). El script `scripts/create-canvas-home.php` ahora hace `Page::create([...])` en lugar de `Node::create([...])`.
+
+**Bug 2: `canvas_page` exige al menos un `media_type: image` configurado**
+
+`/canvas/api/v0/layout/canvas_page/1` retornaba HTTP 500: `"Call to undefined method Drupal\Core\Field\BaseFieldDefinition::id()"` desde `MediaLibraryWidget::getNoMediaTypesAvailableMessage()`. Sin un media type de tipo `image` en el sitio, Canvas no puede generar el form widget para el campo base `image` de canvas_page.
+
+**Fix:** Nuevo script `scripts/create-media-image-type.php` que crea el `media_type: image` con su `field_media_image` (storage + config) y form/view displays. Idempotente.
+
+**Bug 3: Prefijo de idioma `/es/` o `/en/` rompe el SPA router de Canvas**
+
+`/es/canvas/editor/canvas_page/1` cargaba todos los assets (200 OK) pero el editor renderizaba en blanco. La store de Canvas mostraba `configuration.entity = "none"` y `isNew = true` — el router interno SPA parsea `window.location.pathname` y no reconoce el patrón cuando hay prefijo de idioma. Issue upstream: https://www.drupal.org/project/canvas/issues/3489775.
+
+**Fix:** Implementado `Drupal\jalvarez_site\EventSubscriber\CanvasLangPrefixStripper` que intercepta requests a `/es/canvas/editor/...` o `/en/canvas/editor/...` y redirige (302) al equivalente sin prefijo. Registrado vía `jalvarez_site.services.yml` con tag `event_subscriber`. Funciona transparente para el usuario: clicar "Editar" en el toolbar desde `/es/inicio` lleva al editor visual sin romper.
+
+**Estado final del flow editorial**
+
+1. Admin navega a `/`, `/es`, `/en`, `/es/inicio`, `/en/home` o `/page/1` — todas resuelven a la canvas_page.
+2. En el toolbar Drupal Navigation aparece el botón "Editar" (entity.canvas_page.edit_form) que apunta a `/canvas/editor/canvas_page/1`.
+3. Si el admin estaba en `/es/...`, Drupal genera el link con prefijo (`/es/canvas/editor/...`); el EventSubscriber lo redirige al sin prefijo.
+4. Canvas SPA bootstrap, monta el editor visual con preview en vivo + sidebar de Page data + paneles de Add/Layers/Code/Pages/Library.
+
+**Scripts añadidos esta fase**
+
+- `scripts/create-media-image-type.php` — Crea `media_type: image` (idempotente).
+- `scripts/list-media-types.php` — Diagnóstico de media types existentes.
+- `scripts/check-canvas-page.php` — Diagnóstico de canvas_page entities y permisos del admin.
+
+**Configs nuevos en `config/sync`**
+
+- `media.type.image.yml`
+- `field.storage.media.field_media_image.yml`
+- `field.field.media.image.field_media_image.yml`
+- `core.entity_form_display.media.image.default.yml`
+- `core.entity_view_display.media.image.default.yml`
+- `system.site.yml` (page.front actualizado a `/page/1`)
+
+### F8 — Form displays user-friendly + Canvas UI access ✅
+
+Hasta esta fase los nodos `project` y `note` no exponían sus campos en el form de edición (todos quedaban en `hidden:`), y el editor visual de Canvas no era accesible vía UI.
+
+**Form displays con field_group (vertical tabs)**
+
+- ✅ `node.project` — 25 campos en 6 vertical tabs:
+  - Identidad (resumen, intro, fecha)
+  - Clasificación (categoría, tecnología, stack, año, rol, duración, URL externa, destacado, peso)
+  - Visual (cover media + variant + hue, galería)
+  - Caso de estudio (challenge intro/bullets, approach steps paragraphs, results metrics paragraphs, lesson, testimonial embed)
+  - CTA final (heading, sub)
+  - Publicación (estado, autor, fecha, URL alias, redirects, langcode, translation)
+- ✅ `node.note` — 9 campos en 4 vertical tabs:
+  - Identidad (excerpt, body, fecha)
+  - Clasificación (topic, tags)
+  - Visual (featured media, glyph, hue)
+  - Publicación
+- ✅ `node.page` — 2 vertical tabs (`field_canvas` permanece en `hidden:` por diseño — Canvas no expone widget para `component_tree`):
+  - Básicos (body como fallback opcional)
+  - Publicación
+
+**Local task “Editor visual (Canvas)”**
+
+- ✅ Ruta wrapper `jalvarez_site.node.canvas_edit` (`/node/{node}/canvas-edit`) → redirige a `/canvas/editor/node/{nid}` (la app de Canvas).
+- ✅ Local task tab declarado en `jalvarez_site.links.task.yml` con `base_route: entity.node.canonical`.
+- ✅ Access check `CanvasEditController::access` solo permite el tab cuando el bundle del nodo expone un campo `component_tree` (actualmente `node.page`).
+- ✅ Visible en el toolbar dropdown de Drupal Navigation (junto a Edit / Delete / Translations) cuando un admin visita `/node/13`.
+
+**Script de configuración**
+
+- `scripts/configure-form-displays.php` — Idempotente. Borra y recrea form displays + grupos en project, note y page. Correr una vez después de deploy o tras cambios en field schemas.
+
+### F11 — Home: sección "Qué construyo" reemplazada por block dinámico ✅
+
+Antes la sección §02 del home tenía 3 `card-proyecto` SDCs **hardcoded en el Canvas tree** dentro del slot `projects` de `que-construyo`. Si cambiaba un proyecto (título, métricas, cover_hue) había que reeditar el Canvas tree.
+
+**Solución:** un único bloque dinámico que carga proyectos desde la base de datos.
+
+**Cambios al `ProjectsGridBlock`** ([src/Plugin/Block/ProjectsGridBlock.php](web/modules/custom/jalvarez_site/src/Plugin/Block/ProjectsGridBlock.php))
+
+3 nuevos settings configurables vía `blockForm()`:
+
+| Setting | Tipo | Default | Uso |
+|---|---|---|---|
+| `only_featured` | bool | FALSE | Filtra `field_featured_home = 1` (home). En `/proyectos` queda en FALSE para mostrar todos. |
+| `limit` | int | 0 | `0` = sin límite. En el home = `3`. |
+| `wrap` | string | `'section'` | `section` (uso autónomo en `/proyectos`), `grid` (parent provee section), `none` (parent provee section + grid; usado en el slot del home). |
+
+**Config schema declarado** ([config/schema/jalvarez_site.schema.yml](web/modules/custom/jalvarez_site/config/schema/jalvarez_site.schema.yml))
+
+`block.settings.jalvarez_projects_grid` con typed config schema. Sin esto, Canvas `validateComponentInput` rechaza los keys con `'X' is not a supported key`.
+
+**Composición final del home §02 ("qué construyo")**
+
+```
+canvas_page id=1 (Inicio)
+  …
+  ┌─ que-construyo (SDC, slot-driven)
+  │    eyebrow: "qué construyo §02"
+  │    title: "Y resulta que con ese enfoque salen plataformas como estas."
+  │    cta_label: "Ver todo el trabajo" → /proyectos
+  │    └─ slot `projects`:
+  │         block.jalvarez_projects_grid
+  │           only_featured: 1
+  │           limit: 3
+  │           wrap: 'none'   ← parent (que-construyo) provee section.wrap + .projects-grid
+  │           → carga node.project WHERE field_featured_home=1 ORDER BY field_sort_order ASC LIMIT 3
+  │           → renderiza cada uno como SDC byte:card-proyecto
+  └─ …
+```
+
+Para `/proyectos` (canvas_page id=5), el mismo block plugin se usa con `only_featured: 0, limit: 0, wrap: 'section'` (default) — uso autónomo.
+
+**Bug visual encontrado y resuelto: nested-grid breakage**
+
+Canvas envuelve cada componente en `<div id="block-{uuid}">` para selección en editor. Al slottear el block dentro de `que-construyo.projects` (que ya tiene `.projects-grid` como wrapper), el grid CSS quedaba con un solo hijo (el wrapper) y las cards se apilaban verticalmente.
+
+**Fix** en [scss/main.scss](web/themes/custom/byte/scss/main.scss): `display: contents` para los wrappers Canvas dentro de los containers del theme:
+
+```scss
+.projects-grid > div[id^="block-"],
+.notes-list > div[id^="block-"],
+.values > div[id^="block-"],
+.process-list > div[id^="block-"],
+.tests > div[id^="block-"] {
+  display: contents;
+}
+```
+
+`display: contents` hace que el wrapper "desaparezca" del flujo de layout — sus hijos se convierten en hijos directos del padre (el grid container).
+
+**Scripts añadidos / modificados**
+
+- [`scripts/regenerate-canvas-blocks.php`](scripts/regenerate-canvas-blocks.php) — Fuerza `ComponentSourceManager::generateComponents()` para que Canvas re-discover los nuevos settings de los block plugins. Necesario después de modificar `defaultConfiguration()` de cualquier Block plugin custom (sin esto Canvas valida contra el schema viejo cacheado).
+- [`scripts/mark-featured-projects.php`](scripts/mark-featured-projects.php) — Marca los 3 proyectos sample como `field_featured_home=1` con `field_sort_order` 1/2/3. Idempotente.
+- [`scripts/create-canvas-home.php`](scripts/create-canvas-home.php) — Actualizado: añadido helper inline `block_tree_item()`, removidas las 3 `card-proyecto` SDCs hardcoded del slot `projects`, reemplazadas por una única instancia de `block.jalvarez_projects_grid`. Idempotente.
+
+**Beneficio editorial**
+
+Ahora cuando el editor crea/edita un proyecto y marca el checkbox "Destacado en home" (`field_featured_home`), automáticamente:
+- Aparece en el §02 del home si está dentro del top 3 por `field_sort_order`
+- Reemplaza al que estaba antes
+- El editor NO toca el Canvas tree del home — solo edita el proyecto en `/admin/content`
 
 ## Cierre
 

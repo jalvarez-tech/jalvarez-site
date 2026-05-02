@@ -1,0 +1,70 @@
+uuid: 10d9a493-099f-40ec-9bd0-14200d349a98
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: e3e2d0feb1330ca9
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        eyebrow_main:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: '§ proyectos'
+          expression: ℹ︎string␟value
+        eyebrow_aside:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: activos
+          expression: ℹ︎string␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        title_em:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        title_dot:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        sub:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Page header (phead)'
+id: sdc.byte.phead
+provider: byte
+source: sdc
+source_local_id: 'byte:phead'

@@ -1,15 +1,44 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Row Nota'
 status: stable
 description: 'Note row in a list: glyph thumb (with hue) + date + title/excerpt + category + read time. 5-col grid on desktop.'
 props:
   type: object
   properties:
-    title:    { type: string }
-    excerpt:  { type: string }
-    href:     { type: string }
-    date:     { type: string, description: 'Pre-formatted, e.g. "may · 2026"' }
-    category: { type: string, description: 'Mono uppercase, e.g. "Performance"' }
-    read_time: { type: string, examples: ['6 min'] }
-    glyph:    { type: string, description: 'Lucide icon name for the thumb' }
-    hue:      { type: string, enum: [green, orange, blue, purple, red, amber], default: green }
+    title:
+      type: string
+      title: Title
+    excerpt:
+      type: string
+      title: Excerpt
+    href:
+      type: string
+      title: Href
+    date:
+      type: string
+      title: Date
+      description: 'Pre-formatted, e.g. "may · 2026"'
+    category:
+      type: string
+      title: Category
+      description: 'Mono uppercase, e.g. "Performance"'
+    read_time:
+      type: string
+      title: 'Read time'
+      examples:
+        - '6 min'
+    glyph:
+      type: string
+      title: Glyph
+      description: 'Lucide icon name for the thumb'
+    hue:
+      type: string
+      title: Hue
+      enum:
+        - green
+        - orange
+        - blue
+        - purple
+        - red
+        - amber
+      default: green

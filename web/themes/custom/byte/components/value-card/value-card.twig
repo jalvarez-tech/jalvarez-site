@@ -1,0 +1,22 @@
+{# Value card — single value tile inside Como lo hago. #}
+<div class="value">
+  <div class="value__num">
+    <span>{{ '%02d'|format(number|default(1)) }}</span>
+    {%- if tag %}<span class="value__tag">/ {{ tag }}</span>{% endif -%}
+  </div>
+  {%- if icon -%}
+    <div class="value__icon">
+      <svg width="32" height="32" aria-hidden="true">
+        <use href="/{{ active_theme_path() }}/icons.svg#i-{{ icon }}"></use>
+      </svg>
+    </div>
+  {%- endif -%}
+  {%- if title %}<h3 class="value__title">{{ title }}</h3>{% endif -%}
+  {%- if body %}<p class="value__body">{{ body }}</p>{% endif -%}
+  {%- if metric_value -%}
+    <div class="value__metric">
+      {{ metric_value }}{% if metric_unit %}<span class="value__metric-unit">{{ metric_unit }}</span>{% endif %}
+      {%- if caption %}<span class="value__metric-caption">{{ caption }}</span>{% endif -%}
+    </div>
+  {%- endif -%}
+</div>

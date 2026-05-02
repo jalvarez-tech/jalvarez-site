@@ -1,0 +1,230 @@
+uuid: d8517856-c70b-4247-a93b-9746aff1ea45
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.field.node.note.body
+    - field.field.node.note.field_excerpt
+    - field.field.node.note.field_featured_media
+    - field.field.node.note.field_note_tags
+    - field.field.node.note.field_note_topic
+    - field.field.node.note.field_publish_date
+    - field.field.node.note.field_thumb_glyph
+    - field.field.node.note.field_thumb_hue
+    - node.type.note
+  module:
+    - datetime
+    - field_group
+    - media_library
+    - path
+    - text
+third_party_settings:
+  field_group:
+    group_identity:
+      children:
+        - field_excerpt
+        - body
+        - field_publish_date
+      label: '① Identidad'
+      region: content
+      parent_name: ''
+      weight: 1
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: true
+        description: 'Excerpt para el listado, cuerpo principal del artículo y fecha de publicación.'
+        required_fields: false
+    group_classification:
+      children:
+        - field_note_topic
+        - field_note_tags
+      label: '② Clasificación'
+      region: content
+      parent_name: ''
+      weight: 2
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Tema principal (vocabulario note_topics) y etiquetas adicionales.'
+        required_fields: false
+    group_visual:
+      children:
+        - field_featured_media
+        - field_thumb_glyph
+        - field_thumb_hue
+      label: '③ Visual'
+      region: content
+      parent_name: ''
+      weight: 3
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Imagen destacada o, en su defecto, glifo + hue OKLCH para el thumbnail del listado.'
+        required_fields: false
+    group_publishing:
+      children:
+        - status
+        - created
+        - uid
+        - path
+        - url_redirects
+        - promote
+        - sticky
+        - langcode
+        - translation
+      label: '④ Publicación'
+      region: content
+      parent_name: ''
+      weight: 4
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Estado, autor, fecha de creación, URL alias, redirects, idioma y ajustes de traducción.'
+        required_fields: false
+id: node.note.default
+targetEntityType: node
+bundle: note
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 5
+    region: content
+    settings:
+      rows: 12
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 105
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_excerpt:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  field_featured_media:
+    type: media_library_widget
+    weight: 20
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_note_tags:
+    type: entity_reference_autocomplete_tags
+    weight: 11
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_note_topic:
+    type: options_select
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_publish_date:
+    type: datetime_default
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_thumb_glyph:
+    type: options_select
+    weight: 21
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_thumb_hue:
+    type: options_select
+    weight: 22
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: -9
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 100
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 115
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 110
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 116
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  translation:
+    type: ''
+    weight: 99
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 106
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  url_redirects:
+    type: ''
+    weight: 101
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

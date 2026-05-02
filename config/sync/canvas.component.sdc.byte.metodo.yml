@@ -1,0 +1,57 @@
+uuid: a7a8e28a-6dd2-4501-aeba-e8595318ad7e
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: 96087af5f74e3d86
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        eyebrow_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'el método'
+          expression: ℹ︎string␟value
+        eyebrow_number:
+          required: false
+          field_type: integer
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: number
+          default_value:
+            -
+              value: 3
+          expression: ℹ︎integer␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        title_em:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions:
+        steps:
+          title: 'Process steps'
+          description: 'Drop one or more process-row components here.'
+label: 'Método (Process)'
+id: sdc.byte.metodo
+provider: byte
+source: sdc
+source_local_id: 'byte:metodo'

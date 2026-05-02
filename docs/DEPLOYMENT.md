@@ -2,7 +2,7 @@
 
 > Pipeline CI/CD: el repositorio en GitHub es la fuente de verdad. GitHub Actions compila assets, instala dependencias, y publica solo el artefacto final en Hostinger. El servidor de Hostinger NO ejecuta `composer`, `npm` ni `sass`.
 
-- **Última actualización:** 2026-05-01
+- **Última actualización:** 2026-05-02 — Las 4 páginas principales son canvas_page
 - **Repo:** `git@github.com:jalvarez-tech/jalvarez-site.git`
 - **Branch productivo:** `main`
 - **Hosting destino:** Hostinger (plan a confirmar — ver §6)
@@ -454,10 +454,39 @@ git revert <hash> && git push   # CI re-deploya el estado previo
 - ✅ DB MySQL creada (`u211065173_jalvarez_site`)
 - ✅ SSH key generada, pubkey en hPanel, conexión validada (`191.101.32.187:65002`)
 - ✅ 10 GitHub Secrets configurados
-- ✅ Workflows: `.github/workflows/deploy.yml` + `ci.yml`
+- ✅ Workflows: `.github/workflows/deploy.yml` + `ci.yml` + `seed-content.yml`
 - ✅ `.deployignore` con sources excluidos
 - ✅ `web/sites/default/settings.hostinger.php.template`
 - ✅ Theme `byte` scaffold mínimo (info, libraries, theme PHP, package.json, scripts, scss tokens + main)
+- ✅ Canvas migration: 19 SDCs registrados, home node "Inicio (Canvas)" con field_canvas tree (ES + EN)
+
+### Post-deploy específico de Canvas (orden importa)
+
+Después del primer deploy con Canvas, corra estos scripts vía `seed-content.yml` desde GitHub Actions → Run workflow, en este orden:
+
+1. **`scripts/canvas-discover-sdcs.php`** (idempotente)
+   Re-discover los SDCs de byte y registra los Component config entities. Útil si `drush cim` no creó automáticamente los `canvas.component.sdc.byte.*`. También útil tras añadir nuevos SDCs.
+
+2. **`scripts/create-media-image-type.php`** (idempotente)
+   Crea el `media_type: image` con su `field_media_image`. **Requisito hard de canvas_page**: sin un media type tipo image, MediaLibraryWidget crashea cuando Canvas genera el form para el campo base `image` de canvas_page. Sin esto, el editor visual queda en blanco.
+
+3. **`scripts/create-canvas-home.php`** (idempotente — borra y recrea la canvas_page "Inicio (Canvas)")
+   Crea el `canvas_page` con `components` field tree en ES + traducción EN, y setea `system.site.page.front` al `/page/<id>` correcto del entorno (los IDs de canvas_page difieren entre local y prod).
+
+4. **`scripts/create-canvas-other-pages.php`** (idempotente)
+   Crea las 3 canvas_pages restantes: Proyectos, Notas, Contacto. Cada una con traducción EN. Las páginas de listados embeben los block plugins custom (`block.jalvarez_projects_grid`, `block.jalvarez_notes_grid`); Contacto embebe `block.webform_block` con `webform_id: contact`.
+
+5. **`scripts/place-nav-block.php`** (solo primera vez)
+   Coloca el block `jalvarez_nav_glass` en el region `byte:header`.
+
+6. **`scripts/configure-form-displays.php`** (opcional, solo si cambian los schemas de fields en project/note)
+   Configura form displays con field_group fieldsets para project, note y page bundles.
+
+### Sobre la portabilidad de IDs
+
+`system.site.page.front = /page/<id>` referencia el ID numérico del canvas_page Inicio. Como los IDs son auto-incrementales y difieren entre entornos, el script `create-canvas-home.php` actualiza este config dinámicamente al crear la entidad. **No hay que editarlo manualmente entre entornos** — basta con correr el script.
+
+Lo mismo para los aliases (`/inicio`, `/home`, `/proyectos`, etc.): son parte del `path` field de cada canvas_page y se crean junto con la entidad.
 
 ### Primer deploy — flujo automático
 

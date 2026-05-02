@@ -1,10 +1,17 @@
-{# Canal directo — sidebar of /contacto #}
+{# Canal directo — sidebar for contact page (Canvas-editable). #}
+{%- set _channels = [
+  { name: c1_name, value: c1_value, href: c1_href },
+  { name: c2_name, value: c2_value, href: c2_href },
+  { name: c3_name, value: c3_value, href: c3_href },
+]|filter(c => c.name or c.value) -%}
+{%- set _steps = [step_1, step_2, step_3, step_4, step_5]|filter(s => s) -%}
+
 <aside class="contact-side">
-  {%- if channels|length > 0 -%}
+  {%- if _channels|length > 0 -%}
     <div class="contact-card">
       <h4>{{ channels_label|default('Canales directos') }}</h4>
       <div class="contact-channels">
-        {%- for c in channels -%}
+        {%- for c in _channels -%}
           <div class="channel">
             <span class="channel__name">{{ c.name }}</span>
             {%- if c.href -%}
@@ -30,11 +37,11 @@
     </div>
   </div>
 
-  {%- if steps|length > 0 -%}
+  {%- if _steps|length > 0 -%}
     <div class="contact-card">
       <h4>{{ expect_label|default('Cómo va a ser') }}</h4>
       <ol class="contact-steps">
-        {%- for s in steps -%}
+        {%- for s in _steps -%}
           <li>{{ s }}</li>
         {%- endfor -%}
       </ol>

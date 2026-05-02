@@ -1,0 +1,22 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Process row'
+status: stable
+description: 'Single numbered step row inside Método (Process). 4-column layout: num | title | body | tag.'
+props:
+  type: object
+  properties:
+    number:
+      type: integer
+      title: 'Step number (auto-padded to 02)'
+      examples: [1, 2, 3, 4]
+    title:
+      type: string
+      title: 'Step title'
+      examples: ['Auditoría técnica']
+    body:
+      type: string
+      title: 'Step body'
+    tag:
+      type: string
+      title: 'Tag (timeline marker)'
+      examples: ['Semana 1', 'Sem. 3-8', 'Ongoing']

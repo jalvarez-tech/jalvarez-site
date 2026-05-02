@@ -48,9 +48,14 @@
         </div>
       {%- endif -%}
 
-      {%- if meta -%}
+      {%- set _kpis = [
+        { value: m1_value, unit: m1_unit, label: m1_label },
+        { value: m2_value, unit: m2_unit, label: m2_label },
+        { value: m3_value, unit: m3_unit, label: m3_label },
+      ]|filter(k => k.value or k.label) -%}
+      {%- if _kpis|length > 0 -%}
         <div class="hero__meta">
-          {%- for m in meta -%}
+          {%- for m in _kpis -%}
             <div class="hero__meta-item">
               <div class="hero__meta-val tab">
                 {{ m.value }}{% if m.unit %}<span class="hero__meta-unit">{{ m.unit }}</span>{% endif %}

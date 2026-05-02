@@ -1,0 +1,442 @@
+uuid: 1a61118e-0db1-4195-9628-cf9d85430f02
+langcode: es
+status: true
+dependencies:
+  config:
+    - field.field.node.project.field_approach_steps
+    - field.field.node.project.field_challenge_bullets
+    - field.field.node.project.field_challenge_intro
+    - field.field.node.project.field_cover_hue
+    - field.field.node.project.field_cover_media
+    - field.field.node.project.field_cover_variant
+    - field.field.node.project.field_cta_heading
+    - field.field.node.project.field_cta_sub
+    - field.field.node.project.field_duration
+    - field.field.node.project.field_external_url
+    - field.field.node.project.field_featured_home
+    - field.field.node.project.field_gallery
+    - field.field.node.project.field_intro
+    - field.field.node.project.field_lesson
+    - field.field.node.project.field_primary_technology
+    - field.field.node.project.field_project_category
+    - field.field.node.project.field_project_year
+    - field.field.node.project.field_publish_date
+    - field.field.node.project.field_results_metrics
+    - field.field.node.project.field_role
+    - field.field.node.project.field_sort_order
+    - field.field.node.project.field_stack
+    - field.field.node.project.field_summary
+    - field.field.node.project.field_testimonial_embed
+    - node.type.project
+  module:
+    - datetime
+    - field_group
+    - link
+    - media_library
+    - paragraphs
+    - path
+    - text
+third_party_settings:
+  field_group:
+    group_identity:
+      children:
+        - field_summary
+        - field_intro
+        - field_publish_date
+      label: '① Identidad'
+      region: content
+      parent_name: ''
+      weight: 1
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: true
+        description: 'Resumen visible en el card del listado, intro completa de la página de detalle, y fecha de publicación.'
+        required_fields: false
+    group_classification:
+      children:
+        - field_project_category
+        - field_primary_technology
+        - field_stack
+        - field_project_year
+        - field_role
+        - field_duration
+        - field_external_url
+        - field_featured_home
+        - field_sort_order
+      label: '② Clasificación'
+      region: content
+      parent_name: ''
+      weight: 2
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Categoría, tecnología principal, stack completo, año, rol, duración, URL externa, peso de orden y flag “destacado en home”.'
+        required_fields: false
+    group_visual:
+      children:
+        - field_cover_media
+        - field_cover_variant
+        - field_cover_hue
+        - field_gallery
+      label: '③ Visual'
+      region: content
+      parent_name: ''
+      weight: 3
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Cover (imagen o video) + variante + hue del placeholder, y galería para la página de detalle.'
+        required_fields: false
+    group_case_study:
+      children:
+        - field_challenge_intro
+        - field_challenge_bullets
+        - field_approach_steps
+        - field_results_metrics
+        - field_lesson
+        - field_testimonial_embed
+      label: '④ Caso de estudio'
+      region: content
+      parent_name: ''
+      weight: 4
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: '§01 Reto (intro + bullets) · §02 Enfoque (pasos) · §03 Resultados (métricas) · §04 Lección + testimonio embebido.'
+        required_fields: false
+    group_cta:
+      children:
+        - field_cta_heading
+        - field_cta_sub
+      label: '⑤ CTA final'
+      region: content
+      parent_name: ''
+      weight: 5
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Heading y subtítulo del bloque de cierre al final del case study.'
+        required_fields: false
+    group_publishing:
+      children:
+        - status
+        - created
+        - uid
+        - path
+        - url_redirects
+        - promote
+        - sticky
+        - langcode
+        - translation
+      label: '⑥ Publicación'
+      region: content
+      parent_name: ''
+      weight: 6
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: true
+        id: ''
+        open: false
+        description: 'Estado, autor, fecha de creación, URL alias, redirects, idioma y ajustes de traducción.'
+        required_fields: false
+id: node.project.default
+targetEntityType: node
+bundle: project
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 105
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_approach_steps:
+    type: paragraphs
+    weight: 32
+    region: content
+    settings:
+      title: Paso
+      title_plural: Pasos
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  field_challenge_bullets:
+    type: string_textarea
+    weight: 31
+    region: content
+    settings:
+      rows: 4
+      placeholder: ''
+    third_party_settings: {  }
+  field_challenge_intro:
+    type: text_textarea
+    weight: 30
+    region: content
+    settings:
+      rows: 4
+      placeholder: ''
+    third_party_settings: {  }
+  field_cover_hue:
+    type: options_select
+    weight: 22
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_cover_media:
+    type: media_library_widget
+    weight: 20
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_cover_variant:
+    type: options_select
+    weight: 21
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_cta_heading:
+    type: string_textfield
+    weight: 40
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_cta_sub:
+    type: text_textarea
+    weight: 41
+    region: content
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  field_duration:
+    type: string_textfield
+    weight: 15
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_external_url:
+    type: link_default
+    weight: 16
+    region: content
+    settings:
+      placeholder_url: 'https://'
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_featured_home:
+    type: boolean_checkbox
+    weight: 17
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_gallery:
+    type: media_library_widget
+    weight: 23
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_intro:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_lesson:
+    type: text_textarea
+    weight: 34
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_primary_technology:
+    type: options_select
+    weight: 11
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_project_category:
+    type: options_select
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_project_year:
+    type: number
+    weight: 13
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_publish_date:
+    type: datetime_default
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_results_metrics:
+    type: paragraphs
+    weight: 33
+    region: content
+    settings:
+      title: Métrica
+      title_plural: Métricas
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  field_role:
+    type: string_textfield
+    weight: 14
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_sort_order:
+    type: number
+    weight: 18
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_stack:
+    type: entity_reference_autocomplete_tags
+    weight: 12
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_summary:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  field_testimonial_embed:
+    type: paragraphs
+    weight: 35
+    region: content
+    settings:
+      title: Testimonio
+      title_plural: Testimonios
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: -9
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 100
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 115
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 110
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 116
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  translation:
+    type: ''
+    weight: 99
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 106
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  url_redirects:
+    type: ''
+    weight: 101
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden: {  }

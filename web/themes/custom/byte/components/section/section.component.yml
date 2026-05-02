@@ -1,29 +1,33 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
-
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: Section
 status: stable
 description: 'Editorial section wrapper. Two-column head (eyebrow + title/lede). Slot for body.'
-
 props:
   type: object
   properties:
     eyebrow_label:
       type: string
-      examples: ['cómo lo hago']
+      title: 'Eyebrow label'
+      examples:
+        - 'cómo lo hago'
     eyebrow_number:
       type: integer
-      examples: [1]
+      title: 'Eyebrow number'
+      examples:
+        - 1
     title:
       type: string
-      examples: ['No vendo features.']
+      title: Title
+      examples:
+        - 'No vendo features.'
     title_em:
       type: string
       title: 'Italic accent fragment of the title'
-      examples: ['Defiendo cuatro disciplinas no negociables.']
+      examples:
+        - 'Defiendo cuatro disciplinas no negociables.'
     lede:
       type: string
       title: 'Optional supporting paragraph'
-
 slots:
   default:
     title: 'Section body'

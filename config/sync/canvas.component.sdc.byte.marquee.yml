@@ -1,0 +1,130 @@
+uuid: b2aab0d5-480e-4ed1-99b9-665b4b5c4db1
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: 25fc714b8024f5bd
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        item_1:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: WordPress
+          expression: ℹ︎string␟value
+        item_2:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Drupal 11'
+          expression: ℹ︎string␟value
+        item_3:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: n8n
+          expression: ℹ︎string␟value
+        item_4:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: Headless
+          expression: ℹ︎string␟value
+        item_5:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Core Web Vitals'
+          expression: ℹ︎string␟value
+        item_6:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'WCAG 2.2'
+          expression: ℹ︎string␟value
+        item_7:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: Multilenguaje
+          expression: ℹ︎string␟value
+        item_8:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'API Integrations'
+          expression: ℹ︎string␟value
+        item_9:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Performance Audits'
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+  da2603d221468f14:
+    settings:
+      prop_field_definitions:
+        items:
+          required: false
+          field_type: string
+          cardinality: -1
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: WordPress
+            -
+              value: 'Drupal 11'
+            -
+              value: n8n
+            -
+              value: Headless
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: Marquee
+id: sdc.byte.marquee
+provider: byte
+source: sdc
+source_local_id: 'byte:marquee'

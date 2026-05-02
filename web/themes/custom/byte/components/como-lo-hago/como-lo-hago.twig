@@ -1,7 +1,8 @@
 {#
 /**
  * @file
- * Como lo hago — 4 values grid (Section header + 4 value cards).
+ * Como lo hago — section header + values slot (cards inserted by editor or
+ * controller via the `values` slot).
  */
 #}
 <section class="section wrap" id="value">
@@ -19,28 +20,6 @@
   </div>
 
   <div class="values">
-    {%- for v in items|default([]) -%}
-      <div class="value">
-        <div class="value__num">
-          <span>{{ '%02d'|format(loop.index) }}</span>
-          {%- if v.tag %}<span class="value__tag">/ {{ v.tag }}</span>{% endif -%}
-        </div>
-        {%- if v.icon -%}
-          <div class="value__icon">
-            <svg width="32" height="32" aria-hidden="true">
-              <use href="/{{ active_theme_path() }}/icons.svg#i-{{ v.icon }}"></use>
-            </svg>
-          </div>
-        {%- endif -%}
-        {%- if v.title %}<h3 class="value__title">{{ v.title }}</h3>{% endif -%}
-        {%- if v.body %}<p class="value__body">{{ v.body }}</p>{% endif -%}
-        {%- if v.metric_value -%}
-          <div class="value__metric">
-            {{ v.metric_value }}{% if v.metric_unit %}<span class="value__metric-unit">{{ v.metric_unit }}</span>{% endif %}
-            {%- if v.caption %}<span class="value__metric-caption">{{ v.caption }}</span>{% endif -%}
-          </div>
-        {%- endif -%}
-      </div>
-    {%- endfor -%}
+    {% block values %}{{ values }}{% endblock %}
   </div>
 </section>

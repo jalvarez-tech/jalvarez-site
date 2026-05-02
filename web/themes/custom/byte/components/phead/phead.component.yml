@@ -1,13 +1,30 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Page header (phead)'
 status: stable
 description: 'Editorial page header for /proyectos, /notas, /contacto. Eyebrow + display title with italic accent + sub.'
 props:
   type: object
   properties:
-    eyebrow_main: { type: string, examples: ['§ proyectos'] }
-    eyebrow_aside: { type: string, examples: ['activos'] }
-    title: { type: string }
-    title_em: { type: string }
-    title_dot: { type: string, default: '.' }
-    sub: { type: string }
+    eyebrow_main:
+      type: string
+      title: 'Eyebrow main'
+      examples:
+        - '§ proyectos'
+    eyebrow_aside:
+      type: string
+      title: 'Eyebrow aside'
+      examples:
+        - activos
+    title:
+      type: string
+      title: Title
+    title_em:
+      type: string
+      title: 'Title em'
+    title_dot:
+      type: string
+      title: 'Title dot'
+      default: .
+    sub:
+      type: string
+      title: Sub

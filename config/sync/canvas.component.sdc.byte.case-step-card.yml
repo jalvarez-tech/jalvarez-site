@@ -1,0 +1,54 @@
+uuid: c0c10150-32e7-48f3-9faf-09540ba8c0e4
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: ace7dd4b6839bed4
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        number:
+          required: false
+          field_type: integer
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: number
+          default_value:
+            -
+              value: 1
+          expression: ℹ︎integer␟value
+        tag:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Semana 1'
+          expression: ℹ︎string␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        body:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Case step card'
+id: sdc.byte.case-step-card
+provider: byte
+source: sdc
+source_local_id: 'byte:case-step-card'

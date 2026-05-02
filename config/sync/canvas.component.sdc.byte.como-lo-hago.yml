@@ -1,0 +1,61 @@
+uuid: 59181bc1-1f7c-4bb4-9e98-10aaa5ae5fdb
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: b4f7ea03b322b69b
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        eyebrow_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'cómo lo hago'
+          expression: ℹ︎string␟value
+        eyebrow_number:
+          required: false
+          field_type: integer
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: number
+          default_value:
+            -
+              value: 1
+          expression: ℹ︎integer␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'No vendo features. '
+          expression: ℹ︎string␟value
+        title_em:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Defiendo cuatro disciplinas no negociables.'
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions:
+        values:
+          title: 'Value cards'
+          description: 'Drop one or more value-card components here.'
+label: 'Cómo lo hago (Values)'
+id: sdc.byte.como-lo-hago
+provider: byte
+source: sdc
+source_local_id: 'byte:como-lo-hago'

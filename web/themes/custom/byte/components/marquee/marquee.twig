@@ -1,10 +1,13 @@
-{# Marquee — looping stack badges #}
-{%- set list = items|default([]) -%}
-{%- if list|length > 0 -%}
+{# Marquee — looping stack badges. #}
+{%- set _items = [
+  item_1, item_2, item_3, item_4, item_5,
+  item_6, item_7, item_8, item_9
+]|filter(v => v) -%}
+{%- if _items|length > 0 -%}
 <div class="marquee">
   <div class="marquee__track">
     <span>
-    {% for it in list|merge(list) %}
+    {% for it in _items|merge(_items) %}
       <span>{{ it }}</span>
       {% if not loop.last %}<span class="marquee__dot">·</span>{% endif %}
     {% endfor %}

@@ -1,0 +1,31 @@
+uuid: c98b2a18-d68e-4f0d-b081-f4c22cdc7eb8
+langcode: es
+status: true
+dependencies:
+  module:
+    - jalvarez_site
+active_version: bda59c5295b08053
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: jalvarez_notes_grid
+        label: 'Notas — list (byte rows)'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+  361e2d0e26ad41fe:
+    settings:
+      default_settings:
+        id: jalvarez_notes_grid
+        label: 'Notas — list (byte rows)'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+label: 'Notas — list (byte rows)'
+id: block.jalvarez_notes_grid
+provider: jalvarez_site
+source: block
+source_local_id: jalvarez_notes_grid

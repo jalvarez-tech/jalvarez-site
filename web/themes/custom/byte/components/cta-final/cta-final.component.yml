@@ -1,30 +1,40 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
-
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'CTA final'
 status: stable
 description: 'Centered call-to-action band with display title (with optional italic fragment), sub, and primary + ghost buttons.'
-
 props:
   type: object
   properties:
     title:
       type: string
-      examples: ['Si crees lo mismo,']
+      title: Title
+      examples:
+        - 'Si crees lo mismo,'
     title_em:
       type: string
       title: 'Italic accent fragment'
-      examples: ['construyamos algo juntos.']
+      examples:
+        - 'construyamos algo juntos.'
     sub:
       type: string
+      title: Sub
     primary_label:
       type: string
-      examples: ['Iniciar tu proyecto']
+      title: 'Primary label'
+      examples:
+        - 'Iniciar tu proyecto'
     primary_href:
       type: string
-      examples: ['/contacto']
+      title: 'Primary href'
+      examples:
+        - /contacto
     secondary_label:
       type: string
-      examples: ['Revisar mi trabajo']
+      title: 'Secondary label'
+      examples:
+        - 'Revisar mi trabajo'
     secondary_href:
       type: string
-      examples: ['/proyectos']
+      title: 'Secondary href'
+      examples:
+        - /proyectos

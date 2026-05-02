@@ -33,9 +33,14 @@
     </div>
     <h3 class="project__name">{{ name }} <span class="project__arrow" aria-hidden="true">↗</span></h3>
     {%- if description -%}<p class="project__desc">{{ description }}</p>{% endif -%}
-    {%- if metrics|length > 0 -%}
+    {%- set _metrics = [
+      { value: m1_value, key: m1_key },
+      { value: m2_value, key: m2_key },
+      { value: m3_value, key: m3_key },
+    ]|filter(m => m.value or m.key) -%}
+    {%- if _metrics|length > 0 -%}
       <div class="project__metrics">
-        {%- for m in metrics -%}
+        {%- for m in _metrics -%}
           <div><strong>{{ m.value }}</strong>{{ m.key }}</div>
         {%- endfor -%}
       </div>

@@ -4,9 +4,18 @@ status: true
 dependencies:
   module:
     - jalvarez_site
-active_version: bd18dbc209d74f61
+active_version: 1a2b7d540ae1db1c
 versioned_properties:
   active:
+    settings:
+      default_settings:
+        id: jalvarez_nav_glass
+        label: 'Byte top navigation'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+  bd18dbc209d74f61:
     settings:
       default_settings:
         id: jalvarez_nav_glass

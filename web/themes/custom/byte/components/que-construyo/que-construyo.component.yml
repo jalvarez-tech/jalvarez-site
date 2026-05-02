@@ -1,18 +1,36 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Qué construyo (Featured projects)'
 status: stable
-description: 'Section + 3 project cards in grid + CTA "Ver todo el trabajo".'
+description: 'Section header + projects grid + optional ghost CTA. Drop card-proyecto components into the projects slot.'
 props:
   type: object
   properties:
-    eyebrow_label: { type: string }
-    eyebrow_number: { type: integer }
-    title: { type: string }
-    title_em: { type: string }
-    lede: { type: string }
-    items:
-      type: array
-      items:
-        type: object
-    cta_label: { type: string, examples: ['Ver todo el trabajo'] }
-    cta_href: { type: string, examples: ['/proyectos'] }
+    eyebrow_label:
+      type: string
+      title: 'Eyebrow label'
+    eyebrow_number:
+      type: integer
+      title: 'Eyebrow number'
+    title:
+      type: string
+      title: Title
+    title_em:
+      type: string
+      title: 'Italic accent fragment'
+    lede:
+      type: string
+      title: 'Section lede paragraph'
+    cta_label:
+      type: string
+      title: 'CTA label'
+      examples:
+        - 'Ver todo el trabajo'
+    cta_href:
+      type: string
+      title: 'CTA URL'
+      examples:
+        - /proyectos
+slots:
+  projects:
+    title: 'Project cards'
+    description: 'Drop one or more card-proyecto components here.'

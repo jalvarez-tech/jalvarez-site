@@ -1,0 +1,81 @@
+uuid: a7f5f192-4891-4377-8f32-8df27e2534ed
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: 41a1222b8fbec38a
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        eyebrow_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        eyebrow_number:
+          required: false
+          field_type: integer
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: number
+          default_value: null
+          expression: ℹ︎integer␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        title_em:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        lede:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        cta_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Ver todo el trabajo'
+          expression: ℹ︎string␟value
+        cta_href:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: /proyectos
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions:
+        projects:
+          title: 'Project cards'
+          description: 'Drop one or more card-proyecto components here.'
+label: 'Qué construyo (Featured projects)'
+id: sdc.byte.que-construyo
+provider: byte
+source: sdc
+source_local_id: 'byte:que-construyo'

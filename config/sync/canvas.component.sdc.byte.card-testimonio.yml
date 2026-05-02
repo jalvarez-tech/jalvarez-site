@@ -1,0 +1,50 @@
+uuid: 1b0990b0-a6b8-43c4-b16f-b991c3c75d1c
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: d55e22b1a7a68ff6
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        quote:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        name:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        role:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        initials:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Card Testimonio'
+id: sdc.byte.card-testimonio
+provider: byte
+source: sdc
+source_local_id: 'byte:card-testimonio'

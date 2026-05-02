@@ -1,4 +1,4 @@
-{# Palabras de cliente #}
+{# Palabras de cliente — section wrapper + testimonials slot. #}
 <section class="section wrap">
   <div class="section__head">
     <div>
@@ -11,8 +11,6 @@
     </div>
   </div>
   <div class="tests">
-    {%- for t in items|default([]) -%}
-      {%- include 'byte:card-testimonio' with t only -%}
-    {%- endfor -%}
+    {% block testimonials %}{{ testimonials }}{% endblock %}
   </div>
 </section>

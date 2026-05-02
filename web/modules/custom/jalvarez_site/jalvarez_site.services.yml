@@ -1,0 +1,5 @@
+services:
+  jalvarez_site.canvas_lang_prefix_stripper:
+    class: Drupal\jalvarez_site\EventSubscriber\CanvasLangPrefixStripper
+    tags:
+      - { name: event_subscriber }

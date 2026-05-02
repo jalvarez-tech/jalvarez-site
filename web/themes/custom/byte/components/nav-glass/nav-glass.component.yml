@@ -1,38 +1,49 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Nav glass (top)'
 status: stable
-description: 'Liquid-glass fixed top nav: brand monogram + nav links + CTA + lang toggle. Floats centered with backdrop-filter blur.'
+noUi: true
+description: 'Liquid-glass fixed top nav: brand monogram + nav links + CTA + lang toggle. Rendered programmatically by jalvarez_nav_glass block (links built from the active route + language). Hidden from Canvas editor by design.'
 props:
   type: object
   properties:
     brand_initial:
       type: string
-      default: 'J'
+      title: 'Brand initial'
+      default: J
     brand_name:
       type: string
-      default: 'jalvarez'
+      title: 'Brand name'
+      default: jalvarez
     brand_tld:
       type: string
-      default: '.tech'
+      title: 'Brand tld'
+      default: .tech
     links:
       type: array
+      title: Links
       description: 'Menu links to render in the nav'
       items:
         type: object
         properties:
-          label:  { type: string }
-          href:   { type: string }
+          label: { type: string }
+          href: { type: string }
           active: { type: boolean }
     cta_label:
       type: string
-      default: 'Disponible'
+      title: 'Cta label'
+      default: Disponible
     cta_href:
       type: string
-      default: '/contacto'
+      title: 'Cta href'
+      default: /contacto
     show_lang_toggle:
       type: boolean
+      title: 'Show lang toggle'
       default: true
     current_lang:
       type: string
-      enum: [es, en]
+      title: 'Current lang'
+      enum:
+        - es
+        - en
       default: es

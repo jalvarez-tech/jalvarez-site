@@ -1,0 +1,28 @@
+block.settings.jalvarez_projects_grid:
+  type: block_settings
+  label: 'Proyectos — grid (byte cards)'
+  mapping:
+    only_featured:
+      type: boolean
+      label: 'Solo proyectos destacados (field_featured_home)'
+    limit:
+      type: integer
+      label: 'Límite de proyectos'
+    wrap:
+      type: string
+      label: 'Modo de wrapper HTML'
+      constraints:
+        Choice:
+          - section
+          - grid
+          - none
+
+block.settings.jalvarez_notes_grid:
+  type: block_settings
+  label: 'Notas — list (byte rows)'
+  mapping: {}
+
+block.settings.jalvarez_nav_glass:
+  type: block_settings
+  label: 'Byte top navigation'
+  mapping: {}

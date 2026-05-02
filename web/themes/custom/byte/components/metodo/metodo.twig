@@ -1,4 +1,4 @@
-{# Método — process steps #}
+{# Método — section header + steps slot. #}
 <section class="section wrap" id="process">
   <div class="section__head">
     <div>
@@ -14,13 +14,6 @@
   </div>
 
   <div class="process-list">
-    {%- for p in items|default([]) -%}
-      <div class="process-row">
-        <div class="process-num">{{ '%02d'|format(loop.index) }} — step</div>
-        <div class="process-title">{{ p.title }}</div>
-        <div class="process-body">{{ p.body }}</div>
-        {%- if p.tag %}<div class="process-tag">{{ p.tag }}</div>{% endif -%}
-      </div>
-    {%- endfor -%}
+    {% block steps %}{{ steps }}{% endblock %}
   </div>
 </section>

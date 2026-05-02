@@ -1,0 +1,34 @@
+uuid: 7df472e3-012c-40ce-a5ca-a100dcfdc2e9
+langcode: es
+status: false
+dependencies:
+  module:
+    - jalvarez_site
+active_version: c4aa055282a141dc
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: jalvarez_projects_grid
+        label: 'Proyectos — grid (byte cards)'
+        label_display: '0'
+        provider: jalvarez_site
+        only_featured: false
+        limit: 0
+        wrap: section
+    fallback_metadata:
+      slot_definitions: null
+  ead545370ca5c60b:
+    settings:
+      default_settings:
+        id: jalvarez_projects_grid
+        label: 'Proyectos — grid (byte cards)'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+label: 'Proyectos — grid (byte cards)'
+id: block.jalvarez_projects_grid
+provider: jalvarez_site
+source: block
+source_local_id: jalvarez_projects_grid

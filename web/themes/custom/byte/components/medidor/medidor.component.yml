@@ -1,12 +1,37 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Medidor (metric card)'
 status: stable
 description: 'Big metric value + small key + optional note, used in §03 Resultados or in card-proyecto.'
 props:
   type: object
   properties:
-    value: { type: string, examples: ['1.4s', '−38%', 'AA'] }
-    unit:  { type: string, description: 'Optional small unit suffix (e.g. "+ años", "%", "h")' }
-    key:   { type: string, examples: ['LCP', 'Peso', 'A11y'] }
-    note:  { type: string, examples: ['verificado con datos de campo'] }
-    variant: { type: string, enum: [flat, card], default: flat }
+    value:
+      type: string
+      title: Value
+      examples:
+        - 1.4s
+        - −38%
+        - AA
+    unit:
+      type: string
+      title: Unit
+      description: 'Optional small unit suffix (e.g. "+ años", "%", "h")'
+    key:
+      type: string
+      title: Key
+      examples:
+        - LCP
+        - Peso
+        - A11y
+    note:
+      type: string
+      title: Note
+      examples:
+        - 'verificado con datos de campo'
+    variant:
+      type: string
+      title: Variant
+      enum:
+        - flat
+        - card
+      default: flat

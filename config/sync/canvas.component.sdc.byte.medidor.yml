@@ -1,0 +1,67 @@
+uuid: 59c6781d-772d-40cd-8f03-88967d7a362f
+langcode: es
+status: true
+dependencies:
+  module:
+    - options
+  theme:
+    - byte
+active_version: e85eb91094866d54
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        value:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 1.4s
+          expression: ℹ︎string␟value
+        unit:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        key:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: LCP
+          expression: ℹ︎string␟value
+        note:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'verificado con datos de campo'
+          expression: ℹ︎string␟value
+        variant:
+          required: false
+          field_type: list_string
+          field_storage_settings:
+            allowed_values_function: canvas_load_allowed_values_for_component_prop
+          field_instance_settings: {  }
+          field_widget: options_select
+          default_value: null
+          expression: ℹ︎list_string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Medidor (metric card)'
+id: sdc.byte.medidor
+provider: byte
+source: sdc
+source_local_id: 'byte:medidor'

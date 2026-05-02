@@ -1,25 +1,81 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Canal directo'
 status: stable
-description: 'Contact-page sidebar: direct channels (email/phone/whatsapp), availability strip, response-time card, and "Cómo va a ser" expectations list.'
+description: 'Contact-page sidebar: 3 direct channels (email/phone/whatsapp), availability strip, response-time card, and "Cómo va a ser" 5-step expectations list.'
 props:
   type: object
   properties:
-    channels_label: { type: string, default: 'Canales directos' }
-    channels:
-      type: array
-      items:
-        type: object
-        properties:
-          name:  { type: string }
-          value: { type: string }
-          href:  { type: string }
-    availability_label: { type: string, default: 'Disponibilidad' }
-    free_label:  { type: string, default: 'cupos libres' }
-    free_value:  { type: string, examples: ['2'] }
-    response_label: { type: string, default: 'Tiempo de respuesta' }
-    response_value: { type: string, examples: ['< 24h lun-vie'] }
-    expect_label: { type: string, default: 'Cómo va a ser' }
-    steps:
-      type: array
-      items: { type: string }
+    channels_label:
+      type: string
+      title: 'Channels heading'
+      default: 'Canales directos'
+    c1_name:
+      type: string
+      title: 'Channel 1 — name'
+      examples: ['Email']
+    c1_value:
+      type: string
+      title: 'Channel 1 — value'
+      examples: ['contacto@jalvarez.tech']
+    c1_href:
+      type: string
+      title: 'Channel 1 — link URL'
+      examples: ['mailto:contacto@jalvarez.tech']
+    c2_name:
+      type: string
+      title: 'Channel 2 — name'
+      examples: ['WhatsApp']
+    c2_value:
+      type: string
+      title: 'Channel 2 — value'
+    c2_href:
+      type: string
+      title: 'Channel 2 — link URL'
+    c3_name:
+      type: string
+      title: 'Channel 3 — name'
+    c3_value:
+      type: string
+      title: 'Channel 3 — value'
+    c3_href:
+      type: string
+      title: 'Channel 3 — link URL'
+    availability_label:
+      type: string
+      title: 'Availability heading'
+      default: 'Disponibilidad'
+    free_label:
+      type: string
+      title: 'Free slots label'
+      default: 'cupos libres'
+    free_value:
+      type: string
+      title: 'Free slots count'
+      examples: ['2']
+    response_label:
+      type: string
+      title: 'Response time label'
+      default: 'Tiempo de respuesta'
+    response_value:
+      type: string
+      title: 'Response time value'
+      examples: ['< 24h lun-vie']
+    expect_label:
+      type: string
+      title: 'Expectations heading'
+      default: 'Cómo va a ser'
+    step_1:
+      type: string
+      title: 'Step 1'
+    step_2:
+      type: string
+      title: 'Step 2'
+    step_3:
+      type: string
+      title: 'Step 3'
+    step_4:
+      type: string
+      title: 'Step 4'
+    step_5:
+      type: string
+      title: 'Step 5'

@@ -6,5 +6,24 @@ name: Otro(s)
 configEntityTypeId: component
 weight: 0
 items:
+  - sdc.byte.banner-inicio
+  - sdc.byte.button
+  - sdc.byte.canal-directo
+  - sdc.byte.card-proyecto
+  - sdc.byte.card-testimonio
+  - sdc.byte.case-step-card
   - sdc.byte.chip
+  - sdc.byte.como-lo-hago
+  - sdc.byte.cta-final
+  - sdc.byte.eyebrow
+  - sdc.byte.marquee
+  - sdc.byte.medidor
+  - sdc.byte.metodo
+  - sdc.byte.palabras-cliente
+  - sdc.byte.phead
+  - sdc.byte.process-row
+  - sdc.byte.que-construyo
+  - sdc.byte.row-nota
+  - sdc.byte.section
+  - sdc.byte.value-card
   - sdc.navigation.title

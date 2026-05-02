@@ -1,0 +1,86 @@
+uuid: 664b002f-3a9c-4911-8b4c-059ff0d2d1cb
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: 11f29d73cd6a51a7
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Si crees lo mismo,'
+          expression: ℹ︎string␟value
+        title_em:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'construyamos algo juntos.'
+          expression: ℹ︎string␟value
+        sub:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        primary_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Iniciar tu proyecto'
+          expression: ℹ︎string␟value
+        primary_href:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: /contacto
+          expression: ℹ︎string␟value
+        secondary_label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Revisar mi trabajo'
+          expression: ℹ︎string␟value
+        secondary_href:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: /proyectos
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'CTA final'
+id: sdc.byte.cta-final
+provider: byte
+source: sdc
+source_local_id: 'byte:cta-final'

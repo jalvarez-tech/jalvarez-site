@@ -1,0 +1,56 @@
+uuid: 20f71fe8-61c7-492a-9182-3636a4c89418
+langcode: es
+status: true
+dependencies:
+  theme:
+    - byte
+active_version: e8145e5e0fdf8b7a
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        number:
+          required: false
+          field_type: integer
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: number
+          default_value:
+            -
+              value: 1
+          expression: ℹ︎integer␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Auditoría técnica'
+          expression: ℹ︎string␟value
+        body:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value: null
+          expression: ℹ︎string␟value
+        tag:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Semana 1'
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Process row'
+id: sdc.byte.process-row
+provider: byte
+source: sdc
+source_local_id: 'byte:process-row'

@@ -1,0 +1,36 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Value card'
+status: stable
+description: 'Single discipline/value card with line-art Lucide icon, numbered tag, title, body, KPI metric + caption. Used inside Como lo hago.'
+props:
+  type: object
+  properties:
+    number:
+      type: integer
+      title: 'Card number (auto-padded to 02)'
+      examples: [1, 2, 3, 4]
+    tag:
+      type: string
+      title: 'Discipline tag'
+      examples: ['performance', 'arquitectura']
+    icon:
+      type: string
+      title: 'Lucide icon name'
+      examples: ['gauge', 'layers', 'accessibility', 'workflow']
+    title:
+      type: string
+      title: 'Card title'
+    body:
+      type: string
+      title: 'Body text'
+    metric_value:
+      type: string
+      title: 'Metric value'
+      examples: ['42', 'AA']
+    metric_unit:
+      type: string
+      title: 'Metric unit'
+      examples: ['%', '+ años']
+    caption:
+      type: string
+      title: 'Metric caption'

@@ -1,19 +1,27 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Método (Process)'
 status: stable
-description: 'Numbered process steps. 4-column grid on desktop: num | title | body | tag.'
+description: 'Section header (eyebrow + title) followed by a process list. Drop process-row components into the steps slot.'
 props:
   type: object
   properties:
-    eyebrow_label: { type: string, examples: ['el método'] }
-    eyebrow_number: { type: integer, examples: [3] }
-    title: { type: string }
-    title_em: { type: string }
-    items:
-      type: array
-      items:
-        type: object
-        properties:
-          title: { type: string }
-          body: { type: string }
-          tag: { type: string, description: 'e.g. "Semana 1"' }
+    eyebrow_label:
+      type: string
+      title: 'Eyebrow label'
+      examples:
+        - 'el método'
+    eyebrow_number:
+      type: integer
+      title: 'Eyebrow number'
+      examples:
+        - 3
+    title:
+      type: string
+      title: Title
+    title_em:
+      type: string
+      title: 'Italic accent fragment'
+slots:
+  steps:
+    title: 'Process steps'
+    description: 'Drop one or more process-row components here.'

@@ -1,19 +1,24 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: 'Palabras de cliente (Testimonials wrapper)'
 status: stable
-description: 'Section wrapper for 2 testimonial cards in a 2-col grid.'
+description: 'Section wrapper for testimonial cards in a 2-col grid. Drop card-testimonio components into the testimonials slot.'
 props:
   type: object
   properties:
-    eyebrow_label: { type: string }
-    eyebrow_number: { type: integer }
-    title: { type: string }
-    items:
-      type: array
-      items:
-        type: object
-        properties:
-          quote: { type: string }
-          name: { type: string }
-          role: { type: string }
-          initials: { type: string }
+    eyebrow_label:
+      type: string
+      title: 'Eyebrow label'
+      examples:
+        - 'palabra de clientes'
+    eyebrow_number:
+      type: integer
+      title: 'Eyebrow number'
+      examples:
+        - 4
+    title:
+      type: string
+      title: Title
+slots:
+  testimonials:
+    title: 'Testimonial cards'
+    description: 'Drop one or more card-testimonio components here.'

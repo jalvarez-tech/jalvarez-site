@@ -1,11 +1,43 @@
-'$schema': https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
 name: Marquee
 status: stable
-description: 'Infinite-scrolling stack badges. Items separated by accent dots.'
+description: 'Infinite-scrolling stack badges. Up to 9 items, separated by accent dots.'
 props:
   type: object
   properties:
-    items:
-      type: array
-      items: { type: string }
-      examples: [['WordPress', 'Drupal 11', 'n8n', 'Headless']]
+    item_1:
+      type: string
+      title: 'Item 1'
+      examples: ['WordPress']
+    item_2:
+      type: string
+      title: 'Item 2'
+      examples: ['Drupal 11']
+    item_3:
+      type: string
+      title: 'Item 3'
+      examples: ['n8n']
+    item_4:
+      type: string
+      title: 'Item 4'
+      examples: ['Headless']
+    item_5:
+      type: string
+      title: 'Item 5'
+      examples: ['Core Web Vitals']
+    item_6:
+      type: string
+      title: 'Item 6'
+      examples: ['WCAG 2.2']
+    item_7:
+      type: string
+      title: 'Item 7'
+      examples: ['Multilenguaje']
+    item_8:
+      type: string
+      title: 'Item 8'
+      examples: ['API Integrations']
+    item_9:
+      type: string
+      title: 'Item 9'
+      examples: ['Performance Audits']

@@ -4,7 +4,7 @@
 > Este archivo describe la arquitectura **completa y autoritativa** del sitio.
 > Antes de implementar cualquier cosa, leer este documento. Antes de tomar decisiones de arquitectura, actualizar este documento.
 
-- **Última actualización:** 2026-05-01
+- **Última actualización:** 2026-05-02 — Las 4 páginas principales son `canvas_page` editables visualmente
 - **Stack base:** Drupal CMS 11 · Drupal Canvas · DDEV · Theme `byte`
 - **Diseño visual y copy:** ver [DESIGN.md](DESIGN.md) (tokens, componentes CSS↔SDC, contenido ES/EN, composición por página).
 - **Deployment:** ver [DEPLOYMENT.md](DEPLOYMENT.md) (pipeline GitHub Actions → Hostinger, SCSS compilado en CI).
@@ -40,12 +40,18 @@
 ### Decisiones fundacionales
 
 - Drupal 11 **clásico** (no decoupled).
-- Drupal Canvas **solo** para páginas de marketing flexibles (Inicio, Proyectos, Notas, Contacto, futuras landings).
-- Detalle de Proyecto y Nota usan **Twig + SDC**, no Canvas.
+- **Las 4 páginas principales** (Inicio, Proyectos, Notas, Contacto) son entidades **`canvas_page`** editables 100% en el editor visual de Canvas. Cada una con traducción EN.
+- **Listados dinámicos** (Proyectos, Notas) usan **block plugins custom** (`jalvarez_projects_grid`, `jalvarez_notes_grid`) que cargan los nodos y los renderizan via SDC. Estos blocks viven dentro del Canvas tree de su respectiva canvas_page — el editor puede moverlos/quitarlos como cualquier otro componente.
+- **Contacto** combina SDC nativos (phead, canal-directo) + el `block.webform_block` configurado con `webform_id: contact`.
+- **Detalle** de Proyecto y Nota: Twig + SDC en `node--project--full.html.twig` y `node--note--full.html.twig` — son rendering per-entity (no composición editorial), no usan Canvas.
+- **Front page** del sitio: `system.site.page.front = /page/<id>` (la canonical de la canvas_page Inicio). Drupal Routing es language-aware vía `/page/{id}` y Canvas resuelve la translation correcta.
+- **20 SDCs Byte** registrados como Canvas Component config entities (sin `noUi: true` después de F10). Solo `nav-glass` queda `noUi: true` por su lógica de active state que requiere block plugin.
+- **30+ blocks** registrados (sistema, Views, webform, custom).
 - DDEV como runtime local.
-- Español default; inglés como traducción.
+- Español default; inglés como traducción de cada canvas_page (mismas UUIDs de componentes, distintos `inputs` con texto traducido).
 - Prefijos URL `/es` y `/en` con negociación por URL → browser → default.
-- Reutilizar componentes SDC entre Canvas y plantillas de nodo.
+- **`/canvas/editor/*` siempre sin prefijo de idioma** — un EventSubscriber (`CanvasLangPrefixStripper`) intercepta y redirige cualquier `/{lang}/canvas/editor/...` al sin prefijo, porque el SPA router de Canvas 1.3.x no soporta prefix.
+- SDCs son la fuente de verdad visual: el Canvas editor, los block plugins custom y las plantillas de nodo los reutilizan.
 
 ---
 
@@ -68,15 +74,16 @@
    (Project detail) (Note detail)
 ```
 
-| Página | URL ES | URL EN | Tipo |
+| Página | URL ES | URL EN | Render |
 |---|---|---|---|
-| Inicio | `/es` | `/en` | Canvas Page |
-| Proyectos (listado) | `/es/proyectos` | `/en/projects` | Canvas Page + View |
-| Detalle proyecto | `/es/proyectos/{alias}` | `/en/projects/{alias}` | Node Project (SDC + Twig) |
-| Notas (listado) | `/es/notas` | `/en/notes` | Canvas Page + View |
-| Detalle nota | `/es/notas/{alias}` | `/en/notes/{alias}` | Node Note (SDC + Twig) |
-| Contacto | `/es/contacto` | `/en/contact` | Canvas Page + Webform |
-| Sobre mí (futuro) | `/es/sobre-mi` | `/en/about` | Canvas Page |
+| Inicio | `/es` (alias `/inicio`) | `/en` (alias `/home`) | **canvas_page id=1** (banner + sections + cta) |
+| Proyectos | `/es/proyectos` | `/en/projects` | **canvas_page id=5** (phead + `block.jalvarez_projects_grid` + cta) |
+| Detalle proyecto | `/es/proyectos/{alias}` | `/en/projects/{alias}` | Node Project — Twig + SDC, NO Canvas |
+| Notas | `/es/notas` | `/en/notes` | **canvas_page id=6** (phead + `block.jalvarez_notes_grid` + cta) |
+| Detalle nota | `/es/notas/{alias}` | `/en/notes/{alias}` | Node Note — Twig + SDC, NO Canvas |
+| Contacto | `/es/contacto` | `/en/contact` | **canvas_page id=7** (phead + `block.webform_block` + canal-directo) |
+| Otras landings (futuro) | `/es/<slug>` | `/en/<slug>` | Crear nueva canvas_page desde `/admin/content/pages` |
+| Editor visual de cualquier canvas_page | `/canvas/editor/canvas_page/{id}` | mismo (sin prefix) | UI Canvas (Preact SPA + Radix UI) |
 
 Pathauto patterns:
 
@@ -244,92 +251,144 @@ Todas las vistas con labels traducibles vía Configuration Translation.
 ## 7. SDC Components (theme `byte`)
 
 ```
-┌──── SINGLE DIRECTORY COMPONENTS ─────────────────────┐
-│                                                      │
-│  📐 PRIMITIVOS / LAYOUT                              │
-│     ├─ section          (envoltura semántica)        │
-│     ├─ container        (max-width + padding)        │
-│     ├─ grid             (utility grid)               │
-│     └─ stack            (vertical rhythm)            │
-│                                                      │
-│  🎨 BLOQUES DE INICIO                                │
-│     ├─ banner-inicio    (Hero principal)             │
-│     ├─ medible          (KPIs grandes)               │
-│     ├─ como-lo-hago     (sección proceso)            │
-│     ├─ que-construyo    (servicios/áreas)            │
-│     ├─ metodo           (sección método)             │
-│     └─ cta-final        (cierre + botón)             │
-│                                                      │
-│  🃏 CARDS                                            │
-│     ├─ card-proyecto    (teaser proyecto)            │
-│     ├─ card-proceso     (paso proceso)               │
-│     ├─ card-testimonio  (testimonio)                 │
-│     └─ row-nota         (nota en lista)              │
-│                                                      │
-│  📊 UI DATA                                          │
-│     ├─ medidor          (barra/donut métrica)        │
-│     ├─ row-metodo       (fila de método)             │
-│     └─ palabras-cliente (wrapper testimonios)        │
-│                                                      │
-│  📩 CONTACTO                                         │
-│     ├─ contacto         (formulario wrapper)         │
-│     └─ canal-directo    (Email · WhatsApp · LinkedIn)│
-└──────────────────────────────────────────────────────┘
+┌──── SINGLE DIRECTORY COMPONENTS (web/themes/custom/byte/components/) ──────┐
+│                                                                             │
+│  ATOMS — props simples, totalmente Canvas-editables                         │
+│    ├─ chip              (pill tag/label, variants default/accent)           │
+│    ├─ button            (primary/ghost, optional arrow)                     │
+│    ├─ eyebrow           (§ 0N + label, mono uppercase)                      │
+│    ├─ phead             (page hero header con eyebrow + título + sub)       │
+│    ├─ medidor           (big metric value/unit/key/note, variants)          │
+│    ├─ case-step-card    (numbered step inside project case study)           │
+│    ├─ value-card        (atom inside como-lo-hago)                          │
+│    ├─ process-row       (atom inside metodo)                                │
+│    ├─ card-proyecto     (project teaser, m1/m2/m3 metrics planas)           │
+│    ├─ card-testimonio   (testimonial card)                                  │
+│    └─ row-nota          (note row inside listings)                          │
+│                                                                             │
+│  HERO / CTA / MARQUEE — props planos                                        │
+│    ├─ banner-inicio     (Home hero, KPIs aplanados m1_*..m3_*)              │
+│    ├─ cta-final         (closing CTA band)                                  │
+│    └─ marquee           (stack badges, items aplanados item_1..item_9)      │
+│                                                                             │
+│  MOLECULES — slot-driven (compose hijos en Canvas tree)                     │
+│    ├─ section           (slot `default`)                                    │
+│    ├─ como-lo-hago      (slot `values` ← value-card)                        │
+│    ├─ metodo            (slot `steps` ← process-row)                        │
+│    ├─ palabras-cliente  (slot `testimonials` ← card-testimonio)             │
+│    └─ que-construyo     (slot `projects` ← card-proyecto)                   │
+│                                                                             │
+│  PROGRAMÁTICOS — `noUi: true`, NO aparecen en Canvas picker                 │
+│    └─ nav-glass         (renderizado por jalvarez_nav_glass block)          │
+│                         (canal-directo dejó de ser noUi tras aplanarse en F10) │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BLOCK PLUGINS CUSTOM (registrados como Canvas Component blocks):
+  ├─ block.jalvarez_nav_glass         (top nav, language-aware active state)
+  ├─ block.jalvarez_projects_grid     (carga node.project + renderiza SDC card-proyecto)
+  └─ block.jalvarez_notes_grid        (carga node.note + renderiza SDC row-nota + read_time bilingüe)
 ```
 
-Cada SDC tiene `*.component.yml` + `*.twig` + `*.css` con props traducibles vía Configuration Translation.
+### 7.1 Restricciones que impone Canvas a los SDCs
 
-Estructura esperada en `web/themes/custom/byte/components/<nombre>/`:
+Para que un SDC sea registrable como Canvas Component config entity:
+
+1. **Cada prop necesita `title`** — sin `title` Canvas lanza `ComponentDoesNotMeetRequirementsException`. Aplicado por `scripts/add-sdc-prop-titles.php`.
+2. **Props no pueden ser `array of object`** — Canvas no tiene field type/widget que mapee a `[{name,value,…}]`. Soluciones:
+   - Si el array tiene tamaño fijo (≤ 3): aplanar a `m1_*`, `m2_*`, `m3_*`.
+   - Si el array tiene tamaño variable: convertir a slot, extraer el item-template a un SDC atómico.
+3. **`array of string`** se acepta solo aplanado a posiciones fijas (`item_1`, `item_2`, …).
+4. **Slots** se declaran con `slots:` en el YAML; en el Twig se renderizan con `{% block <slot> %}{{ <slot> }}{% endblock %}`.
+5. Para SDCs que no necesitan UI (renderizados programáticamente desde controllers/blocks): añadir `noUi: true` al YAML — siguen funcionando como includes Twig pero no se ofrecen al editor.
+
+### 7.2 Convenciones del directorio
 
 ```
-<nombre>/
-├── <nombre>.component.yml
-├── <nombre>.twig
-├── <nombre>.css
-└── README.md (opcional)
+web/themes/custom/byte/components/<nombre>/
+├── <nombre>.component.yml   ← schema + slots + noUi flag
+├── <nombre>.twig             ← markup (incluye slot blocks si aplica)
+└── (opcional) README.md
 ```
+
+Estilos viven en `web/themes/custom/byte/scss/components/_<nombre>.scss` (un archivo por SDC) y se importan desde `main.scss`.
 
 ---
 
 ## 8. Composición Canvas por página
 
-### Inicio
+Cada canvas_page se crea programáticamente la primera vez (idempotente, scripts en `scripts/`). Después del seed inicial el editor modifica libremente desde `/canvas/editor/canvas_page/{id}`. Las traducciones EN comparten UUIDs con la ES (mismo árbol estructural), solo cambian los inputs (textos).
+
+### Inicio (canvas_page id=1) — `scripts/create-canvas-home.php`
+
+20 instancias de componentes:
 
 ```
-[SDC] banner-inicio
-[SDC] medible             (3-4 KPIs)
-[SDC] que-construyo
-[VIEW] featured_projects  (embebida)
-[SDC] como-lo-hago
-[SDC] palabras-cliente
-[VIEW] featured_testimonials
-[VIEW] recent_notes
-[SDC] cta-final
+banner-inicio        (hero, props planos m1_*..m3_*)
+marquee              (item_1..item_9)
+como-lo-hago         (slot values)
+  └─ value-card × 4  ← children en slot `values`
+que-construyo        (slot projects)
+  └─ card-proyecto × 3 ← children en slot `projects`
+metodo               (slot steps)
+  └─ process-row × 4 ← children en slot `steps`
+palabras-cliente     (slot testimonials)
+  └─ card-testimonio × 2 ← children en slot `testimonials`
+cta-final
 ```
 
-### Proyectos (listado)
+### Proyectos (canvas_page id=5) — `scripts/create-canvas-other-pages.php`
 
 ```
-[SDC] hero-page
-[VIEW] projects   (con filtros expuestos)
-[SDC] cta-final
+phead                                    (eyebrow + título + sub)
+block.jalvarez_projects_grid             (carga Node::loadMultiple + renderiza card-proyecto SDCs)
+cta-final
 ```
 
-### Notas (listado)
+El listado dinámico vive dentro del Canvas tree como un block plugin custom. El editor puede mover/quitar el block; los project nodes se siguen administrando en `/admin/content`.
+
+### Notas (canvas_page id=6)
 
 ```
-[SDC] hero-page
-[VIEW] notes      (con filtros expuestos)
-[SDC] cta-final
+phead                                    (eyebrow + título + sub)
+block.jalvarez_notes_grid                (carga Node::loadMultiple + renderiza row-nota SDCs)
+cta-final
 ```
 
-### Contacto
+`NotesGridBlock::build()` calcula `read_time` a 200 wpm y formatea fechas bilingüe (`abr · 2026` / `Apr · 2026`) según la language context.
+
+### Contacto (canvas_page id=7)
 
 ```
-[SDC] hero-page
-[WEBFORM] contact
-[SDC] canal-directo
+phead                                    (eyebrow + título + sub)
+block.webform_block { webform_id: contact, lazy: false }
+canal-directo                            (3 canales aplanados c1_* c2_* c3_* + 5 steps step_1..step_5)
 ```
+
+El Webform se renderiza vía el block standard de Drupal Webform module. canal-directo dejó de ser `noUi: true` (F10) tras aplanarse.
+
+### Detalle de Proyecto (`node--project--full.html.twig`)
+
+Twig template per-entity, NO Canvas. Compone:
+- Cover (gradient OKLCH + browser mock)
+- chips (category, year)
+- Title + brief
+- Meta line
+- §01 Reto (challenge_intro + bullets)
+- §02 Enfoque (case-step-card × N desde `field_approach_steps`)
+- §03 Resultados (medidor × N desde `field_results_metrics`)
+- §04 Lección (lesson + testimonial_embed)
+- CTA final
+
+### Detalle de Nota (`node--note--full.html.twig`)
+
+Twig template per-entity, NO Canvas. Compone:
+- Back link
+- Tags + title display
+- Sub
+- Byline + 3 action buttons (share/bookmark/copy)
+- Hero glyph fallback
+- Body rich text (h2/h3/blockquote/code/pre)
+- Divider + newsletter CTA
 
 ### Detalle de Proyecto (Twig template, NO Canvas)
 

@@ -1,0 +1,26 @@
+uuid: 05166620-5c29-4444-afd0-1cb4a4619c23
+langcode: es
+status: true
+dependencies:
+  config:
+    - views.view.notes
+  module:
+    - views
+active_version: 17d748290f0650fe
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:notes-block_1'
+        label: 'Listado de notas (block)'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Listado de notas (block)'
+id: block.views_block.notes-block_1
+provider: views
+source: block
+source_local_id: 'views_block:notes-block_1'

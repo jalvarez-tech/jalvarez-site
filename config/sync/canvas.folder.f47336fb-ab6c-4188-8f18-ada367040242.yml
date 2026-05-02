@@ -7,3 +7,5 @@ configEntityTypeId: component
 weight: 0
 items:
   - block.jalvarez_nav_glass
+  - block.jalvarez_notes_grid
+  - block.jalvarez_projects_grid

@@ -1,35 +1,3 @@
-jalvarez_site.home:
-  path: '/home'
-  defaults:
-    _controller: '\Drupal\jalvarez_site\Controller\HomeController::index'
-    _title: 'jalvarez.tech'
-  requirements:
-    _permission: 'access content'
-
-jalvarez_site.projects:
-  path: '/proyectos'
-  defaults:
-    _controller: '\Drupal\jalvarez_site\Controller\ProjectsController::index'
-    _title: 'Proyectos'
-  requirements:
-    _permission: 'access content'
-
-jalvarez_site.notes:
-  path: '/notas'
-  defaults:
-    _controller: '\Drupal\jalvarez_site\Controller\NotesController::index'
-    _title: 'Notas'
-  requirements:
-    _permission: 'access content'
-
-jalvarez_site.contact:
-  path: '/contacto'
-  defaults:
-    _controller: '\Drupal\jalvarez_site\Controller\ContactController::index'
-    _title: 'Contacto'
-  requirements:
-    _permission: 'access content'
-
 jalvarez_site.styleguide:
   path: '/styleguide'
   defaults:
