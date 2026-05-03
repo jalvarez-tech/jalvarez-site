@@ -507,6 +507,32 @@ Lo mismo para los aliases (`/inicio`, `/home`, `/proyectos`, etc.): son parte de
 
 **Prevención manual**: si haces `drush cex` desde local con un dump de DB diferente, **revisa el diff** de `config/sync/system.site.yml` antes de commitear y restaura `name/mail/front` a sus valores prod-canon.
 
+### Bug Canvas 1.3.x: editar canvas_page en `/es` borra la translation EN
+
+**Síntoma observado (2026-05-02):** después de editar el Inicio en el editor visual de Canvas mientras el idioma activo era ES:
+- `/en/home` → 404 (el alias `/home` se había evaporado).
+- `/en` → 200 pero renderizaba el contenido ES con `<html lang="en">` (Drupal hace fallback a la canonical cuando la translation EN no existe).
+- Resto de páginas EN intactas (`/en/projects`, `/en/notes`, `/en/contact`).
+
+**Causa probable:** Canvas 1.3.x sobrescribe el campo `components` y `path` de la translation EN al guardar la versión ES desde el editor visual. La translation EN queda con `components` vacío o eliminada por completo.
+
+**Fix inmediato:**
+
+```bash
+gh workflow run seed-content.yml --field script=scripts/restore-canvas-home-en.php
+```
+
+El script [`scripts/restore-canvas-home-en.php`](../scripts/restore-canvas-home-en.php) resuelve la canvas_page Inicio por alias `/inicio` y reaplica la translation EN canónica (mismo árbol de componentes que `create-canvas-home.php`) sin tocar el ES. Idempotente: detecta si la translation existe o falta. Tras correrlo:
+
+```bash
+# Drupal cache + page cache
+gh workflow run seed-content.yml --field script=scripts/clear-page-cache.php
+```
+
+Y esperar máximo 15 min a que el LiteSpeed cache de Hostinger expire (TTL `cache.page.max_age = 900`), o forzar refresh con `Cache-Control: no-cache` para verificar inmediatamente.
+
+**Prevención**: hasta que Canvas upstream corrija el bug, **siempre editar la canvas_page del Inicio activando el toggle de idioma del editor visual** antes de cambiar nada — no editar via URL directa `/es/canvas/editor/...` y luego switchear idiomas. Si dudas, después de editar revisa que `/en` muestre contenido en inglés con `curl -s -H 'Cache-Control: no-cache' https://jalvarez.tech/en | grep '<title>'`.
+
 ### Primer deploy — flujo automático
 
 `git push origin main` dispara `deploy.yml`:
