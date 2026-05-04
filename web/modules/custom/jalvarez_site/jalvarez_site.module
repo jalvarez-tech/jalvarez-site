@@ -5,6 +5,141 @@
  * jalvarez_site module hooks.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for canvas_page.
+ *
+ * Defensive guard against the Canvas 1.3.x translation-wipe bug.
+ *
+ * Background
+ * ----------
+ *  - Editing a translated canvas_page in the visual editor and saving while
+ *    the active language is X can wipe translation Y from the entity:
+ *      - Y's `components` field becomes empty in the saved revision, OR
+ *      - Y's translation row disappears entirely. Root cause is the
+ *        AutoSaveManager rebuilding the entity from autosave data that
+ *        only carries the active language (see
+ *        web/modules/contrib/canvas/src/AutoSave/AutoSaveManager.php:313).
+ *  - Symptom: /<other_lang>/<aliased_path> 404s and /<other_lang> falls
+ *    back to the canonical translation rendering the wrong content.
+ *  - Upstream issue: https://www.drupal.org/project/canvas/issues/3569959
+ *  - Upstream MR !511 is "Needs work" and not safely backportable to 1.3.x
+ *    (depends on MR !494 + a JS bundle rebuild + has open regressions).
+ *
+ * What this hook does
+ * -------------------
+ * Just before any canvas_page save, compares the in-memory entity against
+ * the version currently in storage. For each translation that previously
+ * existed, it ensures the translation still exists with its `components`,
+ * `path`, `title`, `description` intact. If the save would have removed
+ * or emptied a translation that wasn't actively edited in this request,
+ * the hook restores the original values.
+ *
+ * "Active translation" detection: the one whose `components` hash actually
+ * differs from the original is treated as the editor's intended target.
+ * That one is left alone; all others fall back to the original storage
+ * values. This keeps a legitimate single-language edit working normally.
+ *
+ * Trade-off
+ * ---------
+ * If you genuinely want to delete a canvas_page translation, do it via
+ * drush ($entity->removeTranslation($lang)->save()) or the Translate tab,
+ * NOT via the visual editor. The hook treats translation disappearance as
+ * a bug to repair, not as user intent.
+ *
+ * If/when Canvas upstream fixes this and we update, the hook becomes a
+ * no-op and can be removed safely. Until then it's the cheapest insurance.
+ */
+function jalvarez_site_canvas_page_presave(EntityInterface $entity): void {
+  // Bail out for new entities (no original to compare against).
+  if ($entity->isNew()) {
+    return;
+  }
+
+  // Pull the unchanged entity from storage (bypasses in-flight cache).
+  try {
+    $original = \Drupal::entityTypeManager()
+      ->getStorage($entity->getEntityTypeId())
+      ->loadUnchanged((int) $entity->id());
+  }
+  catch (\Throwable) {
+    return;
+  }
+  if (!$original) {
+    return;
+  }
+
+  // Determine which translation the editor actually changed by comparing
+  // the components hash of each translation against the original. The one
+  // that differs is the active edit target; everything else is restored.
+  $active_lang = $entity->language()->getId();
+  foreach ($entity->getTranslationLanguages() as $langcode => $_) {
+    if (!$original->hasTranslation($langcode)) {
+      continue;
+    }
+    $current_hash = _jalvarez_site_components_hash($entity->getTranslation($langcode));
+    $original_hash = _jalvarez_site_components_hash($original->getTranslation($langcode));
+    if ($current_hash !== $original_hash) {
+      $active_lang = $langcode;
+      break;
+    }
+  }
+
+  // For every translation that existed in storage, ensure it still exists
+  // in the entity being saved with its full content. Skip the active one.
+  foreach ($original->getTranslationLanguages() as $langcode => $_) {
+    if ($langcode === $active_lang) {
+      continue;
+    }
+    $orig_trans = $original->getTranslation($langcode);
+
+    // Case 1: translation removed in this save → re-add it.
+    if (!$entity->hasTranslation($langcode)) {
+      $values = [];
+      foreach (['title', 'description', 'components', 'path', 'status'] as $field) {
+        if ($orig_trans->hasField($field)) {
+          $values[$field] = $orig_trans->get($field)->getValue();
+        }
+      }
+      $entity->addTranslation($langcode, $values);
+      \Drupal::logger('jalvarez_site')->warning(
+        'Restored deleted canvas_page translation @lang on entity @id (translation-wipe bug guard).',
+        ['@lang' => $langcode, '@id' => $entity->id()]
+      );
+      continue;
+    }
+
+    // Case 2: translation exists but a key field got emptied → restore it.
+    $current_trans = $entity->getTranslation($langcode);
+    foreach (['components', 'path', 'title', 'description'] as $field) {
+      if (!$orig_trans->hasField($field)) {
+        continue;
+      }
+      $orig_value = $orig_trans->get($field)->getValue();
+      $current_value = $current_trans->get($field)->getValue();
+      if (!empty($orig_value) && empty($current_value)) {
+        $current_trans->set($field, $orig_value);
+        \Drupal::logger('jalvarez_site')->warning(
+          'Restored emptied @field on canvas_page @id translation @lang (translation-wipe bug guard).',
+          ['@field' => $field, '@id' => $entity->id(), '@lang' => $langcode]
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Stable hash of a translation's components field. Used by the translation-
+ * wipe guard above to detect which translation the editor changed.
+ */
+function _jalvarez_site_components_hash(EntityInterface $translation): string {
+  if (!$translation->hasField('components')) {
+    return '';
+  }
+  return md5(serialize($translation->get('components')->getValue()));
+}
+
 /**
  * Implements hook_pathauto_alias_alter().
  *
