@@ -36,6 +36,10 @@
 
   // Vertical rhythm between page sections.
   // Used by .section, .hero, .cta-band.
+  // Scales by viewport (overridden in the breakpoint blocks at the bottom):
+  //   mobile  (< 720px):    40px
+  //   tablet  (≥ 720px):    50px
+  //   laptop+ (≥ 1024px):   60px
   --section-pad-y: 40px;
   // Hero opens with extra breathing room above.
   --hero-pad-top: 40px;
@@ -74,3 +78,20 @@
 // Default = regular; tweak via [data-density="compact"] etc. on <html>
 [data-density="compact"] { --pad: clamp(16px, 3vw, 32px); }
 [data-density="comfy"]   { --pad: clamp(28px, 5vw, 64px); }
+
+// ─── Vertical rhythm scale by breakpoint ───
+// Tokens default to mobile values; bump them at tablet + laptop.
+// Both --section-pad-y and --hero-pad-top scale together so the rhythm
+// stays uniform between the hero and the rest of the sections.
+@media (min-width: 720px) {
+  :root {
+    --section-pad-y: 50px;
+    --hero-pad-top:  50px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --section-pad-y: 60px;
+    --hero-pad-top:  60px;
+  }
+}
