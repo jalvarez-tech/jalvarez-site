@@ -531,7 +531,19 @@ gh workflow run seed-content.yml --field script=scripts/clear-page-cache.php
 
 Y esperar máximo 15 min a que el LiteSpeed cache de Hostinger expire (TTL `cache.page.max_age = 900`), o forzar refresh con `Cache-Control: no-cache` para verificar inmediatamente.
 
-**Prevención**: hasta que Canvas upstream corrija el bug, **siempre editar la canvas_page del Inicio activando el toggle de idioma del editor visual** antes de cambiar nada — no editar via URL directa `/es/canvas/editor/...` y luego switchear idiomas. Si dudas, después de editar revisa que `/en` muestre contenido en inglés con `curl -s -H 'Cache-Control: no-cache' https://jalvarez.tech/en | grep '<title>'`.
+**Prevención automática (post-2026-05-04):** el módulo `jalvarez_site` implementa `hook_canvas_page_presave()` que detecta y revierte el wipe automáticamente — ver [`web/modules/custom/jalvarez_site/jalvarez_site.module`](../web/modules/custom/jalvarez_site/jalvarez_site.module). El hook se ejecuta antes de cada `->save()` de canvas_page y, si detecta que una translation existente quedaría con `components` vacíos o que desaparecería de la entity, restaura el value original desde storage.
+
+Se valida con [`scripts/test-translation-wipe-guard.php`](../scripts/test-translation-wipe-guard.php), que reproduce el bug por entity API y comprueba que el hook lo bloquea. Idempotente y safe en prod (revierte sus cambios al final). Para ejecutar: `gh workflow run seed-content.yml --field script=scripts/test-translation-wipe-guard.php`.
+
+**Trade-off:** vaciar legítimamente todos los componentes de una translation desde el editor visual ya no funciona. Si quieres hacerlo a propósito, usa drush:
+```bash
+drush php:eval '\Drupal\canvas\Entity\Page::load(5)->getTranslation("en")->set("components", [])->save();'
+```
+
+**Si todo falla:** el restore manual sigue disponible:
+```bash
+gh workflow run seed-content.yml --field script=scripts/restore-canvas-home-en.php
+```
 
 ### Primer deploy — flujo automático
 
