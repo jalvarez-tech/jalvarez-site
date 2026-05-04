@@ -101,27 +101,11 @@ props:
       title: 'Show portrait'
       default: true
     portrait:
-      type: object
       title: 'Portrait image'
-      description: 'Optional portrait image (Media library). When set, replaces the placeholder SVG. Drag a JPG into the Media field to attach it.'
-      required:
-        - src
-      properties:
-        src:
-          title: 'Image URL'
-          type: string
-          format: uri-reference
-          contentMediaType: image/*
-          examples:
-            - public://portrait.jpg
-        alt:
-          title: 'Alt text'
-          type: string
-          examples:
-            - 'Portrait of John Stevans Alvarez'
-        width:
-          type: integer
-          examples: [600]
-        height:
-          type: integer
-          examples: [720]
+      description: 'Optional portrait image (Media library). When set, replaces the placeholder SVG. Use the Media field to attach a JPG/PNG/WEBP.'
+      # Reference Canvas's internal image schema. This is what binds the
+      # prop to the media_library_widget in the visual editor — declaring
+      # the same shape inline would NOT bind a widget (Canvas matches by
+      # $ref identity, not by shape equivalence). See canvas/schema.json
+      # `definitions.image`.
+      $ref: 'json-schema-definitions://canvas.module/image'
