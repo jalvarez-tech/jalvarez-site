@@ -128,6 +128,15 @@
   background: var(--bg-elev);
 
   svg { width: 100%; height: 100%; display: block; }
+
+  // Real Media-uploaded portrait. Same aspect-ratio fill as the SVG;
+  // object-fit: cover makes it crop tastefully regardless of source ratio.
+  .hp-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 }
 .hp-caption {
   position: absolute;

@@ -100,3 +100,28 @@ props:
       type: boolean
       title: 'Show portrait'
       default: true
+    portrait:
+      type: object
+      title: 'Portrait image'
+      description: 'Optional portrait image (Media library). When set, replaces the placeholder SVG. Drag a JPG into the Media field to attach it.'
+      required:
+        - src
+      properties:
+        src:
+          title: 'Image URL'
+          type: string
+          format: uri-reference
+          contentMediaType: image/*
+          examples:
+            - public://portrait.jpg
+        alt:
+          title: 'Alt text'
+          type: string
+          examples:
+            - 'Portrait of John Stevans Alvarez'
+        width:
+          type: integer
+          examples: [600]
+        height:
+          type: integer
+          examples: [720]

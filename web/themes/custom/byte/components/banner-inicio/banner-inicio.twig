@@ -69,24 +69,38 @@
 
     <div class="hero__aside">
       {%- if show_portrait|default(true) -%}
-        <div class="hero__portrait" aria-label="Portrait placeholder">
+        {# When `portrait.src` is set, render the real Media image; otherwise
+           keep the SVG placeholder so the page still looks intentional in
+           empty states (new pages, deleted media, etc.). #}
+        {%- set _portrait_src = portrait.src|default('') -%}
+        <div class="hero__portrait"{% if not _portrait_src %} aria-label="Portrait placeholder"{% endif %}>
           <div class="hp-frame">
-            <svg viewBox="0 0 200 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-              <defs>
-                <linearGradient id="hpBg" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="var(--accent)" stop-opacity="0.18"/>
-                  <stop offset="1" stop-color="var(--accent)" stop-opacity="0.02"/>
-                </linearGradient>
-                <pattern id="hpStripes" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <rect width="1" height="4" fill="var(--fg)" opacity="0.06"/>
-                </pattern>
-              </defs>
-              <rect width="200" height="240" fill="url(#hpBg)"/>
-              <rect width="200" height="240" fill="url(#hpStripes)"/>
-              <circle cx="100" cy="92" r="36" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
-              <path d="M34 240c0-38 30-64 66-64s66 26 66 64" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
-            </svg>
-            <div class="hp-caption mono">[ portrait · drop jpg here ]</div>
+            {%- if _portrait_src -%}
+              <img class="hp-img"
+                   src="{{ _portrait_src }}"
+                   alt="{{ portrait.alt|default('') }}"
+                   {%- if portrait.width %} width="{{ portrait.width }}"{% endif %}
+                   {%- if portrait.height %} height="{{ portrait.height }}"{% endif %}
+                   loading="eager"
+                   decoding="async">
+            {%- else -%}
+              <svg viewBox="0 0 200 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs>
+                  <linearGradient id="hpBg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="var(--accent)" stop-opacity="0.18"/>
+                    <stop offset="1" stop-color="var(--accent)" stop-opacity="0.02"/>
+                  </linearGradient>
+                  <pattern id="hpStripes" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="1" height="4" fill="var(--fg)" opacity="0.06"/>
+                  </pattern>
+                </defs>
+                <rect width="200" height="240" fill="url(#hpBg)"/>
+                <rect width="200" height="240" fill="url(#hpStripes)"/>
+                <circle cx="100" cy="92" r="36" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
+                <path d="M34 240c0-38 30-64 66-64s66 26 66 64" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
+              </svg>
+              <div class="hp-caption mono">[ portrait · drop jpg here ]</div>
+            {%- endif -%}
             <div class="hp-badge">
               <span class="status-dot"></span>
               <span class="mono">15+ años</span>
