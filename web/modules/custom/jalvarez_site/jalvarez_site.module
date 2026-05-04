@@ -70,31 +70,24 @@ function jalvarez_site_canvas_page_presave(EntityInterface $entity): void {
     return;
   }
 
-  // Determine which translation the editor actually changed by comparing
-  // the components hash of each translation against the original. The one
-  // that differs is the active edit target; everything else is restored.
-  $active_lang = $entity->language()->getId();
-  foreach ($entity->getTranslationLanguages() as $langcode => $_) {
-    if (!$original->hasTranslation($langcode)) {
-      continue;
-    }
-    $current_hash = _jalvarez_site_components_hash($entity->getTranslation($langcode));
-    $original_hash = _jalvarez_site_components_hash($original->getTranslation($langcode));
-    if ($current_hash !== $original_hash) {
-      $active_lang = $langcode;
-      break;
-    }
-  }
-
-  // For every translation that existed in storage, ensure it still exists
-  // in the entity being saved with its full content. Skip the active one.
+  // Algorithm — repair-by-shape, not by diff:
+  //   For every translation that existed in storage with content, if the
+  //   in-memory entity has it missing OR with that content blanked out,
+  //   restore from storage.
+  //
+  // This covers the wipe bug regardless of which translation the editor
+  // legitimately changed. A legitimate edit doesn't blank an entire
+  // translation — it changes its content. So "translation got emptied"
+  // is a reliable signal of the bug, not of user intent.
+  //
+  // The only legitimate use case this blocks is intentionally clearing
+  // every component from a translation through the visual editor — rare
+  // enough that doing it via drush ($entity->getTranslation($lang)->set(
+  // 'components', [])->save()) is an acceptable trade-off.
   foreach ($original->getTranslationLanguages() as $langcode => $_) {
-    if ($langcode === $active_lang) {
-      continue;
-    }
     $orig_trans = $original->getTranslation($langcode);
 
-    // Case 1: translation removed in this save → re-add it.
+    // Case 1: translation removed entirely in this save → re-add it.
     if (!$entity->hasTranslation($langcode)) {
       $values = [];
       foreach (['title', 'description', 'components', 'path', 'status'] as $field) {
@@ -110,34 +103,39 @@ function jalvarez_site_canvas_page_presave(EntityInterface $entity): void {
       continue;
     }
 
-    // Case 2: translation exists but a key field got emptied → restore it.
+    // Case 2: translation exists but `components` got emptied → restore
+    // components AND any other key field that got blanked alongside it.
+    // We only act when components flips from non-empty to empty, since
+    // that's the bug's signature. We don't second-guess fields the user
+    // legitimately edited.
     $current_trans = $entity->getTranslation($langcode);
-    foreach (['components', 'path', 'title', 'description'] as $field) {
-      if (!$orig_trans->hasField($field)) {
-        continue;
-      }
-      $orig_value = $orig_trans->get($field)->getValue();
-      $current_value = $current_trans->get($field)->getValue();
-      if (!empty($orig_value) && empty($current_value)) {
-        $current_trans->set($field, $orig_value);
-        \Drupal::logger('jalvarez_site')->warning(
-          'Restored emptied @field on canvas_page @id translation @lang (translation-wipe bug guard).',
-          ['@field' => $field, '@id' => $entity->id(), '@lang' => $langcode]
-        );
+    if (!$orig_trans->hasField('components') || !$current_trans->hasField('components')) {
+      continue;
+    }
+    $orig_components = $orig_trans->get('components')->getValue();
+    $current_components = $current_trans->get('components')->getValue();
+    if (empty($orig_components) || !empty($current_components)) {
+      // Either there was nothing to protect or the current value still
+      // has content (so this isn't a wipe).
+      continue;
+    }
+
+    // Components got wiped — restore it AND its path alias (which often
+    // gets cleared in the same buggy save).
+    $current_trans->set('components', $orig_components);
+    \Drupal::logger('jalvarez_site')->warning(
+      'Restored emptied components on canvas_page @id translation @lang (translation-wipe bug guard).',
+      ['@id' => $entity->id(), '@lang' => $langcode]
+    );
+
+    if ($orig_trans->hasField('path') && $current_trans->hasField('path')) {
+      $orig_path = $orig_trans->get('path')->getValue();
+      $current_path = $current_trans->get('path')->getValue();
+      if (!empty($orig_path) && empty($current_path)) {
+        $current_trans->set('path', $orig_path);
       }
     }
   }
-}
-
-/**
- * Stable hash of a translation's components field. Used by the translation-
- * wipe guard above to detect which translation the editor changed.
- */
-function _jalvarez_site_components_hash(EntityInterface $translation): string {
-  if (!$translation->hasField('components')) {
-    return '';
-  }
-  return md5(serialize($translation->get('components')->getValue()));
 }
 
 /**
