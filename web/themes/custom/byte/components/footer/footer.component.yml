@@ -1,0 +1,144 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Footer'
+status: stable
+description: |
+  Site-wide footer with 4 columns: pitch + availability, navigation menu,
+  contact links, elsewhere links. Plus bottom bar (copyright + version).
+  All visible strings are passed in as props so the bilingual block plugin
+  (jalvarez_site:jalvarez_footer) can translate them at render time.
+props:
+  type: object
+  properties:
+    # ─── Column 1: pitch + availability ───
+    pitch_a:
+      type: string
+      title: 'Pitch — leading text'
+      examples:
+        - 'Construyo plataformas web que '
+    pitch_em:
+      type: string
+      title: 'Pitch — emphasized fragment (muted color)'
+      examples:
+        - 'generan resultados medibles.'
+    availability:
+      type: string
+      title: 'Availability text'
+      description: 'Plain string next to the green status dot.'
+      examples:
+        - 'Aceptando 2 proyectos en Q3 2026'
+
+    # ─── Column 2: site navigation ───
+    nav_label:
+      type: string
+      title: 'Navigation column heading'
+      examples: ['Navegación']
+    # Up to 6 nav items, flattened so Canvas's editor can populate them
+    # individually (Canvas does NOT support array-of-object props — see
+    # SKILL.md §15.2). The block plugin sets the slots it needs and
+    # leaves the rest blank; the twig filters out empty rows.
+    nav_1_label:
+      type: string
+      title: 'Nav 1 — label'
+    nav_1_href:
+      type: string
+      title: 'Nav 1 — URL'
+    nav_2_label:
+      type: string
+      title: 'Nav 2 — label'
+    nav_2_href:
+      type: string
+      title: 'Nav 2 — URL'
+    nav_3_label:
+      type: string
+      title: 'Nav 3 — label'
+    nav_3_href:
+      type: string
+      title: 'Nav 3 — URL'
+    nav_4_label:
+      type: string
+      title: 'Nav 4 — label'
+    nav_4_href:
+      type: string
+      title: 'Nav 4 — URL'
+    nav_5_label:
+      type: string
+      title: 'Nav 5 — label'
+    nav_5_href:
+      type: string
+      title: 'Nav 5 — URL'
+    nav_6_label:
+      type: string
+      title: 'Nav 6 — label'
+    nav_6_href:
+      type: string
+      title: 'Nav 6 — URL'
+
+    # ─── Column 3: contact links ───
+    contact_label:
+      type: string
+      title: 'Contact column heading'
+      examples: ['Contacto']
+    contact_1_label:
+      type: string
+      title: 'Contact 1 — label'
+    contact_1_href:
+      type: string
+      title: 'Contact 1 — URL'
+    contact_2_label:
+      type: string
+      title: 'Contact 2 — label'
+    contact_2_href:
+      type: string
+      title: 'Contact 2 — URL'
+    contact_3_label:
+      type: string
+      title: 'Contact 3 — label'
+    contact_3_href:
+      type: string
+      title: 'Contact 3 — URL'
+    contact_4_label:
+      type: string
+      title: 'Contact 4 — label'
+    contact_4_href:
+      type: string
+      title: 'Contact 4 — URL'
+
+    # ─── Column 4: elsewhere ───
+    elsewhere_label:
+      type: string
+      title: 'Elsewhere column heading'
+      examples: ['En otros lugares']
+    else_1_label:
+      type: string
+      title: 'Elsewhere 1 — label'
+    else_1_href:
+      type: string
+      title: 'Elsewhere 1 — URL'
+    else_2_label:
+      type: string
+      title: 'Elsewhere 2 — label'
+    else_2_href:
+      type: string
+      title: 'Elsewhere 2 — URL'
+    else_3_label:
+      type: string
+      title: 'Elsewhere 3 — label'
+    else_3_href:
+      type: string
+      title: 'Elsewhere 3 — URL'
+    else_4_label:
+      type: string
+      title: 'Elsewhere 4 — label'
+    else_4_href:
+      type: string
+      title: 'Elsewhere 4 — URL'
+
+    # ─── Bottom bar ───
+    copyright:
+      type: string
+      title: 'Copyright line'
+      examples: ['© 2026 John Stevans Alvarez · Senior Web Specialist']
+    version:
+      type: string
+      title: 'Version line'
+      examples: ['v4.0 · Actualizado abr 2026']

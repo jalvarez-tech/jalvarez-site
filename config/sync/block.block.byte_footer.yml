@@ -1,0 +1,20 @@
+uuid: a699603f-8056-4bd5-ba53-379e2c4c97e5
+langcode: es
+status: true
+dependencies:
+  module:
+    - jalvarez_site
+  theme:
+    - byte
+id: byte_footer
+theme: byte
+region: footer
+weight: 0
+provider: null
+plugin: jalvarez_footer
+settings:
+  id: jalvarez_footer
+  label: 'Byte site footer'
+  label_display: '0'
+  provider: jalvarez_site
+visibility: {  }

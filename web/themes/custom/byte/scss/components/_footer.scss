@@ -1,0 +1,90 @@
+// Site footer — 4-column grid (pitch + nav + contact + elsewhere) +
+// bottom bar (copyright + version). Adapted from the design bundle's
+// `.foot` block; classes kept identical so the prototype CSS is portable.
+.foot {
+  border-top: 1px solid var(--line);
+  padding: 56px 0 40px;
+  background: var(--bg-sunk);
+  margin-top: var(--section-pad-y);
+}
+
+.foot-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 1fr;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+
+  @media (min-width: 720px) {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
+
+.foot-col {
+  // Heading promoted from <h5> to <h2> for outline correctness.
+  // Visual size matches the original 11px mono label.
+  &__heading {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--fg-muted); // upgraded from --fg-dim for AA contrast.
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+
+  a {
+    color: var(--fg-muted);
+    font-size: 14px;
+    text-decoration: none;
+    transition: color .15s;
+
+    &:hover { color: var(--fg); }
+  }
+}
+
+.foot-pitch {
+  font-family: var(--f-display);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  max-width: 30ch;
+  line-height: 1.25;
+  margin: 0 0 22px;
+
+  .muted { color: var(--fg-muted); }
+}
+
+.foot-bot {
+  max-width: var(--container);
+  margin: 48px auto 0;
+  padding: 24px var(--pad) 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--fg-muted); // upgraded from --fg-dim for AA contrast.
+  letter-spacing: 0.02em;
+}
+
+// Drupal core wraps the footer block in <footer role="contentinfo"><div>
+// — neutralize the wrapper margins so our .foot sits flush against the
+// preceding section.
+footer[role="contentinfo"] {
+  margin: 0;
+  padding: 0;
+}

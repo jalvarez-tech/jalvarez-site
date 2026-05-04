@@ -1,0 +1,102 @@
+{#
+/**
+ * @file
+ * Site-wide footer — 4-column grid + bottom bar.
+ * Renders in <footer role="contentinfo"> via core's page.html.twig
+ * (region: footer, set in jalvarez_site_footer block placement).
+ *
+ * Empty link rows (label OR href missing) are filtered out so the block
+ * plugin can supply only as many items as it needs without leaving stubs.
+ */
+#}
+{%- set _nav = [
+  { label: nav_1_label, href: nav_1_href },
+  { label: nav_2_label, href: nav_2_href },
+  { label: nav_3_label, href: nav_3_href },
+  { label: nav_4_label, href: nav_4_href },
+  { label: nav_5_label, href: nav_5_href },
+  { label: nav_6_label, href: nav_6_href },
+]|filter(l => l.label and l.href) -%}
+
+{%- set _contact = [
+  { label: contact_1_label, href: contact_1_href },
+  { label: contact_2_label, href: contact_2_href },
+  { label: contact_3_label, href: contact_3_href },
+  { label: contact_4_label, href: contact_4_href },
+]|filter(l => l.label and l.href) -%}
+
+{%- set _elsewhere = [
+  { label: else_1_label, href: else_1_href },
+  { label: else_2_label, href: else_2_href },
+  { label: else_3_label, href: else_3_href },
+  { label: else_4_label, href: else_4_href },
+]|filter(l => l.label and l.href) -%}
+
+<div class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      {# Col 1 — pitch + availability #}
+      <div class="foot-col foot-col--pitch">
+        {%- if pitch_a or pitch_em -%}
+          <p class="foot-pitch">
+            {{- pitch_a -}}
+            {%- if pitch_em %}<span class="muted">{{ pitch_em }}</span>{% endif -%}
+          </p>
+        {%- endif -%}
+        {%- if availability -%}
+          <div class="availability">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>{{ availability }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {# Col 2 — Navigation #}
+      {%- if _nav|length > 0 -%}
+        <nav class="foot-col" aria-label="{{ nav_label|default('Navigation') }}">
+          <h2 class="foot-col__heading">{{ nav_label|default('Navigation') }}</h2>
+          <ul>
+            {%- for l in _nav -%}
+              <li><a href="{{ l.href }}">{{ l.label }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      {%- endif -%}
+
+      {# Col 3 — Contact #}
+      {%- if _contact|length > 0 -%}
+        <div class="foot-col">
+          <h2 class="foot-col__heading">{{ contact_label|default('Contact') }}</h2>
+          <ul>
+            {%- for l in _contact -%}
+              <li><a href="{{ l.href }}"{% if l.href starts with 'http' %} rel="noopener"{% endif %}>{{ l.label }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {# Col 4 — Elsewhere #}
+      {%- if _elsewhere|length > 0 -%}
+        <div class="foot-col">
+          <h2 class="foot-col__heading">{{ elsewhere_label|default('Elsewhere') }}</h2>
+          <ul>
+            {%- for l in _elsewhere -%}
+              <li>
+                <a href="{{ l.href }}"{% if l.href starts with 'http' %} target="_blank" rel="noopener"{% endif %}>
+                  {{- l.label -}}
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if copyright or version -%}
+      <div class="foot-bot">
+        {%- if copyright -%}<span>{{ copyright }}</span>{%- endif -%}
+        {%- if version -%}<span>{{ version }}</span>{%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

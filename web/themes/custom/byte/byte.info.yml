@@ -13,5 +13,6 @@ regions:
   primary_menu: 'Primary menu'
   highlighted: 'Highlighted'
   content: 'Content'
+  footer: 'Footer'
   footer_top: 'Footer top'
   footer_bottom: 'Footer bottom'
