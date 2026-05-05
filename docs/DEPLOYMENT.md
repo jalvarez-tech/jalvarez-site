@@ -545,6 +545,10 @@ drush php:eval '\Drupal\canvas\Entity\Page::load(5)->getTranslation("en")->set("
 gh workflow run seed-content.yml --field script=scripts/restore-canvas-home-en.php
 ```
 
+> ⚠️ **Importante para devs locales:** después de un `git pull` que toca `*.module` o `*.install`, hay que correr `ddev exec ./web/vendor/bin/drush cr` antes de probar el editor visual. Drupal cachea `module.implements` y un hook nuevo no se dispara hasta el rebuild. El deploy a prod ya lo hace automáticamente (`drush cim && cr` en el workflow), pero el entorno local depende de la disciplina del dev.
+>
+> **Síntoma de hook no registrado:** editas en el editor, pierdes una translation, y `drush watchdog:show --type=jalvarez_site` no muestra ningún warning del guard. La cura es `drush cr` + restore-canvas-home-en.php.
+
 ### Primer deploy — flujo automático
 
 `git push origin main` dispara `deploy.yml`:
