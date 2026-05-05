@@ -11,12 +11,26 @@
 }
 
 .value {
-  padding: 40px 32px 48px;
+  // Mobile: no horizontal padding — let the parent .section.wrap supply
+  // the inline gutter (matches the rest of the page sections).
+  padding: 40px 0 48px;
   border-bottom: 1px solid var(--line);
   position: relative;
 
   @media (min-width: 900px) {
-    &:nth-child(odd) { border-right: 1px solid var(--line); }
+    // Desktop grid (2 cols × 2 rows): inner padding kicks in, but the
+    // outer-edge sides stay flush with .section.wrap so cards align with
+    // the rest of the layout.
+    //   col izq (cards 1 + 3 = nth-child(odd))  → no padding-left
+    //   col der (cards 2 + 4 = nth-child(even)) → no padding-right
+    padding: 40px 32px 48px;
+    &:nth-child(odd) {
+      padding-left: 0;
+      border-right: 1px solid var(--line);
+    }
+    &:nth-child(even) {
+      padding-right: 0;
+    }
   }
 
   &__num {
