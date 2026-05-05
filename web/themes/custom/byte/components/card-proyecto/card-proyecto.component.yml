@@ -24,7 +24,11 @@ props:
     cover_url:
       type: string
       title: 'Cover url'
-      description: 'If present, used as background of the cover slot'
+      description: 'If present, replaces the procedural browser-mock with a real <img>.'
+    cover_alt:
+      type: string
+      title: 'Cover alt text'
+      description: 'Alt text for the cover image. Falls back to the project name if empty.'
     hue:
       type: integer
       title: Hue

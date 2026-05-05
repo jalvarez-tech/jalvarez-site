@@ -134,6 +134,22 @@ final class ProjectsGridBlock extends BlockBase {
       $hue = $hue_map[$node->get('field_cover_hue')->value] ?? 160;
     }
 
+    // Resolve cover_media → file URL. The card-proyecto twig uses cover_url
+    // when present and falls back to the procedural browser-mock otherwise.
+    $cover_url = '';
+    $cover_alt = '';
+    if ($node->hasField('field_cover_media') && !$node->get('field_cover_media')->isEmpty()) {
+      $media = $node->get('field_cover_media')->entity;
+      if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+        $file = $media->get('field_media_image')->entity;
+        if ($file) {
+          $cover_url = $file->createFileUrl(FALSE);
+          // Media library widget stores alt on the field item itself.
+          $cover_alt = (string) ($media->get('field_media_image')->alt ?? $media->label());
+        }
+      }
+    }
+
     $metric_props = [];
     if ($node->hasField('field_results_metrics') && !$node->get('field_results_metrics')->isEmpty()) {
       $i = 1;
@@ -152,6 +168,8 @@ final class ProjectsGridBlock extends BlockBase {
       'year'        => $year,
       'description' => $description,
       'hue'         => $hue,
+      'cover_url'   => $cover_url,
+      'cover_alt'   => $cover_alt,
     ] + $metric_props;
   }
 

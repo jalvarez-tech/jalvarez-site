@@ -34,6 +34,14 @@
     border-bottom: 1px solid var(--line);
   }
 
+  // Real image cover — fills the media slot.
+  &__cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
   &__info {
     padding: 22px 22px 24px;
     flex: 1;

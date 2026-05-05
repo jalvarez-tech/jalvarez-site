@@ -1,27 +1,39 @@
 {# Card Proyecto #}
 {%- set h = hue|default(160) -%}
 <a class="project" href="{{ href|default('#') }}">
-  <div class="project__media" style="background: linear-gradient(135deg,#0e1514,#182320);">
-    <div class="pm__browser">
-      <div class="pm__dots"><span></span><span></span><span></span></div>
-      <div class="pm__url">{{ name|lower }}</div>
+  {%- if cover_url -%}
+    {# Real cover image — fills .project__media via object-fit: cover. #}
+    <div class="project__media project__media--has-image">
+      <img class="project__cover"
+           src="{{ cover_url }}"
+           alt="{{ cover_alt|default(name) }}"
+           loading="lazy"
+           decoding="async">
     </div>
-    <div class="pm__canvas">
-      <div class="pm__nav">
-        <div class="pm__brand" style="color: oklch(78% 0.14 {{ h }});">◆ {{ name|split('.')|first }}</div>
-        <div class="pm__links"><span></span><span></span><span></span><span></span></div>
+  {%- else -%}
+    {# Procedural browser-mock placeholder when no cover is attached. #}
+    <div class="project__media" style="background: linear-gradient(135deg,#0e1514,#182320);">
+      <div class="pm__browser">
+        <div class="pm__dots"><span></span><span></span><span></span></div>
+        <div class="pm__url">{{ name|lower }}</div>
       </div>
-      <div class="pm__hero">
-        <div class="pm__l1"></div>
-        <div class="pm__l2" style="background: oklch(75% 0.16 {{ h }});"></div>
-        <div class="pm__l3"></div>
-        <div class="pm__btn" style="background: oklch(68% 0.18 {{ h }});"></div>
-      </div>
-      <div class="pm__tiles">
-        <div class="pm__tile"></div><div class="pm__tile"></div><div class="pm__tile"></div>
+      <div class="pm__canvas">
+        <div class="pm__nav">
+          <div class="pm__brand" style="color: oklch(78% 0.14 {{ h }});">◆ {{ name|split('.')|first }}</div>
+          <div class="pm__links"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div class="pm__hero">
+          <div class="pm__l1"></div>
+          <div class="pm__l2" style="background: oklch(75% 0.16 {{ h }});"></div>
+          <div class="pm__l3"></div>
+          <div class="pm__btn" style="background: oklch(68% 0.18 {{ h }});"></div>
+        </div>
+        <div class="pm__tiles">
+          <div class="pm__tile"></div><div class="pm__tile"></div><div class="pm__tile"></div>
+        </div>
       </div>
     </div>
-  </div>
+  {%- endif -%}
   <div class="project__info">
     <div class="project__tags">
       {%- if category -%}

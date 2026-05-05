@@ -3,20 +3,15 @@ _core:
 langcode: es
 uuid: b415abbf-906c-4bbe-9834-1f46c9fa71c9
 # NOTE: name, mail and page.front are repaired post-cim by
-# scripts/fix-prod-system-site.php (wired into .github/workflows/deploy.yml).
-# Values below are the production canonical ones, kept here so a `drush cex`
-# from local doesn't silently regress them in the repo. If you reset your
-# local DB and re-export config, please restore these three keys to match
-# production before pushing.
+# scripts/fix-prod-system-site.php. Values below are the production
+# canonical ones — restore them if a `drush cex` from local overwrites them.
 name: jalvarez.tech
 mail: stevanswd@gmail.com
 slogan: ''
 page:
   403: ''
   404: ''
-  # canvas_page IDs differ between envs; fix-prod-system-site.php resolves
-  # the home dynamically via path_alias.manager('/inicio') at deploy time.
-  front: /page/1
+  front: /page/8
 admin_compact_mode: false
 weight_select_max: 100
 default_langcode: es
