@@ -61,7 +61,7 @@ class FooterBlock extends BlockBase {
       'whatsapp_label' => 'WhatsApp →',
       'elsewhere_label' => 'En otros lugares',
       'else_items' => [
-        ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvareztech/'],
+        ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
         ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
         ['label' => 'Read.cv ↗',  'href' => 'https://read.cv/jalvarez'],
         ['label' => 'Descargar CV', 'href' => '#'],
@@ -84,7 +84,7 @@ class FooterBlock extends BlockBase {
       'whatsapp_label' => 'WhatsApp →',
       'elsewhere_label' => 'Elsewhere',
       'else_items' => [
-        ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvareztech/'],
+        ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
         ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
         ['label' => 'Read.cv ↗',  'href' => 'https://read.cv/jalvarez'],
         ['label' => 'Download CV', 'href' => '#'],
