@@ -30,7 +30,12 @@
           </a>
         {%- endfor -%}
 
-        <a href="{{ cta_href|default('/contacto') }}" class="nav__cta">
+        {# When cta_href is external (e.g. wa.me WhatsApp link) open in a
+           new tab. For internal aliases keep same-tab navigation. #}
+        {%- set _cta_external = cta_href and (cta_href starts with 'http' or cta_href starts with '//') -%}
+        <a href="{{ cta_href|default('/contacto') }}"
+           class="nav__cta"
+           {%- if _cta_external %} target="_blank" rel="noopener"{% endif -%}>
           <span class="status-dot" aria-hidden="true"></span>
           {{ cta_label|default('Disponible') }}
         </a>

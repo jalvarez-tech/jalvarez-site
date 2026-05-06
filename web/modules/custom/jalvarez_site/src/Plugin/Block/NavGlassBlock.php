@@ -68,8 +68,16 @@ class NavGlassBlock extends BlockBase {
       $links[] = ['label' => $l['label'], 'href' => $href, 'active' => $active];
     }
 
-    // Contact link path matches the language (ES: /contacto · EN: /contact).
-    $contact_path = $current_lang === 'en' ? '/contact' : '/contacto';
+    // CTA "Disponible" / "Available" goes straight to WhatsApp with a
+    // pre-filled message keyed to the current language. Using wa.me (the
+    // official WhatsApp link format) — opens the chat with the message
+    // ready to send. URL-encoded once at compile time, no runtime cost.
+    $cta_messages = [
+      'es' => 'Hola John, vi que estás disponible en jalvarez.tech. ¿Podemos conversar?',
+      'en' => "Hi John, I saw you're available on jalvarez.tech. Can we talk?",
+    ];
+    $cta_message = $cta_messages[$current_lang] ?? $cta_messages['es'];
+    $cta_href = 'https://wa.me/573128014078?text=' . rawurlencode($cta_message);
 
     // Compute the equivalent URL in each language so the language toggle
     // preserves the current page (e.g. /es/proyectos ↔ /en/projects).
@@ -84,7 +92,7 @@ class NavGlassBlock extends BlockBase {
         'brand_tld'     => '.tech',
         'links'         => $links,
         'cta_label'     => $current_lang === 'en' ? 'Available' : 'Disponible',
-        'cta_href'      => '/' . $current_lang . $contact_path,
+        'cta_href'      => $cta_href,
         'show_lang_toggle' => TRUE,
         'current_lang'  => $current_lang,
         'lang_es_href'  => $lang_es_href,
