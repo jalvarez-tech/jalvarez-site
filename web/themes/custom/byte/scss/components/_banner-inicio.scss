@@ -32,7 +32,10 @@
 
   &__title {
     font-family: var(--f-display);
-    font-size: clamp(48px, 8.5vw, 128px);
+    // Was clamp(48px, 8.5vw, 128px) — desktop cap dropped from 128 → 88
+    // and viewport coefficient eased from 8.5 → 7 so the scale-up is
+    // gentler on wide displays. Mobile floor 48 → 44.
+    font-size: clamp(44px, 7vw, 88px);
     font-weight: 500;
     line-height: 0.94;
     letter-spacing: -0.045em;
