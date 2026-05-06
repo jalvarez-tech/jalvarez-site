@@ -63,8 +63,6 @@ class FooterBlock extends BlockBase {
       'else_items' => [
         ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
         ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
-        ['label' => 'Read.cv ↗',  'href' => 'https://read.cv/jalvarez'],
-        ['label' => 'Descargar CV', 'href' => '#'],
       ],
       'copyright' => '© 2026 John Stevans Alvarez · Senior Web Specialist',
       'version' => 'v4.0 · Actualizado may 2026',
@@ -86,8 +84,6 @@ class FooterBlock extends BlockBase {
       'else_items' => [
         ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
         ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
-        ['label' => 'Read.cv ↗',  'href' => 'https://read.cv/jalvarez'],
-        ['label' => 'Download CV', 'href' => '#'],
       ],
       'copyright' => '© 2026 John Stevans Alvarez · Senior Web Specialist',
       'version' => 'v4.0 · Updated May 2026',

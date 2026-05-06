@@ -18,6 +18,19 @@
  */
 #}
 {% set lang = node.get('langcode').value|default('es') %}
+
+{# Per-page WhatsApp deep link: open the chat pre-filled with a message
+   that names the case study the visitor was just reading, so the lead
+   arrives with context ("vi el caso X") instead of a generic ping. The
+   message text is kept here (not in the cta-final config) because it
+   needs the project's label, which is only known at render time. #}
+{%- set _wa_phone = '573128014078' -%}
+{%- set _wa_msg = lang == 'en'
+  ? 'Hi John, I saw the «' ~ node.label ~ '» case study on jalvarez.tech and I\'d like something similar for my project.'
+  : 'Hola John, vi el caso «' ~ node.label ~ '» en jalvarez.tech y quiero algo similar para mi proyecto.'
+-%}
+{%- set _wa_href = 'https://wa.me/' ~ _wa_phone ~ '?text=' ~ _wa_msg|url_encode -%}
+
 {% set i18n = lang == 'en' ? {
   back: '← Back to projects',
   back_path: '/projects',
@@ -34,7 +47,7 @@
   s3_title: 'What happened next',
   s4: '§ 04 Lesson',
   cta_primary: 'Start your project',
-  cta_primary_path: '/contact',
+  cta_primary_href: _wa_href,
   cta_secondary: 'See more projects',
   cta_secondary_path: '/projects',
 } : {
@@ -53,7 +66,7 @@
   s3_title: 'Lo que pasó después',
   s4: '§ 04 Aprendizaje',
   cta_primary: 'Iniciar tu proyecto',
-  cta_primary_path: '/contacto',
+  cta_primary_href: _wa_href,
   cta_secondary: 'Ver más proyectos',
   cta_secondary_path: '/proyectos',
 } %}
@@ -222,7 +235,7 @@
     title: node.field_cta_heading.value,
     sub: node.field_cta_sub.value,
     primary_label: i18n.cta_primary,
-    primary_href: '/' ~ lang ~ i18n.cta_primary_path,
+    primary_href: i18n.cta_primary_href,
     secondary_label: i18n.cta_secondary,
     secondary_href: '/' ~ lang ~ i18n.cta_secondary_path,
   } only %}
