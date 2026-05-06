@@ -87,13 +87,22 @@
     span {
       display: block;
       width: 20px;
-      height: 1.5px;
+      // 2px (integer) renders the same pixel height on every line and
+      // every DPR. Earlier 1.5px hit subpixel rounding inconsistently:
+      // depending on each span's vertical offset within the flex column,
+      // the rasterizer picked 1px on some lines and 2px on others, so
+      // the three bars looked uneven. Integer values guarantee parity.
+      height: 2px;
       background: var(--fg);
       transition: transform .25s, opacity .25s;
     }
 
+    // Translate offsets re-tuned for the new 2px line height so the X
+    // formed when expanded crosses cleanly through the burger's centre.
+    // Math: gap 5 + line 2 = 7 between line centres; midpoint is 7px
+    // from the top/bottom centres.
     &[aria-expanded="true"] span:nth-child(1) {
-      transform: translateY(6.5px) rotate(45deg);
+      transform: translateY(7px) rotate(45deg);
     }
 
     &[aria-expanded="true"] span:nth-child(2) {
@@ -101,7 +110,7 @@
     }
 
     &[aria-expanded="true"] span:nth-child(3) {
-      transform: translateY(-6.5px) rotate(-45deg);
+      transform: translateY(-7px) rotate(-45deg);
     }
   }
 
@@ -296,15 +305,19 @@ body { padding-top: calc(86px + var(--drupal-displace-offset-top, 0px)); }
     visibility: visible;
   }
 
-  // Close button anchored top-right of the drawer. Mirrors the burger's
-  // approximate position on the nav (top-right corner of the viewport) so
-  // the user's finger lands in the same area whether the menu is closed
-  // (tap burger) or open (tap close). 44x44 satisfies WCAG 2.2 SC 2.5.5
-  // (AAA) target size for thumb-reach.
+  // Close button anchored top-right of the drawer. Position is computed
+  // to land at the EXACT same viewport coordinates as the .nav__burger:
+  //   • top:   nav-top (--byte-nav-gap-y = 14px) + (nav-inner-height 58
+  //            − close-size 44) / 2 = 14 + 7 = 21px from viewport top
+  //   • right: nav side-margin (gap-x / 2 = 14px) + nav-inner right
+  //            padding (18px) = 32px from viewport right
+  // This way the user's finger lands on the same pixel whether the menu
+  // is closed (tap burger) or open (tap close).
+  // 44×44 satisfies WCAG 2.2 SC 2.5.5 (AAA) target size for thumb-reach.
   &__close {
     position: absolute;
-    top: calc(var(--byte-nav-gap-y, 14px) + var(--drupal-displace-offset-top, 0px));
-    right: 14px;
+    top: calc(21px + var(--drupal-displace-offset-top, 0px));
+    right: 32px;
     width: 44px;
     height: 44px;
     padding: 0;
