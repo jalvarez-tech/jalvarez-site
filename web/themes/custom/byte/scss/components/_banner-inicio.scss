@@ -170,13 +170,19 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
+  // Locked to dark-mode colours regardless of [data-theme]: the badge
+  // always sits over the portrait, which is a dark photograph in both
+  // themes. If we let --fg-muted / --line-strong follow the theme, in
+  // light mode the text flips to #575249 and the border to #d4cfc3 —
+  // both unreadable on the photo. Hardcoding the dark values keeps
+  // contrast safe everywhere.
   background: rgba(0, 0, 0, .5);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  border: 1px solid var(--line-strong);
+  border: 1px solid #2a2724;
   border-radius: var(--r-pill);
   font-size: 11px;
-  color: var(--fg-muted);
+  color: #a8a39a;
 }
 
 // Terminal card
