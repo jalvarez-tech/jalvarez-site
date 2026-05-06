@@ -140,6 +140,17 @@
     object-fit: cover;
     display: block;
   }
+
+  // Mobile: drop the forced 5:6 ratio so the image renders at its natural
+  // height (was getting cropped weirdly on narrow viewports). The frame
+  // grows with the image instead.
+  @media (max-width: 719px) {
+    aspect-ratio: auto;
+    .hp-img {
+      height: auto;
+      object-fit: contain;
+    }
+  }
 }
 .hp-caption {
   position: absolute;

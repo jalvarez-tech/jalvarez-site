@@ -1,0 +1,59 @@
+uuid: cc8e3a74-e8b3-4737-8096-c183dc4b1a64
+langcode: es
+status: true
+dependencies:
+  config:
+    - filter.format.code_html
+  module:
+    - ckeditor5
+format: code_html
+editor: ckeditor5
+settings:
+  toolbar:
+    items:
+      - heading
+      - '|'
+      - bold
+      - italic
+      - code
+      - '|'
+      - link
+      - '|'
+      - bulletedList
+      - numberedList
+      - '|'
+      - blockQuote
+      - codeBlock
+      - horizontalLine
+      - '|'
+      - sourceEditing
+  plugins:
+    ckeditor5_codeBlock:
+      languages:
+        -
+          label: 'Plain text'
+          language: plaintext
+        -
+          label: Bash
+          language: bash
+        -
+          label: YAML
+          language: yaml
+        -
+          label: PHP
+          language: php
+        -
+          label: JSON
+          language: json
+    ckeditor5_heading:
+      enabled_headings:
+        - heading2
+        - heading3
+        - heading4
+    ckeditor5_sourceEditing:
+      allowed_tags:
+        - '<pre>'
+        - '<code class>'
+        - '<kbd>'
+        - '<span lang>'
+image_upload: {  }
