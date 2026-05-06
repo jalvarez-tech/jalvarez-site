@@ -13,7 +13,9 @@
   left: calc(50% + var(--byte-nav-displace-x) / 2);
   transform: translateX(-50%);
   z-index: var(--z-nav);
-  width: min(1240px, calc(100vw - var(--byte-nav-gap-x) - var(--byte-nav-displace-x)));
+  // Match the global container token (1440px) so the nav aligns visually
+  // with .wrap-based sections instead of capping narrower at 1240.
+  width: min(var(--container), calc(100vw - var(--byte-nav-gap-x) - var(--byte-nav-displace-x)));
   border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--bg-elev) 45%, transparent);
   -webkit-backdrop-filter: blur(26px) saturate(180%);
