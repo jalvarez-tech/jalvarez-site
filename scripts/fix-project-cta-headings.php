@@ -76,8 +76,11 @@ foreach (CTA as $title => $by_lang) {
     }
   }
   if ($changed) {
+    // setNewRevision() returns void on Drupal 11 — cannot chain ->save().
     foreach ($node->getTranslationLanguages() as $lc => $_) {
-      $node->getTranslation($lc)->setNewRevision(false)->save();
+      $t = $node->getTranslation($lc);
+      $t->setNewRevision(false);
+      $t->save();
     }
   }
   else {
