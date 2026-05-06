@@ -8,6 +8,32 @@
 use Drupal\Core\Entity\EntityInterface;
 
 /**
+ * Implements hook_page_attachments_alter().
+ *
+ * Force-attach the byte/global library on every canvas_page render.
+ *
+ * Why: when a canvas_page contains a Block-source component that brings its
+ * own libraries (notably block.webform_block on /contacto), the resulting
+ * aggregated CSS bundle can end up missing byte/global for authenticated
+ * viewers — the chrome of Gin admin theme + webform's library set wins the
+ * library list, and the theme's frontend CSS never lands in the page.
+ *
+ * Symptom: on /es/contacto while logged in as admin, the footer renders as
+ * unstyled flat HTML (no grid, no background, no monospace headings) while
+ * the same footer renders correctly on /es/proyectos.
+ *
+ * The fix is unconditional: anytime a canvas_page route is being served,
+ * tell Drupal that byte/global is required. The library system dedupes,
+ * so this is a no-op when it's already attached.
+ */
+function jalvarez_site_page_attachments_alter(array &$attachments): void {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name === 'entity.canvas_page.canonical') {
+    $attachments['#attached']['library'][] = 'byte/global';
+  }
+}
+
+/**
  * Implements hook_ENTITY_TYPE_presave() for canvas_page.
  *
  * Defensive guard against the Canvas 1.3.x translation-wipe bug.
