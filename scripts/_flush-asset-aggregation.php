@@ -1,0 +1,14 @@
+<?php
+/**
+ * @file
+ * One-shot: bump system.css_js_query_string + flush asset caches so the
+ * deployed theme CSS (with the new nav max-width) shows up in the
+ * aggregated bundle. drush cr alone wasn't busting the aggregated file
+ * URL hash on prod after the SCSS source changed.
+ */
+
+\Drupal::service('asset.css.collection_optimizer')->deleteAll();
+\Drupal::service('asset.js.collection_optimizer')->deleteAll();
+_drupal_flush_css_js();
+drupal_flush_all_caches();
+echo "✓ CSS/JS aggregation flushed and css_js_query_string bumped.\n";
