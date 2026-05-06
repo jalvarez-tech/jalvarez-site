@@ -18,7 +18,7 @@
 
 // ─── CONFIG ───
 $page_alias = '/inicio';   // /inicio /proyectos /notas /contacto
-$language   = 'en';        // 'es' or 'en'
+$language   = 'es';        // 'es' or 'en'
 
 // ─── Resolution ───
 $home_path = \Drupal::service('path_alias.manager')->getPathByAlias($page_alias);
