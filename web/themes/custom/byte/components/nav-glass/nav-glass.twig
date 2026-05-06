@@ -74,8 +74,21 @@
   </div>
 </header>
 
-{# Mobile drawer — `inert` prevents tab focus from reaching it while hidden. #}
+{# Mobile drawer — `inert` prevents tab focus from reaching it while hidden.
+   The drawer slides over the nav, so the burger (which morphs to an X) is
+   covered by the drawer panel and effectively unreachable. We render a
+   dedicated close button anchored top-right of the drawer so users have a
+   clear, in-context exit. #}
 <div id="nav-drawer" class="nav-drawer" data-nav-drawer aria-hidden="true" inert>
+  <button class="nav-drawer__close"
+          type="button"
+          aria-label="{{ i18n.close_menu }}"
+          aria-controls="nav-drawer"
+          data-nav-close>
+    <svg width="20" height="20" aria-hidden="true" focusable="false">
+      <use href="/{{ active_theme_path() }}/icons.svg#i-x"></use>
+    </svg>
+  </button>
   <nav class="nav-drawer__links" aria-label="{{ lang == 'en' ? 'Primary' : 'Principal' }}">
     {%- for l in links -%}
       <a href="{{ l.href }}" class="nav-drawer__link{{ l.active ? ' nav-drawer__link--active' : '' }}"{{ l.active ? ' aria-current="page"' : '' }}>

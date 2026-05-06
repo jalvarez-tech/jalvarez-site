@@ -36,6 +36,14 @@
       setDrawer(!open);
     });
 
+    // Dedicated in-drawer close button. The burger morphs to an X but is
+    // covered by the drawer panel when open, so users have no visible exit
+    // unless we render a close affordance inside the drawer itself.
+    const closeBtn = drawer.querySelector('[data-nav-close]');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => setDrawer(false));
+    }
+
     // Close drawer on Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') setDrawer(false);

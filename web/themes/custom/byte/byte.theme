@@ -5,6 +5,8 @@
  * Theme hooks for the Byte theme.
  */
 
+use Drupal\Core\Render\Markup;
+
 /**
  * Implements hook_preprocess_HOOK() for html.html.twig.
  *
@@ -21,25 +23,34 @@ function byte_preprocess_html(array &$variables): void {
   // byte/global. Re-asserting it here forces the asset collector to keep it.
   $variables['#attached']['library'][] = 'byte/global';
 
-  // Inline script BEFORE first paint to prevent FOUC when user has
-  // a non-default theme persisted in localStorage. Reads jsa-theme
-  // (set by the theme toggle in the nav-glass), defaults to dark.
+  // Inline script BEFORE first paint:
+  //   1. Read jsa-theme from localStorage (set by the theme toggle).
+  //   2. If absent, fall back to the OS color-scheme preference.
+  //   3. On any localStorage error, default to dark.
+  //
+  // IMPORTANT: the JS body MUST be wrapped in Markup::create(); otherwise
+  // Drupal's html_head renderer treats `#value` as text and HTML-escapes
+  // the body, turning `&&` into `&amp;&amp;` — a SyntaxError that throws
+  // on every page load and silently flips the user back to dark mode
+  // (caught by the catch block) regardless of their saved preference.
+  // This was the root cause of the "light mode doesn't persist" bug.
+  $js = <<<JS
+(function(){
+  try {
+    var t = localStorage.getItem('jsa-theme');
+    if (!t) {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+JS;
   $variables['#attached']['html_head'][] = [
     [
       '#tag' => 'script',
-      '#value' => <<<JS
-        (function(){
-          try {
-            var t = localStorage.getItem('jsa-theme');
-            if (!t) {
-              t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-            }
-            document.documentElement.setAttribute('data-theme', t);
-          } catch (e) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          }
-        })();
-      JS,
+      '#value' => Markup::create($js),
     ],
     'byte_inline_theme_init',
   ];

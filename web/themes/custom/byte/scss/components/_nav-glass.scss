@@ -296,6 +296,40 @@ body { padding-top: calc(86px + var(--drupal-displace-offset-top, 0px)); }
     visibility: visible;
   }
 
+  // Close button anchored top-right of the drawer. Mirrors the burger's
+  // approximate position on the nav (top-right corner of the viewport) so
+  // the user's finger lands in the same area whether the menu is closed
+  // (tap burger) or open (tap close). 44x44 satisfies WCAG 2.2 SC 2.5.5
+  // (AAA) target size for thumb-reach.
+  &__close {
+    position: absolute;
+    top: calc(var(--byte-nav-gap-y, 14px) + var(--drupal-displace-offset-top, 0px));
+    right: 14px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid color-mix(in oklab, var(--fg) 12%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--fg) 6%, transparent);
+    color: var(--fg);
+    cursor: pointer;
+    display: inline-grid;
+    place-items: center;
+    transition: background .15s, color .15s, border-color .15s;
+
+    &:hover {
+      background: color-mix(in oklab, var(--fg) 12%, transparent);
+    }
+
+    svg {
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
   &__links {
     display: flex;
     flex-direction: column;
