@@ -90,9 +90,21 @@
       <span class="status-dot" aria-hidden="true"></span>
       {{ cta_label|default('Disponible') }}
     </a>
-    <div class="lang-toggle" role="group" aria-label="{{ i18n.language }}">
-      <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}"{{ lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
-      <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}"{{ lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
+    <div class="nav-drawer__controls">
+      <div class="lang-toggle" role="group" aria-label="{{ i18n.language }}">
+        <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}"{{ lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
+        <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}"{{ lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
+      </div>
+      {# Mobile theme toggle — same data-theme-toggle target as the desktop
+         button so the existing nav.js click handler works for both. #}
+      <button class="theme-toggle" type="button" aria-label="{{ i18n.toggle_theme }}" data-theme-toggle>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" width="16" height="16" aria-hidden="true" focusable="false">
+          <use href="/{{ active_theme_path() }}/icons.svg#i-sun"></use>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" width="16" height="16" aria-hidden="true" focusable="false">
+          <use href="/{{ active_theme_path() }}/icons.svg#i-moon"></use>
+        </svg>
+      </button>
     </div>
   </div>
 </div>

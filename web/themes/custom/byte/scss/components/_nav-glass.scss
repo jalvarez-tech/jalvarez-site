@@ -353,6 +353,23 @@ body { padding-top: calc(86px + var(--drupal-displace-offset-top, 0px)); }
     margin-top: 24px;
     align-items: flex-start;
   }
+
+  // Row holding lang-toggle + theme-toggle inside the drawer footer.
+  // Sits below the CTA pill, aligned left with a gap so both controls
+  // breathe. Theme-toggle inherits its size from the desktop selector
+  // (32x32) — large enough for AA touch in this row.
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    // Override the desktop margin-left on theme-toggle so it sits flush
+    // next to the lang-toggle pill rather than offset right.
+    .theme-toggle {
+      margin-left: 0;
+    }
+  }
 }
 
 // Drawer backdrop

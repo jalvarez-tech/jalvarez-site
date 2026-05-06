@@ -41,8 +41,11 @@
       if (e.key === 'Escape') setDrawer(false);
     });
 
-    // Close drawer when clicking a link inside it
+    // Close drawer when clicking a link inside it (but not when clicking
+    // the in-drawer controls — lang-toggle, theme-toggle — which should
+    // toggle state without dismissing the drawer).
     drawer.querySelectorAll('a').forEach(a => {
+      if (a.closest('.nav-drawer__controls')) return;
       a.addEventListener('click', () => setDrawer(false));
     });
 
@@ -52,20 +55,42 @@
       if (drawer.contains(e.target) || burger.contains(e.target)) return;
       setDrawer(false);
     });
+
+    // Auto-close drawer on resize past the breakpoint where the burger
+    // disappears (CSS hides .nav__burger above 899px). If the user opens
+    // the drawer on mobile, then resizes the window to desktop, the
+    // drawer stays as a stuck overlay with no way to dismiss it because
+    // the burger that toggles it is gone. Watch viewport width and force
+    // the drawer closed when we cross above the breakpoint.
+    const desktopMQ = window.matchMedia('(min-width: 900px)');
+    const handleViewportChange = (e) => {
+      if (e.matches && body.classList.contains('nav-drawer-open')) {
+        setDrawer(false);
+      }
+    };
+    // Modern browsers prefer addEventListener on the MQ; older Safari
+    // versions use addListener. Cover both.
+    if (desktopMQ.addEventListener) {
+      desktopMQ.addEventListener('change', handleViewportChange);
+    } else {
+      desktopMQ.addListener(handleViewportChange);
+    }
   }
 
   // ─── Theme toggle ───
-  const themeToggle = document.querySelector('[data-theme-toggle]');
-
+  // Two buttons in the DOM: the desktop one in .nav__links--desktop and
+  // the mobile one inside .nav-drawer__controls. Wire both. New buttons
+  // injected later (e.g. by Drupal AJAX) fall through to the document-
+  // level delegated handler below.
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     try { localStorage.setItem('jsa-theme', theme); } catch (e) {}
   }
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || 'dark';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
-    });
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
   }
+  document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+    btn.addEventListener('click', toggleTheme);
+  });
 })();
