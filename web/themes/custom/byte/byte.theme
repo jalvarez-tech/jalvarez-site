@@ -13,6 +13,14 @@
  * a non-default mode persisted in localStorage.
  */
 function byte_preprocess_html(array &$variables): void {
+  // Belt-and-suspenders: ensure byte/global is attached on every page
+  // regardless of which render path produced it. The theme info already
+  // declares this library, but on canvas_page routes that embed Block-source
+  // components with their own library footprint (notably block.webform_block
+  // on /contacto), the aggregated CSS for authenticated viewers can drop
+  // byte/global. Re-asserting it here forces the asset collector to keep it.
+  $variables['#attached']['library'][] = 'byte/global';
+
   // Inline script BEFORE first paint to prevent FOUC when user has
   // a non-default theme persisted in localStorage. Reads jsa-theme
   // (set by the theme toggle in the nav-glass), defaults to dark.
