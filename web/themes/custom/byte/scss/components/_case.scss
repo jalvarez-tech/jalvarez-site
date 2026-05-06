@@ -20,7 +20,48 @@
   &:hover { color: var(--accent-hover); }
 }
 
-.case-head { margin-bottom: 40px; }
+.case-head {
+  margin-bottom: 40px;
+
+  // When a cover image is present, render the head as a 2-col grid on
+  // desktop: tags + title + brief + meta on the left, cover on the right.
+  // Mobile keeps the single-column stack with the cover above the meta.
+  &--with-cover {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+
+    @media (min-width: 900px) {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: clamp(40px, 5vw, 72px);
+      align-items: start;
+    }
+  }
+
+  &__main {
+    min-width: 0; // prevent grid item from forcing horizontal scroll
+  }
+
+  &__cover {
+    margin: 0;
+    align-self: start;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: var(--r-card);
+      border: 1px solid var(--line-strong);
+    }
+
+    @media (min-width: 900px) {
+      // Sticks the cover near the top of the case-head so it stays
+      // aligned with tags + title even if the meta block is short.
+      position: sticky;
+      top: 96px;
+    }
+  }
+}
 
 .case-tags {
   display: flex;

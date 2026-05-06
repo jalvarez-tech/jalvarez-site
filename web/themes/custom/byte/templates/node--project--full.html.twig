@@ -61,44 +61,63 @@
 <article class="case wrap">
   <a class="case-back" href="/{{ lang }}{{ i18n.back_path }}">{{ i18n.back }}</a>
 
-  <header class="case-head">
-    <div class="case-tags">
-      {% if node.field_primary_technology.entity %}
-        {% include 'byte:chip' with { label: node.field_primary_technology.entity.label, variant: 'accent' } only %}
+  {%- set _cover_url = '' -%}
+  {%- set _cover_alt = '' -%}
+  {%- if node.field_cover_media.entity and node.field_cover_media.entity.field_media_image.entity -%}
+    {%- set _cover_file = node.field_cover_media.entity.field_media_image.entity -%}
+    {%- set _cover_url = file_url(_cover_file.uri.value) -%}
+    {%- set _cover_alt = node.field_cover_media.entity.field_media_image.alt|default(node.label) -%}
+  {%- endif -%}
+
+  <header class="case-head{{ _cover_url ? ' case-head--with-cover' : '' }}">
+    <div class="case-head__main">
+      <div class="case-tags">
+        {% if node.field_primary_technology.entity %}
+          {% include 'byte:chip' with { label: node.field_primary_technology.entity.label, variant: 'accent' } only %}
+        {% endif %}
+        {% if not node.field_project_year.isEmpty %}
+          {% include 'byte:chip' with { label: node.field_project_year.value } only %}
+        {% endif %}
+        {% if not node.field_role.isEmpty %}
+          {% include 'byte:chip' with { label: node.field_role.value } only %}
+        {% endif %}
+      </div>
+
+      <h1 class="case-title">{{ node.label }}</h1>
+
+      {% if not node.field_intro.isEmpty %}
+        <p class="case-brief">{{ node.field_intro.value }}</p>
+      {% elseif not node.field_summary.isEmpty %}
+        <p class="case-brief">{{ node.field_summary.value }}</p>
       {% endif %}
-      {% if not node.field_project_year.isEmpty %}
-        {% include 'byte:chip' with { label: node.field_project_year.value } only %}
-      {% endif %}
-      {% if not node.field_role.isEmpty %}
-        {% include 'byte:chip' with { label: node.field_role.value } only %}
-      {% endif %}
+
+      <dl class="case-meta">
+        {% if not node.field_role.isEmpty %}
+          <div><dt class="case-meta__k">{{ i18n.rol }}</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
+        {% endif %}
+        {% if not node.field_project_year.isEmpty %}
+          <div><dt class="case-meta__k">{{ i18n.year }}</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
+        {% endif %}
+        {% if not node.field_duration.isEmpty %}
+          <div><dt class="case-meta__k">{{ i18n.duration }}</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
+        {% endif %}
+        {% if node.field_primary_technology.entity %}
+          <div><dt class="case-meta__k">{{ i18n.stack }}</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
+        {% endif %}
+        {% if not node.field_external_url.isEmpty %}
+          <div><dt class="case-meta__k">{{ i18n.live }}</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default(i18n.visit) }}</a></dd></div>
+        {% endif %}
+      </dl>
     </div>
 
-    <h1 class="case-title">{{ node.label }}</h1>
-
-    {% if not node.field_intro.isEmpty %}
-      <p class="case-brief">{{ node.field_intro.value }}</p>
-    {% elseif not node.field_summary.isEmpty %}
-      <p class="case-brief">{{ node.field_summary.value }}</p>
+    {% if _cover_url %}
+      <figure class="case-head__cover">
+        <img src="{{ _cover_url }}"
+             alt="{{ _cover_alt }}"
+             loading="eager"
+             decoding="async">
+      </figure>
     {% endif %}
-
-    <dl class="case-meta">
-      {% if not node.field_role.isEmpty %}
-        <div><dt class="case-meta__k">{{ i18n.rol }}</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
-      {% endif %}
-      {% if not node.field_project_year.isEmpty %}
-        <div><dt class="case-meta__k">{{ i18n.year }}</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
-      {% endif %}
-      {% if not node.field_duration.isEmpty %}
-        <div><dt class="case-meta__k">{{ i18n.duration }}</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
-      {% endif %}
-      {% if node.field_primary_technology.entity %}
-        <div><dt class="case-meta__k">{{ i18n.stack }}</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
-      {% endif %}
-      {% if not node.field_external_url.isEmpty %}
-        <div><dt class="case-meta__k">{{ i18n.live }}</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default(i18n.visit) }}</a></dd></div>
-      {% endif %}
-    </dl>
   </header>
 
   {# §01 Desafío #}
