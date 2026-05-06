@@ -9,6 +9,8 @@
 
 \Drupal::service('asset.css.collection_optimizer')->deleteAll();
 \Drupal::service('asset.js.collection_optimizer')->deleteAll();
-_drupal_flush_css_js();
+// Bump the cache-busting query string so any browser/CDN copies of the
+// aggregated bundle URLs become stale.
+\Drupal::state()->set('system.css_js_query_string', base_convert((string) \Drupal::time()->getRequestTime(), 10, 36));
 drupal_flush_all_caches();
 echo "✓ CSS/JS aggregation flushed and css_js_query_string bumped.\n";
