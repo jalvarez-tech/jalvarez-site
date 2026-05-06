@@ -144,7 +144,12 @@
       <h2 class="case-section__title">{{ i18n.s2_title }}</h2>
       <div class="case-steps">
         {% for delta, item in node.field_approach_steps %}
-          {% set step = item.entity %}
+          {%- set step = item.entity -%}
+          {# Resolve the paragraph in the same language as the parent node
+             — entity references load in the default language by default. #}
+          {%- if step and step.hasTranslation(lang) -%}
+            {%- set step = step.getTranslation(lang) -%}
+          {%- endif -%}
           {% if step %}
             {% include 'byte:case-step-card' with {
               number: delta + 1,
@@ -167,7 +172,10 @@
       {% if not node.field_results_metrics.isEmpty %}
         <div class="medidores">
           {% for item in node.field_results_metrics %}
-            {% set m = item.entity %}
+            {%- set m = item.entity -%}
+            {%- if m and m.hasTranslation(lang) -%}
+              {%- set m = m.getTranslation(lang) -%}
+            {%- endif -%}
             {% if m %}
               {% include 'byte:medidor' with {
                 value: m.field_metric_value.value,
@@ -181,7 +189,10 @@
       {% endif %}
 
       {% if not node.field_testimonial_embed.isEmpty %}
-        {% set t = node.field_testimonial_embed.0.entity %}
+        {%- set t = node.field_testimonial_embed.0.entity -%}
+        {%- if t and t.hasTranslation(lang) -%}
+          {%- set t = t.getTranslation(lang) -%}
+        {%- endif -%}
         {% if t %}
           <div style="margin-top: 48px;">
             {% include 'byte:card-testimonio' with {
