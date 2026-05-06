@@ -63,6 +63,18 @@ jobs:
             npm install --no-audit --no-fund
           fi
 
+      # Stamp the theme library with the commit SHA so the aggregated
+      # CSS/JS bundle URL changes on every deploy. Drupal includes the
+      # `version:` value in the bundle hash; without this bump the URL
+      # would stay constant across deploys and browsers / Hostinger HCDN
+      # would keep serving stale copies even after `drush cr`.
+      - name: Stamp library version with commit SHA
+        working-directory: ${{ env.THEME_DIR }}
+        run: |
+          sed -i "s/^  version: .*/  version: ${GITHUB_SHA}/" byte.libraries.yml
+          echo "─── byte.libraries.yml after stamp ───"
+          head -3 byte.libraries.yml
+
       - name: Build theme assets (SCSS → CSS, Lucide sprite)
         working-directory: ${{ env.THEME_DIR }}
         run: npm run build
