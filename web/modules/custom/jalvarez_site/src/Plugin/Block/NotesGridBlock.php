@@ -34,8 +34,16 @@ final class NotesGridBlock extends BlockBase {
       ->accessCheck(TRUE)
       ->execute();
 
+    // Resolve each node into the active interface language so titles,
+    // excerpts and aliases render in the right language (Drupal's
+    // EntityRepository falls back to the canonical translation when a
+    // translation doesn't exist).
+    $current_lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $entity_repo = \Drupal::service('entity.repository');
+
     $rows = [];
     foreach (Node::loadMultiple($nids ?: []) as $i => $node) {
+      $node = $entity_repo->getTranslationFromContext($node, $current_lang);
       $rows[$i] = [
         '#type' => 'component',
         '#component' => 'byte:row-nota',

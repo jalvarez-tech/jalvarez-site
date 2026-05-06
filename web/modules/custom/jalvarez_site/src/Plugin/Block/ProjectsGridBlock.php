@@ -89,8 +89,14 @@ final class ProjectsGridBlock extends BlockBase {
     }
 
     $nids = $query->execute();
+    // Resolve each node into the active interface language so the listing
+    // renders titles + excerpts in the right language (canonical fallback
+    // when no translation exists).
+    $current_lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $entity_repo = \Drupal::service('entity.repository');
     $cards = [];
     foreach (Node::loadMultiple($nids ?: []) as $i => $node) {
+      $node = $entity_repo->getTranslationFromContext($node, $current_lang);
       $cards[$i] = [
         '#type' => 'component',
         '#component' => 'byte:card-proyecto',

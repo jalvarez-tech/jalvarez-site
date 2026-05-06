@@ -475,7 +475,7 @@ $node = Node::create([
   'status' => TRUE,
   'title' => 'Cómo conecté el sitio desde GitHub a Hostinger',
   'field_publish_date' => '2026-05-06',
-  'field_excerpi18n' => 'El paso a paso del CI/CD que mueve este sitio desde mi repo a producción: build en GitHub Actions, rsync por SSH, drush en post-deploy. Sin Composer ni Node corriendo en el servidor.',
+  'field_excerpt' => 'El paso a paso del CI/CD que mueve este sitio desde mi repo a producción: build en GitHub Actions, rsync por SSH, drush en post-deploy. Sin Composer ni Node corriendo en el servidor.',
   'field_thumb_glyph' => 'workflow',
   'body' => [
     'value' => $body_es,
@@ -491,7 +491,7 @@ echo "✓ Created ES note nid={$node->id()}\n";
 // EN translation.
 $node->addTranslation('en', [
   'title' => 'How I wired this site from GitHub to Hostinger',
-  'field_excerpi18n' => 'The CI/CD playbook that moves this site from repo to production: build on GitHub Actions, rsync over SSH, drush in post-deploy. No Composer or Node running on the server.',
+  'field_excerpt' => 'The CI/CD playbook that moves this site from repo to production: build on GitHub Actions, rsync over SSH, drush in post-deploy. No Composer or Node running on the server.',
   'body' => [
     'value' => $body_en,
     'format' => $format_id,
