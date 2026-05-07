@@ -484,8 +484,18 @@ Traducible: ✅ vía Configuration Translation.
 - Webform
 - Media + Media Library
 - Pathauto + Redirect
-- Metatag + Schema.org
+- Metatag (core)
 - Search API + DB backend
+
+### SEO y discoverability
+
+- **Metatag** (core) — defaults globales por preset (front, node, taxonomy_term, user, 403/404).
+- **Simple XML Sitemap** + **Simple XML Sitemap Engines** — `/sitemap.xml` con hreflang ES/EN para canvas_page, node:project y node:note. Bundle settings exportados a `config/sync/`. Regenera vía `drush ssg` en cada deploy.
+- **Custom** en `jalvarez_site.module`:
+  - `hook_metatags_alter()` — backfill description en project/note desde `field_summary`/`field_excerpt` (el default `[node:summary]` está vacío para esos bundles).
+  - `hook_page_attachments_alter()` — inyecta OG, Twitter Card, `<link rel="alternate" hreflang>`, author, theme-color y JSON-LD (`@graph`: `Person` + `WebSite` + `WebPage|BlogPosting|CreativeWork`) para canvas_page + project + note en la traducción activa.
+- **Custom** `LlmsTxtController` + `LlmsTxtSubscriber` — sirve `/llms.txt` y `/llms-full.txt` siguiendo la convención [llmstxt.org](https://llmstxt.org). Bilingüe (secciones ES + EN). Subscriber prioridad 350 evita el redirect del language path-prefix. `CacheableResponse` con tags `canvas_page_list`, `node_list:project`, `node_list:note` → invalidación instantánea en cada edit.
+- `web/robots.txt` versionado con `Sitemap:` + comentario `llms.txt`. Excluido del scaffold de `drupal/core` vía `composer.json` para no perderse en cada `composer install`.
 
 ### Custom
 
@@ -534,8 +544,9 @@ Cuando trabajes en este sitio:
 6. ⏳ Scaffold de SDCs en `byte` (estructura mínima viable primero).
 7. ⏳ Crear Canvas Pages una por una empezando por Inicio.
 8. ⏳ Webform de contacto + opciones reutilizables.
-9. ⏳ Pathauto + Metatag + Redirect.
-10. ⏳ Pruebas de traducción y QA.
+9. ✅ Pathauto + Metatag + Redirect.
+10. ✅ SEO (sitemap, llms.txt, OG/Twitter/JSON-LD, hreflang).
+11. ⏳ Pruebas de traducción y QA.
 
 ---
 

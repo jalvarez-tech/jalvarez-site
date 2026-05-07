@@ -416,6 +416,25 @@ curl -s https://jalvarez.tech/es | grep -E 'aria-current|aria-controls|inert|dat
 # → 2× aria-current="page", 2× aria-current="true", inert, data-label-open/close
 ```
 
+### F13 — SEO discoverable (metatags, OG/Twitter/JSON-LD, sitemap, llms.txt) ✅
+
+**Qué se entregó:**
+
+- 4 canvas_pages con `metatags` JSON poblado (ES + EN) — title + description SEO-optimizados via `scripts/update-seo-metatags.php`.
+- `jalvarez_site_metatags_alter()` — backfill description en project/note desde `field_summary`/`field_excerpt`.
+- `jalvarez_site_page_attachments_alter()` — inyecta OG, Twitter Card, hreflang, author, theme-color, JSON-LD (`Person + WebSite + WebPage|BlogPosting|CreativeWork`) en canvas_page + project + note.
+- `simple_sitemap` + `simple_sitemap_engines` habilitados vía config; `/sitemap.xml` con 18 URLs y hreflang. Bundle settings sembrados con `scripts/configure-simple-sitemap.php`.
+- `LlmsTxtController` + `LlmsTxtSubscriber` → `/llms.txt` y `/llms-full.txt` bilingües, `CacheableResponse` con tags que invalidan al editar.
+- `web/robots.txt` con `Sitemap:` + comentario llms; excluido del scaffold de `drupal/core` para no perderse en `composer install`.
+- `deploy.yml`: paso `drush ssg -y` post-cim. `DEPLOYMENT.md` y `ARCHITECTURE.md` documentan el sistema.
+
+**Verificado vía `curl`:**
+```bash
+curl -sI https://jalvarez.tech/llms.txt        # → 200 text/plain (sin redirect a /es/)
+curl -s  https://jalvarez.tech/sitemap.xml | grep -c '<url>'  # → 18
+curl -s  https://jalvarez.tech/inicio | grep -E '<(title|meta property="og:|link rel="alternate")'
+```
+
 ## Cierre
 
 - ✅ Commit final + push → deploy a producción.
