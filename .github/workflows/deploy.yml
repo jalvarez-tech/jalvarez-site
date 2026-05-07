@@ -266,15 +266,6 @@ jobs:
             fi
           "
 
-      # Ship the post-cim repair script to /tmp on the server so the next
-      # step can run it via drush php:script. We don't deploy scripts/
-      # permanently because they're maintenance tooling, not runtime code.
-      - name: Send post-cim repair script
-        run: |
-          REMOTE_FIX=/tmp/jalvarez-fix-system-site.php
-          echo "REMOTE_FIX=$REMOTE_FIX" >> $GITHUB_ENV
-          scp scripts/fix-prod-system-site.php "hostinger:$REMOTE_FIX"
-
       - name: Drupal post-deploy
         run: |
           ssh hostinger "
@@ -292,14 +283,11 @@ jobs:
               # (name, mail, page.front) with stale values from local config
               # exports — page.front in particular points to a canvas_page
               # ID that doesn't exist in prod, taking down /, /es, /en.
-              # See scripts/fix-prod-system-site.php for the repair logic.
-              if [ -f $REMOTE_FIX ]; then
-                echo '→ Running post-cim system.site repair.'
-                \$DRUSH php:script $REMOTE_FIX
-                rm -f $REMOTE_FIX
-              else
-                echo '⚠ Repair script not found at $REMOTE_FIX — skipping.'
-              fi
+              # The custom drush command lives inside the module
+              # (src/Drush/Commands/RepairCommands.php) so it ships with the
+              # rsync — no more scp+php:script dance.
+              echo '→ Running post-cim system.site repair.'
+              \$DRUSH jalvarez:repair-system-site || echo '⚠ Repair command failed — non-fatal, continuing.'
 
               # Regenerate sitemap.xml. Idempotent: simple_sitemap rebuilds
               # from queue and overwrites the served sitemap atomically.
@@ -314,6 +302,51 @@ jobs:
               echo '   Run \`drush site:install\` manually once via SSH to bootstrap.'
             fi
           "
+
+      # ───── Post-deploy smoke test ─────
+      # Fail the workflow if the just-deployed site doesn't respond cleanly.
+      # Without this, a broken updb / cim / cr leaves prod degraded but the
+      # Action ends green and nobody notices until a user reports it.
+      #
+      # Three independent checks must all pass:
+      #   1. drush bootstrap on the server reports Successful
+      #   2. HTTPS GET returns 200
+      #   3. Response body contains an actual <html document (rules out a
+      #      Hostinger maintenance placeholder or LiteSpeed 5xx page)
+      - name: Post-deploy smoke test
+        run: |
+          set -euo pipefail
+          echo "─── 1. drush status (server-side bootstrap) ───"
+          BOOT=$(ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            ./vendor/bin/drush status --field=bootstrap 2>/dev/null | tr -d '[:space:]'
+          ") || BOOT='(ssh failed)'
+          echo "  bootstrap=$BOOT"
+          if [ "$BOOT" != "Successful" ]; then
+            echo "::error::drush bootstrap is not 'Successful' (got: $BOOT) — site is broken"
+            exit 1
+          fi
+
+          echo "─── 2. HTTPS GET https://jalvarez.tech/ ───"
+          STATUS=$(curl -sko /tmp/smoke.html -w "%{http_code}" --max-time 20 "https://jalvarez.tech/" || echo "000")
+          SIZE=$(wc -c < /tmp/smoke.html | tr -d '[:space:]')
+          echo "  HTTP $STATUS · ${SIZE}B"
+          # 301 to /es is also acceptable (language detection redirect from /).
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "301" ] && [ "$STATUS" != "302" ]; then
+            echo "::error::Site returned HTTP $STATUS"
+            head -20 /tmp/smoke.html || true
+            exit 1
+          fi
+
+          echo "─── 3. HTTPS GET https://jalvarez.tech/es ───"
+          curl -sko /tmp/smoke-es.html -w "  HTTP %{http_code} · %{size_download}B\n" --max-time 20 "https://jalvarez.tech/es"
+          if ! grep -q '<html' /tmp/smoke-es.html; then
+            echo "::error::Response body missing <html — likely Hostinger placeholder or 5xx"
+            head -20 /tmp/smoke-es.html || true
+            exit 1
+          fi
+          echo "✓ All smoke checks passed."
 
       # ───── Post-deploy: re-harden permissions (only if SSH was set up) ─────
       - name: Re-harden remote permissions

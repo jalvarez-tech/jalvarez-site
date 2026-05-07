@@ -510,12 +510,13 @@ Lo mismo para los aliases (`/inicio`, `/home`, `/proyectos`, etc.): son parte de
 
 **Fix permanente** (vive en el repo):
 
-1. **`scripts/fix-prod-system-site.php`** — script defensivo que:
+1. **Comando Drush custom `drush jalvarez:repair-system-site`** — implementado en `web/modules/custom/jalvarez_site/src/Drush/Commands/RepairCommands.php`:
    - Resuelve la home dinámicamente vía `path_alias.manager->getPathByAlias('/inicio')` → `/page/{id}` (sin asumir IDs entre envs).
    - Fuerza `system.site.name`, `system.site.mail`, `system.site.page.front` y `update.settings.notification.emails` a sus valores canónicos.
    - Idempotente (solo escribe si hay drift).
+   - Vive dentro del módulo, viaja con el rsync — no requiere `scp` cada deploy.
 
-2. **`.github/workflows/deploy.yml` — paso post-cim:** después de `drush updb && cim && cr`, el workflow hace `scp` del script a `/tmp` del server y lo ejecuta con `drush php:script`. Así, aunque alguien re-exporte config local sin sanitizar, el deploy lo repara automáticamente.
+2. **`.github/workflows/deploy.yml` — paso post-cim:** después de `drush updb && cim && cr`, el workflow ejecuta `drush jalvarez:repair-system-site`. Así, aunque alguien re-exporte config local sin sanitizar, el deploy lo repara automáticamente.
 
 3. **`config/sync/system.site.yml` y `update.settings.yml`** — los valores `name`, `mail`, `front`, `notification.emails` quedaron con los valores canónicos de prod (no de local), y un comentario YAML pide explícitamente restaurarlos antes de hacer `drush cex && git push`.
 
