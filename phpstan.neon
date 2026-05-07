@@ -16,10 +16,5 @@ parameters:
             # established and we can lift level/strictness intentionally.
             - web/modules/custom/*/tests/*
 
-    ignoreErrors:
-        # The DI conversion of Block plugins is tracked as a MAJOR follow-up
-        # from the audit. Silence here until that PR lands so CI stays green.
-        - identifier: globalDrupalDependencyInjection.useDependencyInjection
-
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false

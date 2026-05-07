@@ -8,8 +8,15 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\path_alias\AliasManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Renders the byte:nav-glass SDC as the site-wide top navigation.
@@ -21,12 +28,36 @@ use Drupal\Core\Url;
  */
 #[Block(
   id: 'jalvarez_nav_glass',
-  admin_label: new \Drupal\Core\StringTranslation\TranslatableMarkup('Byte top navigation'),
-  category: new \Drupal\Core\StringTranslation\TranslatableMarkup('Jalvarez'),
+  admin_label: new TranslatableMarkup('Byte top navigation'),
+  category: new TranslatableMarkup('Jalvarez'),
 )]
-class NavGlassBlock extends BlockBase {
+class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly LanguageManagerInterface $languageManager,
+    private readonly CurrentPathStack $currentPath,
+    private readonly AliasManagerInterface $aliasManager,
+    private readonly RouteMatchInterface $routeMatch,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('language_manager'),
+      $container->get('path.current'),
+      $container->get('path_alias.manager'),
+      $container->get('current_route_match'),
+    );
+  }
 
   /**
    * Per-language nav definition.
@@ -50,12 +81,12 @@ class NavGlassBlock extends BlockBase {
   ];
 
   public function build(): array {
-    $current_lang = \Drupal::languageManager()
+    $current_lang = $this->languageManager
       ->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)
       ->getId();
 
-    $current_path = \Drupal::service('path.current')->getPath();
-    $current_alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path, $current_lang);
+    $current_path = $this->currentPath->getPath();
+    $current_alias = $this->aliasManager->getAliasByPath($current_path, $current_lang);
 
     // Strip language prefix to compare with link path.
     $alias_no_lang = preg_replace('#^/(es|en)#', '', $current_alias) ?: '/';
@@ -123,8 +154,8 @@ class NavGlassBlock extends BlockBase {
   private function computeLanguageSwitcherHrefs(string $current_lang): array {
     $defaults = ['es' => '/es', 'en' => '/en'];
     try {
-      $url = Url::fromRouteMatch(\Drupal::routeMatch());
-      $links = \Drupal::languageManager()
+      $url = Url::fromRouteMatch($this->routeMatch);
+      $links = $this->languageManager
         ->getLanguageSwitchLinks(LanguageInterface::TYPE_INTERFACE, $url);
       $hrefs = $defaults;
       if (!empty($links->links)) {
@@ -134,7 +165,7 @@ class NavGlassBlock extends BlockBase {
             // alias for that language even when the current request is in
             // the other one.
             $link_url = clone $link['url'];
-            $link_url->setOption('language', \Drupal::languageManager()->getLanguage($langcode));
+            $link_url->setOption('language', $this->languageManager->getLanguage($langcode));
             $hrefs[$langcode] = $link_url->toString();
           }
         }

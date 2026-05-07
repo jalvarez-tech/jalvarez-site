@@ -8,7 +8,10 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Renders the byte:footer SDC as the site-wide footer.
@@ -27,7 +30,25 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   admin_label: new TranslatableMarkup('Byte site footer'),
   category: new TranslatableMarkup('Jalvarez'),
 )]
-class FooterBlock extends BlockBase {
+class FooterBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly LanguageManagerInterface $languageManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('language_manager'),
+    );
+  }
 
   /**
    * Brand contact info (language-independent — values, not labels).
@@ -93,7 +114,7 @@ class FooterBlock extends BlockBase {
   ];
 
   public function build(): array {
-    $lang = \Drupal::languageManager()
+    $lang = $this->languageManager
       ->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)
       ->getId();
     $lang_data = self::LANG[$lang] ?? self::LANG['es'];

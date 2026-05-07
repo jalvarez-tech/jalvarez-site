@@ -187,7 +187,7 @@
         ],
         "phpcs": "phpcs --standard=phpcs.xml.dist",
         "phpcbf": "phpcbf --standard=phpcs.xml.dist",
-        "phpstan": "phpstan analyse --configuration=phpstan.neon",
+        "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=1G",
         "test": "phpunit -c phpunit.xml.dist",
         "qa": [
             "@phpcs",

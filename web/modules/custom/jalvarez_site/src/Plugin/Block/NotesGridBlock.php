@@ -7,9 +7,13 @@ namespace Drupal\jalvarez_site\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Renders the full Notes list using `byte:row-nota` SDC instances.
@@ -23,10 +27,33 @@ use Drupal\node\NodeInterface;
   admin_label: new TranslatableMarkup('Notas — list (byte rows)'),
   category: new TranslatableMarkup('Jalvarez'),
 )]
-final class NotesGridBlock extends BlockBase {
+final class NotesGridBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly LanguageManagerInterface $languageManager,
+    private readonly EntityRepositoryInterface $entityRepository,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('language_manager'),
+      $container->get('entity.repository'),
+    );
+  }
 
   public function build(): array {
-    $nids = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+    $node_storage = $this->entityTypeManager->getStorage('node');
+    $nids = $node_storage->getQuery()
       ->condition('type', 'note')
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('field_publish_date', 'DESC')
@@ -35,15 +62,17 @@ final class NotesGridBlock extends BlockBase {
       ->execute();
 
     // Resolve each node into the active interface language so titles,
-    // excerpts and aliases render in the right language (Drupal's
-    // EntityRepository falls back to the canonical translation when a
-    // translation doesn't exist).
-    $current_lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    $entity_repo = \Drupal::service('entity.repository');
+    // excerpts and aliases render in the right language (EntityRepository
+    // falls back to the canonical translation when a translation doesn't
+    // exist).
+    $current_lang = $this->languageManager->getCurrentLanguage()->getId();
 
     $rows = [];
-    foreach (Node::loadMultiple($nids ?: []) as $i => $node) {
-      $node = $entity_repo->getTranslationFromContext($node, $current_lang);
+    foreach ($node_storage->loadMultiple($nids ?: []) as $i => $node) {
+      $node = $this->entityRepository->getTranslationFromContext($node, $current_lang);
+      if (!$node instanceof NodeInterface) {
+        continue;
+      }
       $rows[$i] = [
         '#type' => 'component',
         '#component' => 'byte:row-nota',
@@ -80,9 +109,7 @@ final class NotesGridBlock extends BlockBase {
     if ($node->hasField('field_publish_date') && !$node->get('field_publish_date')->isEmpty()) {
       $raw = $node->get('field_publish_date')->value;
       if ($raw) {
-        $current_lang = \Drupal::languageManager()
-          ->getCurrentLanguage()
-          ->getId();
+        $current_lang = $this->languageManager->getCurrentLanguage()->getId();
         $months = $current_lang === 'en'
           ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
           : ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];

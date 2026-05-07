@@ -7,12 +7,16 @@ namespace Drupal\jalvarez_site\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
-use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Renders a grid of project nodes as `byte:card-proyecto` SDC instances.
@@ -32,7 +36,29 @@ use Drupal\node\NodeInterface;
   admin_label: new TranslatableMarkup('Proyectos — grid (byte cards)'),
   category: new TranslatableMarkup('Jalvarez'),
 )]
-final class ProjectsGridBlock extends BlockBase {
+final class ProjectsGridBlock extends BlockBase implements ContainerFactoryPluginInterface {
+
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly LanguageManagerInterface $languageManager,
+    private readonly EntityRepositoryInterface $entityRepository,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new self(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('language_manager'),
+      $container->get('entity.repository'),
+    );
+  }
 
   public function defaultConfiguration(): array {
     return [
@@ -75,7 +101,8 @@ final class ProjectsGridBlock extends BlockBase {
   }
 
   public function build(): array {
-    $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+    $node_storage = $this->entityTypeManager->getStorage('node');
+    $query = $node_storage->getQuery()
       ->condition('type', 'project')
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('field_sort_order', 'ASC')
@@ -94,11 +121,13 @@ final class ProjectsGridBlock extends BlockBase {
     // Resolve each node into the active interface language so the listing
     // renders titles + excerpts in the right language (canonical fallback
     // when no translation exists).
-    $current_lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    $entity_repo = \Drupal::service('entity.repository');
+    $current_lang = $this->languageManager->getCurrentLanguage()->getId();
     $cards = [];
-    foreach (Node::loadMultiple($nids ?: []) as $i => $node) {
-      $node = $entity_repo->getTranslationFromContext($node, $current_lang);
+    foreach ($node_storage->loadMultiple($nids ?: []) as $i => $node) {
+      $node = $this->entityRepository->getTranslationFromContext($node, $current_lang);
+      if (!$node instanceof NodeInterface) {
+        continue;
+      }
       $cards[$i] = [
         '#type' => 'component',
         '#component' => 'byte:card-proyecto',
