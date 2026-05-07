@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Canal directo'
 status: stable
 description: 'Contact-page sidebar: 3 direct channels (email/phone/whatsapp), availability strip, response-time card, and "Cómo va a ser" 5-step expectations list.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

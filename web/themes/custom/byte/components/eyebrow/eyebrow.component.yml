@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: Eyebrow
 status: stable
 description: 'Section eyebrow with optional § 0N number prefix. Mono font, uppercase tracking.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: Section
 status: stable
 description: 'Editorial section wrapper. Two-column head (eyebrow + title/lede). Slot for body.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: Marquee
 status: stable
 description: 'Infinite-scrolling stack badges. Up to 9 items, separated by accent dots.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

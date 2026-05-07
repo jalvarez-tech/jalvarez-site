@@ -16,11 +16,16 @@ use Drupal\Core\Render\Markup;
  */
 function byte_preprocess_html(array &$variables): void {
   // Belt-and-suspenders: ensure byte/global is attached on every page
-  // regardless of which render path produced it. The theme info already
-  // declares this library, but on canvas_page routes that embed Block-source
-  // components with their own library footprint (notably block.webform_block
-  // on /contacto), the aggregated CSS for authenticated viewers can drop
-  // byte/global. Re-asserting it here forces the asset collector to keep it.
+  // regardless of which render path produced it. The theme info declares
+  // it, every SDC under components/* now declares `libraries:
+  // [byte/global]` in its component.yml as of PR3b, AND it's force-asserted
+  // here. Triple coverage exists because canvas_page routes that embed
+  // Block-source components with their own library footprint (notably
+  // block.webform_block on /contacto) used to drop byte/global from the
+  // aggregated CSS for authenticated viewers. The per-SDC libraries
+  // declaration likely fixes that on its own, but verifying the failure
+  // mode requires Canvas preview routes that aren't easy to exercise in
+  // CI — until then this line stays as defense-in-depth.
   $variables['#attached']['library'][] = 'byte/global';
 
   // Inline script BEFORE first paint:

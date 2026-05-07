@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: Icon
 description: Inline SVG icon backed by the byte/icons.svg sprite. Replaces 11 ad-hoc <svg><use> markers across templates and components.
 status: experimental
+libraries:
+  - byte/global
+
 props:
   type: object
   required: [name]

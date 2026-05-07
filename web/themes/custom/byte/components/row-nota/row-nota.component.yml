@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Row Nota'
 status: stable
 description: 'Note row in a list: glyph thumb (with hue) + date + title/excerpt + category + read time. 5-col grid on desktop.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

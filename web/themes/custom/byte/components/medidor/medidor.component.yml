@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Medidor (metric card)'
 status: stable
 description: 'Big metric value + small key + optional note, used in §03 Resultados or in card-proyecto.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

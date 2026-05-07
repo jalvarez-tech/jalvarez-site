@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Qué construyo (Featured projects)'
 status: stable
 description: 'Section header + projects grid + optional ghost CTA. Drop card-proyecto components into the projects slot.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

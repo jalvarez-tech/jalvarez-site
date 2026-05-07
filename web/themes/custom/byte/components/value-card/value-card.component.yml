@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Value card'
 status: stable
 description: 'Single discipline/value card with line-art Lucide icon, numbered tag, title, body, KPI metric + caption. Used inside Como lo hago.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

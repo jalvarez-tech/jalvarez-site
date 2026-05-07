@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Process row'
 status: stable
 description: 'Single numbered step row inside Método (Process). 4-column layout: num | title | body | tag.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

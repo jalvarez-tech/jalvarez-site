@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Card Proyecto'
 status: stable
 description: 'Project teaser card: cover media (or browser-mock placeholder) + chips + name with arrow + desc + metrics row.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

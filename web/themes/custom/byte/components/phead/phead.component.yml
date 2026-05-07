@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Page header (phead)'
 status: stable
 description: 'Editorial page header for /proyectos, /notas, /contacto. Eyebrow + display title with italic accent + sub.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:
