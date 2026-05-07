@@ -1,7 +1,0 @@
-# Allowlist consumed by .github/workflows/seed-content.yml.
-# One path per line, relative to repo root, exact match (grep -Fxq).
-# Lines starting with `#` are comments but still count for grep — keep them
-# distinct from real script paths.
-#
-# To allow a new seed script, add its path on its own line. Comments below
-# this line are ignored by grep -Fxq because they don't match a script path.

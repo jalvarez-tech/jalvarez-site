@@ -7,6 +7,13 @@
  * a11y-correct default for decorative icons (siblings of a visible text
  * label). When a title is given, expose the icon as an image with
  * role="img" + aria-label so screen readers announce it.
+ *
+ * Sprite path is hardcoded to `/themes/custom/byte/icons.svg` instead of
+ * `active_theme_path()` so the icons keep resolving when this component is
+ * rendered under a different active theme — admin theme, Canvas preview,
+ * node edit forms, etc. SDC's Twig sandbox does not expose `base_path()`,
+ * so a leading slash is the cleanest portable choice. Adjust if the site
+ * ever runs from a subdirectory.
  */
 #}
 {%- set _size = size|default(16) -%}
@@ -18,4 +25,4 @@
 {%- else -%}
   {%- set _attrs = _attrs.setAttribute('aria-hidden', 'true') -%}
 {%- endif -%}
-<svg{{ _attrs }}><use href="/{{ active_theme_path() }}/icons.svg#i-{{ name }}"></use></svg>
+<svg{{ _attrs }}><use href="/themes/custom/byte/icons.svg#i-{{ name }}"></use></svg>

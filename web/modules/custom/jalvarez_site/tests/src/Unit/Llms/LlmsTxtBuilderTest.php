@@ -106,6 +106,90 @@ final class LlmsTxtBuilderTest extends UnitTestCase {
   }
 
   /**
+   * Editor-supplied titles must not be able to break out of the markdown link.
+   *
+   * @covers ::escapeMarkdownText
+   *
+   * @dataProvider markdownTextCases
+   */
+  public function testEscapeMarkdownTextEscapesBracketsAndCollapsesWhitespace(string $input, string $expected): void {
+    $reflection = new \ReflectionMethod(LlmsTxtBuilder::class, 'escapeMarkdownText');
+    $builder = new LlmsTxtBuilder($this->stubEntityTypeManagerWithEmptyNodes());
+    $this->assertSame($expected, $reflection->invoke($builder, $input));
+  }
+
+  public static function markdownTextCases(): array {
+    return [
+      'plain title untouched'          => ['Hello world', 'Hello world'],
+      'closing bracket escaped'        => ['Foo] bar', 'Foo\] bar'],
+      'opening bracket escaped'        => ['Foo [bar', 'Foo \[bar'],
+      'backslash escaped'              => ['back\\slash', 'back\\\\slash'],
+      'newlines collapsed to space'    => ["line one\nline two", 'line one line two'],
+      'crlf collapsed to space'        => ["line one\r\nline two", 'line one line two'],
+      'tabs and double spaces shrink'  => ["foo\t\tbar  baz", 'foo bar baz'],
+      'leading and trailing trimmed'   => ["  hello  ", 'hello'],
+      // Concrete payload an attacker editor might try. Only `]` needs to be
+      // escaped — once the closing bracket is neutralised the parser can no
+      // longer end the label early and reach a malicious target. Parentheses
+      // inside a label are valid markdown and do not need escaping.
+      'link injection neutralised'     => ['Title](javascript:alert(1))', 'Title\](javascript:alert(1))'],
+    ];
+  }
+
+  /**
+   * Only http(s) URLs may end up in the markdown link target.
+   *
+   * @covers ::escapeMarkdownUrl
+   *
+   * @dataProvider markdownUrlCases
+   */
+  public function testEscapeMarkdownUrlAcceptsOnlyHttpSchemes(string $input, string $expected): void {
+    $reflection = new \ReflectionMethod(LlmsTxtBuilder::class, 'escapeMarkdownUrl');
+    $builder = new LlmsTxtBuilder($this->stubEntityTypeManagerWithEmptyNodes());
+    $this->assertSame($expected, $reflection->invoke($builder, $input));
+  }
+
+  public static function markdownUrlCases(): array {
+    return [
+      'https accepted'                 => ['https://jalvarez.tech/proyectos', 'https://jalvarez.tech/proyectos'],
+      'http accepted'                  => ['http://example.com/x', 'http://example.com/x'],
+      'parentheses encoded'            => ['https://x.test/foo(bar)', 'https://x.test/foo%28bar%29'],
+      'javascript scheme rejected'     => ['javascript:alert(1)', ''],
+      'data scheme rejected'           => ['data:text/html,<script>x</script>', ''],
+      'mailto scheme rejected'         => ['mailto:contacto@jalvarez.tech', ''],
+      'empty rejected'                 => ['', ''],
+      'relative path rejected'         => ['/proyectos', ''],
+    ];
+  }
+
+  /**
+   * Markdown injected via a label cannot escape the bullet structure.
+   *
+   * @covers ::bullet
+   */
+  public function testBulletProducesEscapedLineForHostileTitle(): void {
+    $reflection = new \ReflectionMethod(LlmsTxtBuilder::class, 'bullet');
+    $builder = new LlmsTxtBuilder($this->stubEntityTypeManagerWithEmptyNodes());
+    $row = [
+      'title' => 'Real](javascript:alert(1))',
+      'url' => 'https://jalvarez.tech/proyectos/x',
+      'description' => "first line\r\nsecond line",
+      'langcode' => 'es',
+    ];
+
+    $line = $reflection->invoke($builder, $row, FALSE);
+
+    // The injected `]` is escaped so the parser cannot terminate the label
+    // before our real `](url)`. Parentheses inside the label are valid
+    // markdown — they do not need escaping.
+    $this->assertStringContainsString('Real\](javascript:alert(1))', $line);
+    $this->assertStringContainsString('](https://jalvarez.tech/proyectos/x)', $line);
+    // Description newlines collapse to a single space — no orphan bullet line.
+    $this->assertStringContainsString('first line second line', $line);
+    $this->assertStringNotContainsString("\n", $line);
+  }
+
+  /**
    * Stub that returns no nodes / no canvas pages.
    *
    * Lets the builder render the static brand header + Optional section

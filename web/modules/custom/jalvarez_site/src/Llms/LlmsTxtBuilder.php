@@ -283,11 +283,54 @@ class LlmsTxtBuilder {
     if (!$full && mb_strlen($desc) > 180) {
       $desc = mb_substr($desc, 0, 177) . '…';
     }
-    $line = "- [{$row['title']}]({$row['url']})";
+    $title = $this->escapeMarkdownText($row['title']);
+    $url = $this->escapeMarkdownUrl($row['url']);
+    // Without a valid http(s) URL we still want the title in the index, but
+    // as plain text — a markdown link with an empty/invalid target is worse
+    // than no link at all (some llms.txt parsers follow `(javascript:…)`).
+    $line = $url === '' ? "- {$title}" : "- [{$title}]({$url})";
     if ($desc !== '') {
-      $line .= ': ' . $desc;
+      $line .= ': ' . $this->escapeMarkdownText($desc);
     }
     return $line;
+  }
+
+  /**
+   * Sanitises arbitrary user input for inclusion in a markdown bullet.
+   *
+   * Editors with permission to create projects/notes/canvas pages can put any
+   * character in a title or summary. Without escaping, a `]` in a title or a
+   * raw newline in a description silently breaks the markdown structure —
+   * crawlers that parse llms.txt as markdown then misread later rows. This
+   * helper collapses whitespace into single spaces and backslash-escapes the
+   * characters that would terminate a link label early.
+   */
+  private function escapeMarkdownText(string $value): string {
+    $value = trim(preg_replace('/\s+/', ' ', $value) ?? '');
+    return strtr($value, [
+      '\\' => '\\\\',
+      '[' => '\\[',
+      ']' => '\\]',
+    ]);
+  }
+
+  /**
+   * Validates and prepares a URL for a markdown link target.
+   *
+   * Only `http` and `https` URLs are accepted — anything else (`javascript:`,
+   * `data:`, `mailto:`, malformed, empty) returns '' so `bullet()` falls back
+   * to a plain text entry. Surviving URLs get their `(` and `)` percent-
+   * encoded so they cannot terminate the markdown link target.
+   */
+  private function escapeMarkdownUrl(string $url): string {
+    if ($url === '') {
+      return '';
+    }
+    $scheme = parse_url($url, PHP_URL_SCHEME);
+    if ($scheme !== 'http' && $scheme !== 'https') {
+      return '';
+    }
+    return strtr($url, ['(' => '%28', ')' => '%29']);
   }
 
 }

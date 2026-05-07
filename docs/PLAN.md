@@ -82,10 +82,10 @@ Canvas 1.3.x no soporta props `array of object` en su UI editor (sólo strings/i
 
 **Deploy a producción**
 
-El workflow `.github/workflows/seed-content.yml` ejecuta cualquier `scripts/*.php` en prod. En el primer deploy post-migración:
+Los scripts puntuales en prod se ejecutan vía SSH (`scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php'`). En el primer deploy post-migración:
 1. `composer install`/`drush cim` traen los `canvas.component.sdc.byte.*.yml` y el `field_canvas`.
-2. Correr `seed-content` → `scripts/canvas-discover-sdcs.php` (idempotente, registra los Components si la sync no los trajo).
-3. Correr `seed-content` → `scripts/create-canvas-home.php` (idempotente, regenera el nodo "Inicio (Canvas)" y el page.front).
+2. Correr `scripts/canvas-discover-sdcs.php` (idempotente, registra los Components si la sync no los trajo).
+3. Correr `scripts/create-canvas-home.php` (idempotente, regenera el nodo "Inicio (Canvas)" y el page.front).
 
 ### F5 — Responsive verification ⬜
 
@@ -184,7 +184,7 @@ Para `Contacto`, el formulario se incrusta como Canvas component con settings `w
 
 **Deploy a producción**
 
-`seed-content.yml` correr en orden:
+Correr vía SSH (`scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php'`) en orden:
 1. `scripts/canvas-discover-sdcs.php` (registra SDCs)
 2. `scripts/create-media-image-type.php` (Canvas requirement)
 3. `scripts/create-canvas-home.php` (Inicio + setea page.front)
@@ -444,6 +444,6 @@ curl -s  https://jalvarez.tech/inicio | grep -E '<(title|meta property="og:|link
 ## Convenciones operativas durante este plan
 
 - Cada fase: trabajo local → build CSS → verificación visual → commit + push → seed prod si requiere data.
-- Workflow `seed-content.yml` reusable para cualquier `.php` script en producción.
+- Para scripts puntuales en prod: `scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php && rm /tmp/X.php'`.
 - Si un cambio no aplica vía `drush cim` (UUID mismatch), se ejecuta script directo en prod.
 - Mantener idempotencia en todos los scripts.

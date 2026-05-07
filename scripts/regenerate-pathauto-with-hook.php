@@ -19,9 +19,15 @@ foreach (['project_es', 'project_en', 'note_es', 'note_en'] as $id) {
 }
 
 // Re-import original ES patterns from config/sync if missing.
+// Resolve the config/sync directory from Drupal so the script works in any
+// environment (DDEV, Hostinger, CI) — the previous hardcoded
+// `/var/www/html/config/sync/...` only resolved under DDEV and silently
+// skipped the restore step on the live server.
+$sync_dir = \Drupal\Core\Site\Settings::get('config_sync_directory')
+  ?: (DRUPAL_ROOT . '/../config/sync');
 foreach (['project', 'note'] as $bundle) {
   if (!PathautoPattern::load($bundle)) {
-    $config_file = '/var/www/html/config/sync/pathauto.pattern.' . $bundle . '.yml';
+    $config_file = rtrim($sync_dir, '/') . '/pathauto.pattern.' . $bundle . '.yml';
     if (file_exists($config_file)) {
       $data = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($config_file));
       // Strip readonly properties pathauto may complain about.
