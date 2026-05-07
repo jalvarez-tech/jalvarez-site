@@ -316,7 +316,7 @@ Estilos viven en `web/themes/custom/byte/scss/components/_<nombre>.scss` (un arc
 
 ## 8. Composición Canvas por página
 
-Cada canvas_page se creó programáticamente la primera vez en F8–F10. Los seed scripts originales (`create-canvas-home.php`, `create-canvas-other-pages.php`) se borraron en PR2 — el contenido vive en producción y se mantiene desde el editor visual de Canvas. Para reconstruir la estructura desde cero en un entorno nuevo, ver el README en `scripts/maintenance/setup/` (audit pendiente para extraer a recipe). Las traducciones EN comparten UUIDs con la ES (mismo árbol estructural), solo cambian los inputs (textos).
+Cada canvas_page se creó programáticamente la primera vez en F8–F10. Los seed scripts originales (`create-canvas-home.php`, `create-canvas-other-pages.php`) se borraron en PR2 — el contenido vive en producción y se mantiene desde el editor visual de Canvas. Para reconstruir desde cero en un entorno nuevo: `drush si --existing-config` reproduce la estructura (content types, fields, paragraphs, views, displays, blocks, sitemap), y las cuatro canvas_pages se recrean editando a través del Canvas visual editor. Las traducciones EN comparten UUIDs con la ES (mismo árbol estructural), solo cambian los inputs (textos).
 
 ### Inicio (canvas_page id=1)
 

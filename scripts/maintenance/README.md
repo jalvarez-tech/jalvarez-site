@@ -1,8 +1,16 @@
 # scripts/maintenance/
 
-On-demand PHP scripts that survived the PR2 cleanup. These run via
+On-demand PHP scripts that survived the PR2/PR3c cleanup. These run via
 `drush php:script` over SSH (see `docs/DEPLOYMENT.md` § Cómo correr un
 script puntual en prod).
+
+> **Update PR3c (2026-05-07):** the `setup/` subfolder was deleted after
+> auditing each script against `config/sync/`. All 11 setup scripts
+> were 100% reproducible from the active config (10 COVERED + 1
+> OBSOLETE — `configure-page-displays.php` still targeted
+> `node.page.field_canvas`, which the architecture migrated away from
+> when canvas_page became its own entity). A clean reinstall now uses
+> `drush si --existing-config` and that's it.
 
 Anything reusable enough to deserve a flag-driven CLI lives as a Drush
 command in `web/modules/custom/jalvarez_site/src/Drush/Commands/` instead

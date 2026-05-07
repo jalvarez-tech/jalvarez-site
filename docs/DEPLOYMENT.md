@@ -516,44 +516,40 @@ La configuración del Environment no se versiona en YAML, vive en GitHub Setting
 - ✅ Theme `byte` scaffold mínimo (info, libraries, theme PHP, package.json, scripts, scss tokens + main)
 - ✅ Canvas migration: 19 SDCs registrados, home node "Inicio (Canvas)" con field_canvas tree (ES + EN)
 
-### Post-deploy específico de Canvas (orden importa)
+### Post-deploy específico de Canvas (un único paso)
 
-Después del primer deploy con Canvas, corra estos scripts vía SSH (ver patrón en [§ Cómo correr un script puntual en prod](#cómo-correr-un-script-puntual-en-prod) más abajo), en este orden:
+Tras el audit de PR3c (2026-05-07) confirmamos que **`drush deploy + cim`
+reproduce el 100% de la estructura desde `config/sync/`** (4 content types,
+3 vocabularies, 3 paragraph types, ~50 fields, 7 views, displays, block
+placements, sitemap bundle settings, media type, webform). Los 11 scripts
+SETUP que vivían en `scripts/maintenance/setup/` se eliminaron porque eran
+duplicados de la config exportada.
+
+Lo único que sigue siendo útil correr a mano post-deploy:
 
 1. **`scripts/maintenance/canvas-discover-sdcs.php`** (idempotente)
-   Re-discover los SDCs de byte y registra los Component config entities. Útil si `drush cim` no creó automáticamente los `canvas.component.sdc.byte.*`. También útil tras añadir nuevos SDCs.
+   Re-discover los SDCs de byte y registra los Component config entities.
+   `drush cim` los crea automáticamente desde `config/sync/canvas.component.sdc.byte.*.yml`,
+   pero si añadís un SDC nuevo entre dos deploys y querés que aparezca en
+   el editor sin esperar a re-exportar config, este script lo registra al vuelo.
 
-2. **`scripts/maintenance/setup/create-media-image-type.php`** (idempotente)
-   Crea el `media_type: image` con su `field_media_image`. **Requisito hard de canvas_page**: sin un media type tipo image, MediaLibraryWidget crashea cuando Canvas genera el form para el campo base `image` de canvas_page. Sin esto, el editor visual queda en blanco.
+2. **Initial canvas_page seed** — el contenido vive en producción y se
+   mantiene desde el editor visual. Para un entorno nuevo (raro), recrear
+   las cuatro canvas_pages (Inicio, Proyectos, Notas, Contacto) editando
+   a través del Canvas visual editor. No hay un script para esto: los
+   originales `create-canvas-home.php` / `create-canvas-other-pages.php`
+   se borraron en PR2 porque hardcodeaban el copy y los UUIDs.
 
-3. **Initial canvas_page seed** — already in production. The original seed
-   scripts (`create-canvas-home.php`, `create-canvas-other-pages.php`) were
-   one-shots that ran once per environment in F8–F10. They were deleted in
-   PR2 (2026-05-07) because the resulting `canvas_page` entities now live
-   in production and the structural definitions sit in `config/sync`. For
-   a brand-new environment, recreate the four pages by editing through the
-   visual Canvas editor.
+### Post-deploy específico de SEO
 
-4. **`scripts/maintenance/setup/place-nav-block.php`** (solo primera vez)
-   Coloca el block `jalvarez_nav_glass` en el region `byte:header`.
+Ya no hay scripts SEO post-deploy. La configuración de `simple_sitemap`
+(qué bundles indexar, prioridad, changefreq) vive en
+`config/sync/simple_sitemap.bundle_settings.default.*.yml` y se aplica
+sola con `drush cim` en cada deploy. El workflow corre `drush ssg`
+después para regenerar `sitemap.xml`.
 
-5. **`scripts/maintenance/setup/configure-form-displays.php`** (opcional, solo si cambian los schemas de fields en project/note)
-   Configura form displays con field_group fieldsets para project, note y page bundles.
-
-### Post-deploy específico de SEO (orden importa)
-
-El módulo `simple_sitemap` se habilita automáticamente vía `drush cim` (está en `config/sync/core.extension.yml`) y el workflow corre `drush ssg` en cada deploy para regenerar `sitemap.xml`. Lo único que no se hace solo es:
-
-1. **`scripts/maintenance/setup/configure-simple-sitemap.php`** (idempotente — solo correr 1ª vez por entorno)
-   Registra `canvas_page`, `node:project` y `node:note` como bundles indexables en el variant `default` del sitemap. Sin esto, `drush ssg` produciría un sitemap vacío. Correr vía SSH (ver § Cómo correr un script puntual en prod).
-
-2. **Metatags seed** — already in production. The `update-seo-metatags.php`
-   one-shot script populated the `metatags` field on the 4 canvas_pages in
-   F11; the values now live in DB and `config/sync`. Future SEO copy
-   changes go through the visual editor or `drush config:set`. Script
-   deleted in PR2.
-
-The sitemap variant config script must run once per environment. In subsequent deploys it's not needed: the sitemap regenerates automatically via `drush ssg` and the metatags persist in DB.
+Los metatags de las 4 canvas_pages se editan desde el editor visual o
+con `drush config:set` directo.
 
 `/llms.txt` y `/llms-full.txt` son endpoints dinámicos servidos por `LlmsTxtController`. No requieren generación: leen DB en cada request con `CacheableResponse` tagueada (cache tags `canvas_page_list`, `node_list:project`, `node_list:note`) — la edición de cualquier proyecto, nota o canvas_page invalida el cache automáticamente.
 
@@ -569,7 +565,7 @@ ssh hostinger "cd \$DRUPAL_PATH/public_html && ./vendor/bin/drush php:script /tm
 
 `hostinger` es el alias SSH definido localmente (`~/.ssh/config` con `HostName`, `Port`, `User`, `IdentityFile`); `$DRUPAL_PATH` es la ruta al proyecto en el servidor (ver `secrets.HOSTINGER_PATH` en GitHub Secrets para el valor canónico). En la máquina del autor está exportado en `~/.zshrc` para evitar repetirlo.
 
-> Antes había un workflow `seed-content.yml` que hacía esto vía `workflow_dispatch`. Se eliminó en PR1 (2026-05-06) porque la mayoría de los scripts en `scripts/` eran one-shots ya aplicados, y PR2 (2026-05-07) terminó la limpieza: 49 scripts borrados, 4 supervivientes activos en `scripts/maintenance/`, 11 setup parked en `scripts/maintenance/setup/` (audit pendiente para borrarlos o migrarlos a recipe), 3 reusables convertidos a Drush commands en `MaintenanceCommands.php`, y 1 mutación de field config movida a `jalvarez_site_update_10001()`. Ejecutar puntualmente por SSH reduce la superficie de ataque (un workflow menos con `secrets.HOSTINGER_*`) y mantiene el flujo trivial.
+> Antes había un workflow `seed-content.yml` que hacía esto vía `workflow_dispatch`. Se eliminó en PR1 (2026-05-06) porque la mayoría de los scripts en `scripts/` eran one-shots ya aplicados. PR2 (2026-05-07) borró 49 scripts y movió 11 SETUP a `scripts/maintenance/setup/` parked pending audit. PR3c (2026-05-07) cerró la auditoría — los 11 SETUP scripts eran 100% reproducibles desde `config/sync/` (10 COVERED + 1 OBSOLETE) y se eliminaron. Estado final: 4 supervivientes activos en `scripts/maintenance/`, 3 Drush commands en `MaintenanceCommands.php`, 1 mutación de field config en `jalvarez_site_update_10001()`. Ejecutar puntualmente por SSH reduce la superficie de ataque (un workflow menos con `secrets.HOSTINGER_*`) y mantiene el flujo trivial.
 
 ### Sobre la portabilidad de IDs
 

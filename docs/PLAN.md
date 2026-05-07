@@ -3,12 +3,12 @@
 > Plan en ejecución autónoma. Marcas: ✅ hecho · ⏳ en curso · ⬜ pendiente.
 > Última actualización: 2026-05-02 (Pase WCAG 2.2 AA site-wide: focus-visible, prefers-reduced-motion, contraste --fg-dim, ARIA, touch targets)
 >
-> **Nota retrospectiva PR2 (2026-05-07):** las referencias a `scripts/X.php`
-> a lo largo de este documento son históricas. La reorganización fue:
-> · 49 scripts one-shot / diagnostic / duplicate borrados (ya aplicados en prod)
+> **Nota retrospectiva PR2 + PR3c (2026-05-07):** las referencias a `scripts/X.php`
+> a lo largo de este documento son históricas. Estado final tras la limpieza:
+> · 60 scripts borrados en total (49 one-shot/diagnostic/duplicate en PR2 +
+>   11 SETUP en PR3c tras confirmar que `config/sync` los reproduce 100%)
 > · 4 supervivientes activos en `scripts/maintenance/` (con README)
-> · 11 scripts SETUP en `scripts/maintenance/setup/` (audit pendiente; PR3)
-> · 3 reusables ahora son Drush commands en `MaintenanceCommands.php`
+> · 3 reusables son Drush commands en `MaintenanceCommands.php`
 >   (`drush jalvarez:audit-translations`, `pathauto-rebuild`, `test-wipe-guard`)
 > · 1 mutación de field config movida a `jalvarez_site_update_10001()`
 > · `lib/canvas-tree.inc.php` borrado junto con sus consumidores
