@@ -469,17 +469,36 @@ El workflow ya activa/desactiva maintenance automáticamente alrededor de cada d
 
 ---
 
-## 9b. GitHub Environment `production` (one-time setup)
+## 9b. GitHub Environment `production`
 
-`deploy.yml` declara `environment: production`. La primera vez que un push a `main` dispara el workflow, GitHub crea automáticamente el environment con ese nombre. Después, hay que ir a la UI a configurarlo:
+`deploy.yml` declara `environment: production`. La primera vez que un push a `main` dispara el workflow, GitHub crea automáticamente el environment con ese nombre.
 
-1. **Repo → Settings → Environments → production**
-2. **Required reviewers**: añadir al menos 1 (idealmente 2). Cada deploy queda en pausa hasta que un reviewer aprueba en la UI de Actions. Sin esto, cualquier merge a `main` despliega sin gate humano.
-3. **Wait timer** (opcional): 5–10 minutos. Da margen para cancelar (`gh run cancel`) si te das cuenta que el merge tenía un bug.
-4. **Deployment branches**: restringir a `main` solamente. Evita que alguien dispare deploy desde otra rama vía `workflow_dispatch`.
-5. **Mover los secrets**: hoy `secrets.HOSTINGER_*` y `secrets.DRUPAL_*` viven a nivel repo. Idealmente se mueven al environment (Settings → Environments → production → Environment secrets) — así sólo workflows con `environment: production` pueden leerlos. Si los mueves, asegúrate de copiar TODOS antes de eliminar las versiones del repo (de lo contrario el siguiente run falla).
+### Decisión actual: Nivel 0 (sin protection rules)
 
-`docs/DEPLOYMENT.md` y este checklist son la fuente de verdad — la configuración del Environment no se versiona en YAML, vive en GitHub.
+Para un sitio personal con un único developer, el environment se mantiene **sin** required reviewers, wait timer ni branch restrictions. Beneficios reales bajo este nivel:
+
+- Historial de deploys agrupado por environment en la UI de Actions.
+- URL `https://jalvarez.tech` clicable en cada run.
+
+Costo cero, fricción cero. Los secrets `HOSTINGER_*` y `DRUPAL_*` siguen viviendo a nivel repo (no se movieron al environment) — el `environment:` declarado en el YAML no fuerza nada en ese plano cuando no hay protection rules activas.
+
+### Si en el futuro querés subir a Nivel 1 (recomendado si entra otro dev)
+
+**Repo → Settings → Environments → production**
+
+1. ✅ **Wait timer**: 5 minutos. Da margen para `gh run cancel` si te das cuenta que el merge tenía un bug.
+2. ✅ **Deployment branches**: "Selected branches" → añadir `main`. Evita que alguien dispare deploy desde otra rama vía `workflow_dispatch`.
+
+Ambas reglas son no-disruptivas para single-dev.
+
+### Si en algún momento querés Nivel 2 (compliance posture)
+
+Sumar a los dos anteriores:
+
+3. **Required reviewers**: 1+ usuarios. Cada deploy queda en pausa hasta que alguien aprueba en la UI de Actions. Para single-dev esto significa aprobarte a vos mismo en cada deploy — sólo tiene sentido si hay otro reviewer.
+4. **Mover los secrets**: copiar `HOSTINGER_*` y `DRUPAL_*` desde repo-secrets a environment-secrets. Así sólo workflows con `environment: production` pueden leerlos. Cuidado: copiar **todos** antes de borrar los del repo, de lo contrario el siguiente run falla.
+
+La configuración del Environment no se versiona en YAML, vive en GitHub Settings — este checklist es la fuente de verdad.
 
 ---
 
