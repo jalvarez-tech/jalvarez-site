@@ -116,8 +116,11 @@ jobs:
     env:
       SIMPLETEST_DB: mysql://drupal:drupal@127.0.0.1:3306/drupal_test
       SIMPLETEST_BASE_URL: http://127.0.0.1:8080
-      BROWSERTEST_OUTPUT_DIRECTORY: /tmp
-      BROWSERTEST_OUTPUT_VERBOSE: 'false'
+      # Verbose mode dumps the offending HTML response under
+      # BROWSERTEST_OUTPUT_DIRECTORY when an assertion fails — we need it
+      # so the diagnostic step below can surface the body of any 500s.
+      BROWSERTEST_OUTPUT_DIRECTORY: /tmp/simpletest-output
+      BROWSERTEST_OUTPUT_VERBOSE: 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -141,13 +144,17 @@ jobs:
 
       - name: Start built-in PHP web server
         run: |
+          mkdir -p /tmp/simpletest-output
           php -S 127.0.0.1:8080 -t web web/.ht.router.php > /tmp/php-server.log 2>&1 &
           # Give the server a moment to bind. BrowserTestBase installs a
           # fresh Drupal in its own DB schema, so the docroot doesn't need
-          # to be pre-installed.
+          # to be pre-installed — but we DO need the server to respond to
+          # something before tests start (BrowserTestBase fails fast if
+          # the URL is unreachable).
           for i in 1 2 3 4 5; do
-            if curl -fsS -o /dev/null http://127.0.0.1:8080/ 2>/dev/null; then
-              echo "PHP server is up."
+            STATUS=$(curl -sko /dev/null -w "%{http_code}" http://127.0.0.1:8080/ 2>/dev/null || echo "000")
+            if [ "$STATUS" != "000" ]; then
+              echo "PHP server is up (HTTP $STATUS on /)."
               break
             fi
             sleep 1
@@ -155,3 +162,21 @@ jobs:
 
       - name: PHPUnit (Functional testsuite)
         run: web/vendor/bin/phpunit --testsuite jalvarez-functional --do-not-cache-result
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          echo "::group::PHP server log (/tmp/php-server.log)"
+          tail -n 200 /tmp/php-server.log 2>/dev/null || echo "(no log)"
+          echo "::endgroup::"
+
+          echo "::group::Simpletest output directory listing"
+          ls -la /tmp/simpletest-output/ 2>/dev/null || echo "(empty)"
+          echo "::endgroup::"
+
+          for f in /tmp/simpletest-output/*.html; do
+            [ -f "$f" ] || continue
+            echo "::group::$f (first 120 lines)"
+            head -120 "$f"
+            echo "::endgroup::"
+          done
