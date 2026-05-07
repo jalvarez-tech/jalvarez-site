@@ -1,6 +1,7 @@
 {# Card Proyecto #}
 {%- set h = hue|default(160) -%}
-<a class="project" href="{{ href|default('#') }}">
+{%- set _attrs = attributes|default(create_attribute()).addClass('project').setAttribute('href', href|default('#')) -%}
+<a{{ _attrs }}>
   {%- if cover_url -%}
     {# Real cover image — fills .project__media via object-fit: cover. #}
     <div class="project__media project__media--has-image">

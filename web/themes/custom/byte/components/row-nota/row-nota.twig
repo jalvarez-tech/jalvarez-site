@@ -1,11 +1,14 @@
 {# Row Nota #}
 {%- set hue = hue|default('green') -%}
-<a class="post post--nota" href="{{ href|default('#') }}">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['post', 'post--nota']).setAttribute('href', href|default('#')) -%}
+<a{{ _attrs }}>
   <div class="post__thumb post__thumb--{{ hue }}">
     {%- if glyph -%}
-      <svg class="post__glyph" width="22" height="22" aria-hidden="true">
-        <use href="/{{ active_theme_path() }}/icons.svg#i-{{ glyph }}"></use>
-      </svg>
+      {% include 'byte:icon' with {
+        name: glyph,
+        size: 22,
+        decorative_class: 'post__glyph',
+      } only %}
     {%- endif -%}
   </div>
   {%- if date %}<div class="post__date mono">{{ date }}</div>{% endif -%}

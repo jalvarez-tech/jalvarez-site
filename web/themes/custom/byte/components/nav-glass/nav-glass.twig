@@ -15,7 +15,8 @@
   current_page: 'Página actual',
   current_lang: 'Idioma actual',
 } -%}
-<header class="nav" data-nav-root>
+{%- set _attrs = attributes|default(create_attribute()).addClass('nav').setAttribute('data-nav-root', '') -%}
+<header{{ _attrs }}>
   <div class="nav__inner">
     <a class="brand" href="/{{ lang }}">
       <span class="brand__mark">{{ brand_initial|default('J') }}</span>
@@ -41,12 +42,8 @@
         </a>
 
         <button class="theme-toggle" type="button" aria-label="{{ i18n.toggle_theme }}" data-theme-toggle>
-          <svg class="theme-toggle__icon theme-toggle__icon--sun" width="16" height="16" aria-hidden="true" focusable="false">
-            <use href="/{{ active_theme_path() }}/icons.svg#i-sun"></use>
-          </svg>
-          <svg class="theme-toggle__icon theme-toggle__icon--moon" width="16" height="16" aria-hidden="true" focusable="false">
-            <use href="/{{ active_theme_path() }}/icons.svg#i-moon"></use>
-          </svg>
+          {% include 'byte:icon' with { name: 'sun',  decorative_class: 'theme-toggle__icon theme-toggle__icon--sun' } only %}
+          {% include 'byte:icon' with { name: 'moon', decorative_class: 'theme-toggle__icon theme-toggle__icon--moon' } only %}
         </button>
 
         {%- if show_lang_toggle|default(true) -%}
@@ -85,9 +82,7 @@
           aria-label="{{ i18n.close_menu }}"
           aria-controls="nav-drawer"
           data-nav-close>
-    <svg width="20" height="20" aria-hidden="true" focusable="false">
-      <use href="/{{ active_theme_path() }}/icons.svg#i-x"></use>
-    </svg>
+    {% include 'byte:icon' with { name: 'x', size: 20 } only %}
   </button>
   <nav class="nav-drawer__links" aria-label="{{ lang == 'en' ? 'Primary' : 'Principal' }}">
     {%- for l in links -%}
@@ -111,12 +106,8 @@
       {# Mobile theme toggle — same data-theme-toggle target as the desktop
          button so the existing nav.js click handler works for both. #}
       <button class="theme-toggle" type="button" aria-label="{{ i18n.toggle_theme }}" data-theme-toggle>
-        <svg class="theme-toggle__icon theme-toggle__icon--sun" width="16" height="16" aria-hidden="true" focusable="false">
-          <use href="/{{ active_theme_path() }}/icons.svg#i-sun"></use>
-        </svg>
-        <svg class="theme-toggle__icon theme-toggle__icon--moon" width="16" height="16" aria-hidden="true" focusable="false">
-          <use href="/{{ active_theme_path() }}/icons.svg#i-moon"></use>
-        </svg>
+        {% include 'byte:icon' with { name: 'sun',  decorative_class: 'theme-toggle__icon theme-toggle__icon--sun' } only %}
+        {% include 'byte:icon' with { name: 'moon', decorative_class: 'theme-toggle__icon theme-toggle__icon--moon' } only %}
       </button>
     </div>
   </div>

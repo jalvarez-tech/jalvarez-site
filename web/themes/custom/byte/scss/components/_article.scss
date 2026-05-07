@@ -168,6 +168,13 @@
     text-transform: uppercase;
   }
 
+  // Decorative glyph fallback when no featured media is set on a note —
+  // accent-coloured outline icon centered in the hero placeholder.
+  &__hero-glyph {
+    opacity: 0.5;
+    color: var(--accent);
+  }
+
   &__body {
     font-size: 19px;
     line-height: 1.7;

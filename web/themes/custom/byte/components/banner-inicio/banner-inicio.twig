@@ -5,7 +5,8 @@
  * right column with portrait + optional terminal card.
  */
 #}
-<section class="hero wrap">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['hero', 'wrap']) -%}
+<section{{ _attrs }}>
   <div class="hero__grid">
     <div>
       {%- if status -%}

@@ -32,7 +32,8 @@
   { label: else_4_label, href: else_4_href },
 ]|filter(l => l.label and l.href) -%}
 
-<div class="foot">
+{%- set _attrs = attributes|default(create_attribute()).addClass('foot') -%}
+<div{{ _attrs }}>
   <div class="wrap">
     <div class="foot-grid">
       {# Col 1 — pitch + availability #}

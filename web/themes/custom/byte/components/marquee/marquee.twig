@@ -4,7 +4,8 @@
   item_6, item_7, item_8, item_9
 ]|filter(v => v) -%}
 {%- if _items|length > 0 -%}
-<div class="marquee">
+{%- set _attrs = attributes|default(create_attribute()).addClass('marquee') -%}
+<div{{ _attrs }}>
   <div class="marquee__track">
     <span>
     {% for it in _items|merge(_items) %}

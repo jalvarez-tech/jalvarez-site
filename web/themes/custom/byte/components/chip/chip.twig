@@ -6,8 +6,7 @@
 #}
 {%- set tag = tag|default('span') -%}
 {%- set variant = variant|default('default') -%}
-{%- set classes = ['chip', variant == 'accent' ? 'chip--accent' : ''] -%}
-<{{ tag }}
-  class="{{ classes|filter(c => c)|join(' ') }}"
-  {%- if tag == 'a' and href %} href="{{ href }}"{% endif -%}
->{{ label }}</{{ tag }}>
+{%- set _attrs = attributes|default(create_attribute()).addClass('chip') -%}
+{%- if variant == 'accent' -%}{%- set _attrs = _attrs.addClass('chip--accent') -%}{%- endif -%}
+{%- if tag == 'a' and href -%}{%- set _attrs = _attrs.setAttribute('href', href) -%}{%- endif -%}
+<{{ tag }}{{ _attrs }}>{{ label }}</{{ tag }}>

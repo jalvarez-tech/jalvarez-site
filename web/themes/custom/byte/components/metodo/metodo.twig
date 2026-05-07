@@ -1,5 +1,6 @@
 {# Método — section header + steps slot. #}
-<section class="section wrap" id="process">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['section', 'wrap']).setAttribute('id', 'process') -%}
+<section{{ _attrs }}>
   <div class="section__head">
     <div>
       {%- if eyebrow_label -%}

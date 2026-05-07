@@ -1,14 +1,13 @@
 {# Value card — single value tile inside Como lo hago. #}
-<div class="value">
+{%- set _attrs = attributes|default(create_attribute()).addClass('value') -%}
+<div{{ _attrs }}>
   <div class="value__num">
     <span>{{ '%02d'|format(number|default(1)) }}</span>
     {%- if tag %}<span class="value__tag">/ {{ tag }}</span>{% endif -%}
   </div>
   {%- if icon -%}
     <div class="value__icon">
-      <svg width="32" height="32" aria-hidden="true">
-        <use href="/{{ active_theme_path() }}/icons.svg#i-{{ icon }}"></use>
-      </svg>
+      {% include 'byte:icon' with { name: icon, size: 32 } only %}
     </div>
   {%- endif -%}
   {%- if title %}<h3 class="value__title">{{ title }}</h3>{% endif -%}

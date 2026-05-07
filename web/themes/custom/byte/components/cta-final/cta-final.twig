@@ -4,7 +4,8 @@
  * CTA Final — closing band: title (with italic fragment), sub, two CTAs.
  */
 #}
-<section class="cta-band">
+{%- set _attrs = attributes|default(create_attribute()).addClass('cta-band') -%}
+<section{{ _attrs }}>
   <div class="wrap">
     {%- if title -%}
       <h2 class="cta-band__title">

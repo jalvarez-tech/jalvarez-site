@@ -1,5 +1,6 @@
 {# Case step card — numbered step inside §02 Enfoque #}
-<article class="case-step">
+{%- set _attrs = attributes|default(create_attribute()).addClass('case-step') -%}
+<article{{ _attrs }}>
   {%- if number is defined and number is not null -%}
     <div class="case-step__num">{{ number < 10 ? '0' ~ number : number }}</div>
   {%- endif -%}

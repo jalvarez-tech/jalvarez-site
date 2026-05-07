@@ -1,6 +1,7 @@
 {# Medidor — metric card #}
 {%- set v = variant|default('flat') -%}
-<div class="medidor medidor--{{ v }}">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['medidor', 'medidor--' ~ v]) -%}
+<div{{ _attrs }}>
   <div class="medidor__value">
     {{ value }}{% if unit %}<span class="medidor__unit">{{ unit }}</span>{% endif %}
   </div>

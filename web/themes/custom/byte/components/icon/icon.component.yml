@@ -1,0 +1,25 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Icon
+description: Inline SVG icon backed by the byte/icons.svg sprite. Replaces 11 ad-hoc <svg><use> markers across templates and components.
+status: experimental
+props:
+  type: object
+  required: [name]
+  properties:
+    name:
+      type: string
+      title: Icon slug
+      description: 'Slug from icons.manifest.json without the i- prefix (e.g. "share-2", "bookmark", "copy", "mail").'
+    size:
+      type: integer
+      title: Pixel size
+      description: 'Used for both width and height. Defaults to 16.'
+      default: 16
+    title:
+      type: string
+      title: Accessible label
+      description: 'When set, the SVG is exposed to assistive tech with role="img" + aria-label. Otherwise it is hidden with aria-hidden="true". Use this for stand-alone icons; leave empty for icons next to a visible text label.'
+    decorative_class:
+      type: string
+      title: Extra CSS class
+      description: 'Optional class added to the <svg> root for purely visual styling (e.g. opacity tweaks). For functional state, prefer passing attributes via {{ attributes }}.'

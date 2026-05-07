@@ -1,5 +1,6 @@
 {# Palabras de cliente — section wrapper + testimonials slot. #}
-<section class="section wrap">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['section', 'wrap']) -%}
+<section{{ _attrs }}>
   <div class="section__head">
     <div>
       {%- if eyebrow_label -%}

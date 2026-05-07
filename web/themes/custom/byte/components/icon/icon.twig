@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * Inline SVG icon backed by the byte/icons.svg sprite.
+ *
+ * Always emit `aria-hidden="true"` UNLESS a title is provided — that's the
+ * a11y-correct default for decorative icons (siblings of a visible text
+ * label). When a title is given, expose the icon as an image with
+ * role="img" + aria-label so screen readers announce it.
+ */
+#}
+{%- set _size = size|default(16) -%}
+{%- set _classes = ['byte-icon'] -%}
+{%- if decorative_class -%}{%- set _classes = _classes|merge([decorative_class]) -%}{%- endif -%}
+{%- set _attrs = attributes|default(create_attribute()).addClass(_classes).setAttribute('width', _size).setAttribute('height', _size) -%}
+{%- if title -%}
+  {%- set _attrs = _attrs.setAttribute('role', 'img').setAttribute('aria-label', title) -%}
+{%- else -%}
+  {%- set _attrs = _attrs.setAttribute('aria-hidden', 'true') -%}
+{%- endif -%}
+<svg{{ _attrs }}><use href="/{{ active_theme_path() }}/icons.svg#i-{{ name }}"></use></svg>

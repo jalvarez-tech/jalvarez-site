@@ -5,8 +5,9 @@
   { name: c3_name, value: c3_value, href: c3_href },
 ]|filter(c => c.name or c.value) -%}
 {%- set _steps = [step_1, step_2, step_3, step_4, step_5]|filter(s => s) -%}
+{%- set _attrs = attributes|default(create_attribute()).addClass('contact-side') -%}
 
-<aside class="contact-side">
+<aside{{ _attrs }}>
   {%- if _channels|length > 0 -%}
     <div class="contact-card">
       <h2 class="contact-card__title">{{ channels_label|default('Canales directos') }}</h2>
