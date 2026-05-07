@@ -6,7 +6,6 @@ namespace Drupal\jalvarez_site\Seo;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -43,8 +42,11 @@ class SeoResolver {
       return NULL;
     }
 
+    // ContentEntityInterface extends TranslatableInterface, so the API is
+    // always available — we just need to check whether the requested
+    // translation exists.
     $langcode = $this->languageManager->getCurrentLanguage()->getId();
-    if ($entity instanceof TranslatableInterface && $entity->hasTranslation($langcode)) {
+    if ($entity->hasTranslation($langcode)) {
       $translated = $entity->getTranslation($langcode);
       if ($translated instanceof ContentEntityInterface) {
         $entity = $translated;

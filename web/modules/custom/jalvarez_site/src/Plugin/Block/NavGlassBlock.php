@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   admin_label: new TranslatableMarkup('Byte top navigation'),
   category: new TranslatableMarkup('Jalvarez'),
 )]
-class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInterface {
+final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
 
@@ -47,8 +47,8 @@ class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInterface
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
-    return new self(
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,

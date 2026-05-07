@@ -1,7 +1,9 @@
 parameters:
-    # Level 2 is the Drupal contrib baseline. Higher levels are achievable
-    # but need a cleanup pass on the procedural .module hooks first.
-    level: 2
+    # Level 5 = full argument + return type checks + dead-code detection +
+    # instanceof validation. We tried level 6 (missing typehints) but it
+    # would require typing every Drupal render array (~45 violations) for
+    # cosmetic gain only — not a useful tradeoff for a site this size.
+    level: 5
 
     paths:
         - web/modules/custom
