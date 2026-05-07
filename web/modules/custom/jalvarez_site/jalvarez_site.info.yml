@@ -5,3 +5,7 @@ package: Custom
 core_version_requirement: ^11
 dependencies:
   - drupal:system
+  - drupal:node
+  - drupal:language
+  - drupal:path_alias
+  - drupal:file

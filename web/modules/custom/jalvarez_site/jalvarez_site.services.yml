@@ -13,3 +13,33 @@ services:
     arguments: ['@jalvarez_site.llms_txt_builder']
     tags:
       - { name: event_subscriber }
+
+  jalvarez_site.seo_resolver:
+    class: Drupal\jalvarez_site\Seo\SeoResolver
+    arguments:
+      - '@current_route_match'
+      - '@language_manager'
+      - '@request_stack'
+      - '@file_url_generator'
+
+  jalvarez_site.seo_renderer:
+    class: Drupal\jalvarez_site\Seo\SeoRenderer
+    arguments: ['@jalvarez_site.seo_resolver']
+
+  # OOP hook implementations (Drupal 11 #[Hook] attribute). Declared as
+  # services so the container injects their dependencies; HookCollectorPass
+  # picks up the #[Hook] attributes and routes the calls.
+  Drupal\jalvarez_site\Hook\PageAttachmentsHook:
+    arguments: ['@current_route_match', '@jalvarez_site.seo_renderer']
+
+  Drupal\jalvarez_site\Hook\MetatagsHook:
+    arguments: ['@jalvarez_site.seo_resolver']
+
+  Drupal\jalvarez_site\Hook\CanvasPageHook:
+    arguments: ['@entity_type.manager', '@logger.channel.jalvarez_site']
+
+  Drupal\jalvarez_site\Hook\PathautoHook: {}
+
+  logger.channel.jalvarez_site:
+    parent: logger.channel_base
+    arguments: ['jalvarez_site']
