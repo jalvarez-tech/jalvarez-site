@@ -440,9 +440,46 @@ github: deploy → drush cim -y aplica la config en producción
 
 ### Rollback
 
+Hay tres mecanismos, en orden de granularidad:
+
+**1. Revertir el commit (rollback rápido — preserva la DB):**
 ```
 git revert <hash> && git push   # CI re-deploya el estado previo
 ```
+Esto sólo revierte código (rsync), no toca la DB. Si el problema es código, basta con esto. Si el problema es una migración de DB rota, hace falta el siguiente paso también.
+
+**2. Restaurar la DB desde el snapshot pre-deploy (rollback de datos):**
+Cada deploy genera un dump gzipped en `~/db-snapshots/jalvarez-pre-deploy-<timestamp>.sql.gz` ANTES de correr `drush updb`. Se rotan automáticamente — quedan los últimos 5. Para restaurar:
+```bash
+ssh hostinger
+cd $HOSTINGER_PATH/public_html
+ls -1t ~/db-snapshots/jalvarez-pre-deploy-*.sql.gz | head -5  # ver opciones
+SNAPSHOT=~/db-snapshots/jalvarez-pre-deploy-20260507-031500.sql.gz
+gunzip < $SNAPSHOT | ./vendor/bin/drush sqlc
+./vendor/bin/drush cr
+```
+
+**3. Maintenance mode manual** (cuando necesitas oscurecer el sitio fuera de un deploy):
+```bash
+ssh hostinger "cd \$HOSTINGER_PATH/public_html && ./vendor/bin/drush state:set system.maintenance_mode 1 --input-format=integer && ./vendor/bin/drush cr"
+# … investiga / repara …
+ssh hostinger "cd \$HOSTINGER_PATH/public_html && ./vendor/bin/drush state:set system.maintenance_mode 0 --input-format=integer && ./vendor/bin/drush cr"
+```
+El workflow ya activa/desactiva maintenance automáticamente alrededor de cada deploy — sólo necesitas estos comandos para escenarios manuales.
+
+---
+
+## 9b. GitHub Environment `production` (one-time setup)
+
+`deploy.yml` declara `environment: production`. La primera vez que un push a `main` dispara el workflow, GitHub crea automáticamente el environment con ese nombre. Después, hay que ir a la UI a configurarlo:
+
+1. **Repo → Settings → Environments → production**
+2. **Required reviewers**: añadir al menos 1 (idealmente 2). Cada deploy queda en pausa hasta que un reviewer aprueba en la UI de Actions. Sin esto, cualquier merge a `main` despliega sin gate humano.
+3. **Wait timer** (opcional): 5–10 minutos. Da margen para cancelar (`gh run cancel`) si te das cuenta que el merge tenía un bug.
+4. **Deployment branches**: restringir a `main` solamente. Evita que alguien dispare deploy desde otra rama vía `workflow_dispatch`.
+5. **Mover los secrets**: hoy `secrets.HOSTINGER_*` y `secrets.DRUPAL_*` viven a nivel repo. Idealmente se mueven al environment (Settings → Environments → production → Environment secrets) — así sólo workflows con `environment: production` pueden leerlos. Si los mueves, asegúrate de copiar TODOS antes de eliminar las versiones del repo (de lo contrario el siguiente run falla).
+
+`docs/DEPLOYMENT.md` y este checklist son la fuente de verdad — la configuración del Environment no se versiona en YAML, vive en GitHub.
 
 ---
 

@@ -17,6 +17,16 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # Pin this job to the `production` GitHub Environment. The Environment
+    # is what holds `secrets.HOSTINGER_*` and (once configured in the repo
+    # Settings → Environments → production) any required reviewers,
+    # deployment branch restrictions and wait timer. Configuring required
+    # reviewers there means a deploy can't go out without an explicit
+    # human approval click — see docs/DEPLOYMENT.md § GitHub Environment
+    # for the one-time setup checklist.
+    environment:
+      name: production
+      url: https://jalvarez.tech
     env:
       THEME_DIR: web/themes/custom/byte
     steps:
@@ -164,6 +174,51 @@ jobs:
               echo '→ Removing legacy ~/config (now lives at public_html/config)'
               rm -rf ${{ secrets.HOSTINGER_PATH }}/config
             fi
+          "
+
+      # ───── Pre-deploy safety: DB snapshot + maintenance mode ─────
+      # Both steps no-op on a brand-new server where the site isn't installed
+      # yet (drush bootstrap != Successful). On every subsequent deploy:
+      #   1. A gzipped DB dump is written to ~/db-snapshots/ on the server
+      #      and rotated to keep the latest 5. If a `drush updb` later in
+      #      this workflow corrupts the DB, you can `gunzip < snapshot.sql.gz
+      #      | drush sqlc` to roll back to a known-good state.
+      #   2. Maintenance mode is enabled so users see Drupal's maintenance
+      #      page (cached HTML) instead of half-deployed code or a 5xx while
+      #      rsync rewrites the docroot. It's flipped off again after the
+      #      smoke test below — and on workflow failure (`if: always()`),
+      #      so a broken deploy doesn't leave the site permanently dark.
+      - name: Pre-deploy DB snapshot (rotated, keep last 5)
+        run: |
+          ssh hostinger "
+            set -e
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            if ! ./vendor/bin/drush status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+              echo '⚠ Site not installed — skipping snapshot.'
+              exit 0
+            fi
+            mkdir -p ${{ secrets.HOSTINGER_PATH }}/db-snapshots
+            SNAPSHOT=${{ secrets.HOSTINGER_PATH }}/db-snapshots/jalvarez-pre-deploy-\$(date +%Y%m%d-%H%M%S).sql.gz
+            ./vendor/bin/drush sql:dump --gzip --result-file=- > \$SNAPSHOT
+            echo \"  ✓ Snapshot: \$SNAPSHOT (\$(du -h \$SNAPSHOT | cut -f1))\"
+            ls -1t ${{ secrets.HOSTINGER_PATH }}/db-snapshots/jalvarez-pre-deploy-*.sql.gz | tail -n +6 | xargs -r rm -f
+            echo '  ✓ Rotation done — keeping latest 5 snapshots.'
+          "
+
+      - name: Enable maintenance mode
+        id: maintenance
+        run: |
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            if ! ./vendor/bin/drush status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+              echo '⚠ Site not installed — skipping maintenance flag.'
+              exit 0
+            fi
+            ./vendor/bin/drush state:set system.maintenance_mode 1 --input-format=integer
+            ./vendor/bin/drush cr
+            echo '  ✓ Maintenance mode ON'
           "
 
       # ───── Deploy: 2 rsync passes ─────
@@ -347,6 +402,27 @@ jobs:
             exit 1
           fi
           echo "✓ All smoke checks passed."
+
+      # Always disable maintenance mode at the end, even on workflow
+      # failure. Without `if: always()`, a failed `cim` would leave the
+      # site permanently dark until someone SSH'd in to flip the flag.
+      # `steps.maintenance.outcome == 'success'` makes sure we only
+      # try to disable when we actually enabled it (skips the case
+      # where the site wasn't installed and the enable step no-op'd).
+      - name: Disable maintenance mode
+        if: always() && steps.maintenance.outcome == 'success'
+        run: |
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            if ! ./vendor/bin/drush status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+              echo '⚠ Site not bootstrapping — leaving maintenance flag as-is for manual triage.'
+              exit 0
+            fi
+            ./vendor/bin/drush state:set system.maintenance_mode 0 --input-format=integer
+            ./vendor/bin/drush cr
+            echo '  ✓ Maintenance mode OFF'
+          " || echo '⚠ Could not disable maintenance — flip it manually with: drush state:set system.maintenance_mode 0'
 
       # ───── Post-deploy: re-harden permissions (only if SSH was set up) ─────
       - name: Re-harden remote permissions
