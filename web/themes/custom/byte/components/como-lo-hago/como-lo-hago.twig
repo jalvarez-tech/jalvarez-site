@@ -5,7 +5,8 @@
  * controller via the `values` slot).
  */
 #}
-<section class="section wrap" id="value">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['section', 'wrap']).setAttribute('id', 'value') -%}
+<section{{ _attrs }}>
   <div class="section__head">
     <div>
       {%- if eyebrow_label -%}

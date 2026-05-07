@@ -11,6 +11,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\jalvarez_site\BrandConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -49,18 +50,6 @@ final class FooterBlock extends BlockBase implements ContainerFactoryPluginInter
       $container->get('language_manager'),
     );
   }
-
-  /**
-   * Brand contact info (language-independent — values, not labels).
-   *
-   * If these ever change, update here AND in canal-directo.twig defaults.
-   */
-  private const BRAND = [
-    'email' => 'contacto@jalvarez.tech',
-    'phone' => '+57 312 801 4078',
-    'phone_tel' => '+573128014078',
-    'whatsapp' => 'https://wa.link/fb2acg',
-  ];
 
   /**
    * Per-language footer copy.
@@ -130,12 +119,12 @@ final class FooterBlock extends BlockBase implements ContainerFactoryPluginInter
 
       // Col 3 — contact (labels translated, values from BRAND)
       'contact_label' => $lang_data['contact_label'],
-      'contact_1_label' => self::BRAND['email'],
-      'contact_1_href'  => 'mailto:' . self::BRAND['email'],
-      'contact_2_label' => self::BRAND['phone'],
-      'contact_2_href'  => 'tel:' . self::BRAND['phone_tel'],
+      'contact_1_label' => BrandConfig::EMAIL,
+      'contact_1_href'  => 'mailto:' . BrandConfig::EMAIL,
+      'contact_2_label' => BrandConfig::PHONE,
+      'contact_2_href'  => 'tel:' . BrandConfig::PHONE_TEL,
       'contact_3_label' => $lang_data['whatsapp_label'],
-      'contact_3_href'  => self::BRAND['whatsapp'],
+      'contact_3_href'  => BrandConfig::WHATSAPP_LINK,
 
       // Col 4 — elsewhere.
       'elsewhere_label' => $lang_data['elsewhere_label'],

@@ -17,6 +17,10 @@ block.settings.jalvarez_projects_grid:
           - grid
           - none
 
+# Block plugins below have no custom block-level settings (no
+# defaultConfiguration() override + no blockForm()). Drupal still requires
+# a typed schema entry for every block.settings.<plugin_id> config tree,
+# otherwise `drush cim` warns about "missing schema for ...".
 block.settings.jalvarez_notes_grid:
   type: block_settings
   label: 'Notas — list (byte rows)'
@@ -25,4 +29,9 @@ block.settings.jalvarez_notes_grid:
 block.settings.jalvarez_nav_glass:
   type: block_settings
   label: 'Byte top navigation'
+  mapping: {}
+
+block.settings.jalvarez_footer:
+  type: block_settings
+  label: 'Byte site footer'
   mapping: {}

@@ -1,5 +1,6 @@
 {# Card Testimonio #}
-<div class="test">
+{%- set _attrs = attributes|default(create_attribute()).addClass('test') -%}
+<div{{ _attrs }}>
   <p class="test__quote">{{ quote }}</p>
   <div class="test__attr">
     {%- if initials %}<div class="test__avatar">{{ initials }}</div>{% endif -%}

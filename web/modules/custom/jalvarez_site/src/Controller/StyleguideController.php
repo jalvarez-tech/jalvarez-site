@@ -8,19 +8,40 @@ use Drupal\Core\Controller\ControllerBase;
 
 /**
  * Renders a styleguide of byte SDC components for visual QA.
+ *
+ * Internal admin-only tool (`administer site configuration` permission, see
+ * routing.yml). The chrome strings (h1 + lede) go through t() for
+ * consistency; the SDC sample content (banner copy, chip labels, CTA copy)
+ * is intentionally hardcoded ES — it's representative content used to
+ * eyeball the components, not user-facing UI to translate.
  */
-class StyleguideController extends ControllerBase {
+final class StyleguideController extends ControllerBase {
 
+  /**
+   * Top-level styleguide route.
+   */
   public function index(): array {
-    $build = [];
-
-    // Header.
-    $build['header'] = [
-      '#markup' => '<div class="wrap" style="padding-top:56px;padding-bottom:24px;"><h1 style="font-family:var(--f-display);font-size:42px;font-weight:500;letter-spacing:-0.03em;margin:0 0 8px;">Byte styleguide</h1><p style="font-family:var(--f-mono);font-size:13px;color:var(--fg-muted);">Phase E components — visual QA only.</p></div>',
+    return [
+      'header'     => $this->headerSection(),
+      'hero'       => $this->heroSample(),
+      'primitives' => $this->primitivesSample(),
+      'cta'        => $this->ctaSample(),
     ];
+  }
 
-    // Hero (banner-inicio)
-    $build['hero'] = [
+  private function headerSection(): array {
+    $title = $this->t('Byte styleguide');
+    $lede = $this->t('Phase E components — visual QA only.');
+    return [
+      '#markup' => '<div class="wrap" style="padding-top:56px;padding-bottom:24px;">'
+      . '<h1 style="font-family:var(--f-display);font-size:42px;font-weight:500;letter-spacing:-0.03em;margin:0 0 8px;">' . $title . '</h1>'
+      . '<p style="font-family:var(--f-mono);font-size:13px;color:var(--fg-muted);">' . $lede . '</p>'
+      . '</div>',
+    ];
+  }
+
+  private function heroSample(): array {
+    return [
       '#type' => 'component',
       '#component' => 'byte:banner-inicio',
       '#props' => [
@@ -43,9 +64,10 @@ class StyleguideController extends ControllerBase {
         ],
       ],
     ];
+  }
 
-    // Section + chip + button samples.
-    $build['primitives'] = [
+  private function primitivesSample(): array {
+    return [
       '#type' => 'component',
       '#component' => 'byte:section',
       '#props' => [
@@ -58,26 +80,10 @@ class StyleguideController extends ControllerBase {
       'samples' => [
         '#prefix' => '<div class="wrap" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:24px;">',
         '#suffix' => '</div>',
-        'chip1' => [
-          '#type' => 'component',
-          '#component' => 'byte:chip',
-          '#props' => ['label' => 'WordPress', 'variant' => 'accent'],
-        ],
-        'chip2' => [
-          '#type' => 'component',
-          '#component' => 'byte:chip',
-          '#props' => ['label' => '2025'],
-        ],
-        'chip3' => [
-          '#type' => 'component',
-          '#component' => 'byte:chip',
-          '#props' => ['label' => 'Drupal 11', 'variant' => 'accent'],
-        ],
-        'chip4' => [
-          '#type' => 'component',
-          '#component' => 'byte:chip',
-          '#props' => ['label' => 'Performance'],
-        ],
+        'chip1' => $this->chip('WordPress', 'accent'),
+        'chip2' => $this->chip('2025'),
+        'chip3' => $this->chip('Drupal 11', 'accent'),
+        'chip4' => $this->chip('Performance'),
         'btn1' => [
           '#type' => 'component',
           '#component' => 'byte:button',
@@ -95,9 +101,10 @@ class StyleguideController extends ControllerBase {
         ],
       ],
     ];
+  }
 
-    // CTA final.
-    $build['cta'] = [
+  private function ctaSample(): array {
+    return [
       '#type' => 'component',
       '#component' => 'byte:cta-final',
       '#props' => [
@@ -110,8 +117,18 @@ class StyleguideController extends ControllerBase {
         'secondary_href' => '/proyectos',
       ],
     ];
+  }
 
-    return $build;
+  private function chip(string $label, ?string $variant = NULL): array {
+    $props = ['label' => $label];
+    if ($variant !== NULL) {
+      $props['variant'] = $variant;
+    }
+    return [
+      '#type' => 'component',
+      '#component' => 'byte:chip',
+      '#props' => $props,
+    ];
   }
 
 }

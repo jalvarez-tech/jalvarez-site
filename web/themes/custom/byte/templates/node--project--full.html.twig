@@ -19,60 +19,27 @@
 #}
 {% set lang = node.get('langcode').value|default('es') %}
 
-{# Per-page WhatsApp deep link: open the chat pre-filled with a message
-   that names the case study the visitor was just reading, so the lead
+{# Per-language URL aliases — these are NOT strings to localize via Locale,
+   they're the canonical paths configured on the bundle. Everything else
+   (UI labels, section headings) goes through |trans so the strings are
+   extractable to .po. #}
+{% set back_path = lang == 'en' ? '/projects' : '/proyectos' %}
+{% set cta_secondary_path = lang == 'en' ? '/projects' : '/proyectos' %}
+
+{# Per-page WhatsApp deep link: opens the chat pre-filled with a message
+   naming the case study the visitor was just reading, so the lead
    arrives with context ("vi el caso X") instead of a generic ping. The
-   message text is kept here (not in the cta-final config) because it
-   needs the project's label, which is only known at render time. #}
-{%- set _wa_phone = '573128014078' -%}
+   phone number lives in the global `brand` variable injected by
+   hook_preprocess_node (see jalvarez_site.module). The message body is
+   templated here because it depends on the project's label. #}
 {%- set _wa_msg = lang == 'en'
   ? 'Hi John, I saw the «' ~ node.label ~ '» case study on jalvarez.tech and I\'d like something similar for my project.'
   : 'Hola John, vi el caso «' ~ node.label ~ '» en jalvarez.tech y quiero algo similar para mi proyecto.'
 -%}
-{%- set _wa_href = 'https://wa.me/' ~ _wa_phone ~ '?text=' ~ _wa_msg|url_encode -%}
-
-{% set i18n = lang == 'en' ? {
-  back: '← Back to projects',
-  back_path: '/projects',
-  rol: 'Role',
-  year: 'Year',
-  duration: 'Duration',
-  stack: 'Stack',
-  live: 'Live',
-  visit: 'Visit ↗',
-  s1: '§ 01 Challenge',
-  s2: '§ 02 Approach',
-  s2_title: 'How I tackled it',
-  s3: '§ 03 Results',
-  s3_title: 'What happened next',
-  s4: '§ 04 Lesson',
-  cta_primary: 'Start your project',
-  cta_primary_href: _wa_href,
-  cta_secondary: 'See more projects',
-  cta_secondary_path: '/projects',
-} : {
-  back: '← Volver a proyectos',
-  back_path: '/proyectos',
-  rol: 'Rol',
-  year: 'Año',
-  duration: 'Duración',
-  stack: 'Stack',
-  live: 'Live',
-  visit: 'Visitar ↗',
-  s1: '§ 01 Desafío',
-  s2: '§ 02 Enfoque',
-  s2_title: 'Cómo lo abordé',
-  s3: '§ 03 Resultados',
-  s3_title: 'Lo que pasó después',
-  s4: '§ 04 Aprendizaje',
-  cta_primary: 'Iniciar tu proyecto',
-  cta_primary_href: _wa_href,
-  cta_secondary: 'Ver más proyectos',
-  cta_secondary_path: '/proyectos',
-} %}
+{%- set _wa_href = 'https://wa.me/' ~ brand.whatsapp_phone ~ '?text=' ~ _wa_msg|url_encode -%}
 
 <article class="case wrap">
-  <a class="case-back" href="/{{ lang }}{{ i18n.back_path }}">{{ i18n.back }}</a>
+  <a class="case-back" href="/{{ lang }}{{ back_path }}">{{ '← Back to projects'|trans({}, {'context': 'jalvarez_site'}) }}</a>
 
   {%- set _cover_url = '' -%}
   {%- set _cover_alt = '' -%}
@@ -106,19 +73,19 @@
 
       <dl class="case-meta">
         {% if not node.field_role.isEmpty %}
-          <div><dt class="case-meta__k">{{ i18n.rol }}</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
+          <div><dt class="case-meta__k">{{ 'Role'|trans({}, {'context': 'jalvarez_site'}) }}</dt><dd class="case-meta__v">{{ node.field_role.value }}</dd></div>
         {% endif %}
         {% if not node.field_project_year.isEmpty %}
-          <div><dt class="case-meta__k">{{ i18n.year }}</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
+          <div><dt class="case-meta__k">{{ 'Year'|trans({}, {'context': 'jalvarez_site'}) }}</dt><dd class="case-meta__v">{{ node.field_project_year.value }}</dd></div>
         {% endif %}
         {% if not node.field_duration.isEmpty %}
-          <div><dt class="case-meta__k">{{ i18n.duration }}</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
+          <div><dt class="case-meta__k">{{ 'Duration'|trans({}, {'context': 'jalvarez_site'}) }}</dt><dd class="case-meta__v">{{ node.field_duration.value }}</dd></div>
         {% endif %}
         {% if node.field_primary_technology.entity %}
-          <div><dt class="case-meta__k">{{ i18n.stack }}</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
+          <div><dt class="case-meta__k">{{ 'Stack'|trans({}, {'context': 'jalvarez_site'}) }}</dt><dd class="case-meta__v">{{ node.field_primary_technology.entity.label }}</dd></div>
         {% endif %}
         {% if not node.field_external_url.isEmpty %}
-          <div><dt class="case-meta__k">{{ i18n.live }}</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default(i18n.visit) }}</a></dd></div>
+          <div><dt class="case-meta__k">{{ 'Live'|trans({}, {'context': 'jalvarez_site'}) }}</dt><dd class="case-meta__v"><a class="case-meta__link" href="{{ node.field_external_url.uri }}" target="_blank" rel="noopener">{{ node.field_external_url.title|default('Visit ↗'|trans({}, {'context': 'jalvarez_site'})) }}</a></dd></div>
         {% endif %}
       </dl>
     </div>
@@ -136,7 +103,7 @@
   {# §01 Desafío #}
   {% if not node.field_challenge_intro.isEmpty or not node.field_challenge_bullets.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">{{ i18n.s1 }}</div>
+      <div class="case-section__num">{{ '§ 01 Challenge'|trans({}, {'context': 'jalvarez_site'}) }}</div>
       {% if not node.field_challenge_intro.isEmpty %}
         <p class="case-section__lede">{{ node.field_challenge_intro.value }}</p>
       {% endif %}
@@ -153,8 +120,8 @@
   {# §02 Enfoque (case_step paragraphs) #}
   {% if not node.field_approach_steps.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">{{ i18n.s2 }}</div>
-      <h2 class="case-section__title">{{ i18n.s2_title }}</h2>
+      <div class="case-section__num">{{ '§ 02 Approach'|trans({}, {'context': 'jalvarez_site'}) }}</div>
+      <h2 class="case-section__title">{{ 'How I tackled it'|trans({}, {'context': 'jalvarez_site'}) }}</h2>
       <div class="case-steps">
         {% for delta, item in node.field_approach_steps %}
           {%- set step = item.entity -%}
@@ -179,8 +146,8 @@
   {# §03 Resultados (metric paragraphs + embedded testimonial) #}
   {% if not node.field_results_metrics.isEmpty or not node.field_testimonial_embed.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">{{ i18n.s3 }}</div>
-      <h2 class="case-section__title">{{ i18n.s3_title }}</h2>
+      <div class="case-section__num">{{ '§ 03 Results'|trans({}, {'context': 'jalvarez_site'}) }}</div>
+      <h2 class="case-section__title">{{ 'What happened next'|trans({}, {'context': 'jalvarez_site'}) }}</h2>
 
       {% if not node.field_results_metrics.isEmpty %}
         <div class="medidores">
@@ -223,7 +190,7 @@
   {# §04 Aprendizaje #}
   {% if not node.field_lesson.isEmpty %}
     <section class="case-section">
-      <div class="case-section__num">{{ i18n.s4 }}</div>
+      <div class="case-section__num">{{ '§ 04 Lesson'|trans({}, {'context': 'jalvarez_site'}) }}</div>
       <p class="case-section__body">{{ node.field_lesson.value }}</p>
     </section>
   {% endif %}
@@ -234,9 +201,9 @@
   {% include 'byte:cta-final' with {
     title: node.field_cta_heading.value,
     sub: node.field_cta_sub.value,
-    primary_label: i18n.cta_primary,
-    primary_href: i18n.cta_primary_href,
-    secondary_label: i18n.cta_secondary,
-    secondary_href: '/' ~ lang ~ i18n.cta_secondary_path,
+    primary_label: 'Start your project'|trans({}, {'context': 'jalvarez_site'}),
+    primary_href: _wa_href,
+    secondary_label: 'See more projects'|trans({}, {'context': 'jalvarez_site'}),
+    secondary_href: '/' ~ lang ~ cta_secondary_path,
   } only %}
 {% endif %}

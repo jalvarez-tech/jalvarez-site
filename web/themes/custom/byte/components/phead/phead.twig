@@ -1,5 +1,6 @@
 {# Page header #}
-<section class="phead wrap">
+{%- set _attrs = attributes|default(create_attribute()).addClass(['phead', 'wrap']) -%}
+<section{{ _attrs }}>
   {%- if eyebrow_main or eyebrow_aside -%}
     <div class="phead__eyebrow">
       {%- if eyebrow_main %}<span>{{ eyebrow_main }}</span>{% endif -%}

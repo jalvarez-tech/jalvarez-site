@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\jalvarez_site\Seo;
 
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\jalvarez_site\BrandConfig;
 use Drupal\node\NodeInterface;
 
 /**
@@ -151,8 +152,8 @@ class SeoRenderer {
       'alternateName' => 'JSA',
       'url' => $base . '/',
       'jobTitle' => 'Senior Web Specialist',
-      'email' => 'mailto:contacto@jalvarez.tech',
-      'telephone' => '+57 312 801 4078',
+      'email' => 'mailto:' . BrandConfig::EMAIL,
+      'telephone' => BrandConfig::PHONE,
       'address' => [
         '@type' => 'PostalAddress',
         'addressLocality' => 'Medellín',

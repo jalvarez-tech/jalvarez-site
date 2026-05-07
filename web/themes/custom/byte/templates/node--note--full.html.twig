@@ -5,46 +5,36 @@
  */
 #}
 {% set lang = node.get('langcode').value|default('es') %}
-{% set i18n = lang == 'en' ? {
-  back: '← Back to writing',
-  back_path: '/notes',
-  role: 'Senior Web Specialist · jalvarez.tech',
-  share: 'Share',
-  save: 'Save',
-  copy: 'Copy link',
-  hero_alt: 'Featured image',
-} : {
-  back: '← Volver a notas',
-  back_path: '/notas',
-  role: 'Senior Web Specialist · jalvarez.tech',
-  share: 'Compartir',
-  save: 'Guardar',
-  copy: 'Copiar enlace',
-  hero_alt: 'Imagen destacada',
-} %}
+
+{# Per-language path segments aren't strings to translate via locale —
+   they're the canonical aliases configured on the node bundle.
+   Everything else goes through |trans so the strings land in the
+   .po extraction pipeline. #}
+{% set back_path = lang == 'en' ? '/notes' : '/notas' %}
 
 {# Read time estimate #}
 {% set body_text = node.body.value|default('')|striptags %}
 {% set words = body_text|split(' ')|length %}
 {% set read_min = max(1, (words / 200)|round(0, 'ceil')) %}
 
-{# Format date #}
+{# Format date — Drupal's |format_date doesn't expose abbreviated months
+   on the default formats, so we still build the abbreviation locally. #}
 {% set raw_date = node.field_publish_date.value %}
-{% set months_es = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'] %}
-{% set months_en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
 {% set date_str = '' %}
 {% if raw_date %}
   {% set parts = raw_date|split('-') %}
   {% if parts|length >= 3 %}
     {% set m = (parts[1]|number_format) - 1 %}
-    {% set month = lang == 'en' ? months_en[m] : months_es[m] %}
-    {% set date_str = month ~ ' ' ~ parts[2] ~ ', ' ~ parts[0] %}
+    {% set months = lang == 'en'
+      ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      : ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'] %}
+    {% set date_str = months[m] ~ ' ' ~ parts[2] ~ ', ' ~ parts[0] %}
   {% endif %}
 {% endif %}
 
 <article class="article">
   <div class="article__wrap">
-    <a class="article__back" href="/{{ lang }}{{ i18n.back_path }}">{{ i18n.back }}</a>
+    <a class="article__back" href="/{{ lang }}{{ back_path }}">{{ '← Back to writing'|trans({}, {'context': 'jalvarez_site'}) }}</a>
 
     <header class="article__head">
       <div class="article__tags">
@@ -70,18 +60,18 @@
           <div class="article__avatar">JA</div>
           <div>
             <div class="article__author-name">John Stevans Alvarez</div>
-            <div class="article__author-role">{{ i18n.role }}</div>
+            <div class="article__author-role">{{ 'Senior Web Specialist · jalvarez.tech'|trans({}, {'context': 'jalvarez_site'}) }}</div>
           </div>
         </div>
         <div class="article__actions">
-          <button class="article__action" aria-label="{{ i18n.share }}" type="button">
-            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-share-2"></use></svg>
+          <button class="article__action" aria-label="{{ 'Share'|trans({}, {'context': 'jalvarez_site'}) }}" type="button">
+            {% include 'byte:icon' with { name: 'share-2' } only %}
           </button>
-          <button class="article__action" aria-label="{{ i18n.save }}" type="button">
-            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-bookmark"></use></svg>
+          <button class="article__action" aria-label="{{ 'Save'|trans({}, {'context': 'jalvarez_site'}) }}" type="button">
+            {% include 'byte:icon' with { name: 'bookmark' } only %}
           </button>
-          <button class="article__action" aria-label="{{ i18n.copy }}" type="button">
-            <svg width="16" height="16" aria-hidden="true"><use href="/{{ active_theme_path() }}/icons.svg#i-copy"></use></svg>
+          <button class="article__action" aria-label="{{ 'Copy link'|trans({}, {'context': 'jalvarez_site'}) }}" type="button">
+            {% include 'byte:icon' with { name: 'copy' } only %}
           </button>
         </div>
       </div>
@@ -93,7 +83,11 @@
       </div>
     {% else %}
       <div class="article__hero">{% if node.field_thumb_glyph.value %}
-        <svg width="80" height="80" aria-hidden="true" style="opacity:.5;color:var(--accent);"><use href="/{{ active_theme_path() }}/icons.svg#i-{{ node.field_thumb_glyph.value }}"></use></svg>
+        {% include 'byte:icon' with {
+          name: node.field_thumb_glyph.value,
+          size: 80,
+          decorative_class: 'article__hero-glyph',
+        } only %}
       {% endif %}</div>
     {% endif %}
 
