@@ -358,6 +358,31 @@ jobs:
             fi
           "
 
+      # Disable maintenance mode BEFORE the smoke test — otherwise the
+      # smoke test's HTTPS GET hits Drupal's maintenance page (HTTP 503)
+      # and fails the workflow even though the deploy succeeded.
+      #
+      # `if: always()` so this still fires when Drupal post-deploy
+      # failed: better to leave the site reachable (and let the smoke
+      # test surface the breakage) than to leave it permanently dark
+      # until someone SSH'd in to flip the flag.
+      # `steps.maintenance.outcome == 'success'` skips the disable when
+      # we never enabled it (uninstalled site / first deploy).
+      - name: Disable maintenance mode
+        if: always() && steps.maintenance.outcome == 'success'
+        run: |
+          ssh hostinger "
+            export PATH=/opt/alt/php84/usr/bin:\$PATH
+            cd ${{ secrets.HOSTINGER_PATH }}/public_html
+            if ! ./vendor/bin/drush status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
+              echo '⚠ Site not bootstrapping — leaving maintenance flag as-is for manual triage.'
+              exit 0
+            fi
+            ./vendor/bin/drush state:set system.maintenance_mode 0 --input-format=integer
+            ./vendor/bin/drush cr
+            echo '  ✓ Maintenance mode OFF'
+          " || echo '⚠ Could not disable maintenance — flip it manually with: drush state:set system.maintenance_mode 0'
+
       # ───── Post-deploy smoke test ─────
       # Fail the workflow if the just-deployed site doesn't respond cleanly.
       # Without this, a broken updb / cim / cr leaves prod degraded but the
@@ -365,9 +390,12 @@ jobs:
       #
       # Three independent checks must all pass:
       #   1. drush bootstrap on the server reports Successful
-      #   2. HTTPS GET returns 200
+      #   2. HTTPS GET returns 200/301/302
       #   3. Response body contains an actual <html document (rules out a
       #      Hostinger maintenance placeholder or LiteSpeed 5xx page)
+      #
+      # Runs AFTER the maintenance-mode disable above so the GET sees the
+      # real site, not Drupal's 503 maintenance page.
       - name: Post-deploy smoke test
         run: |
           set -euo pipefail
@@ -402,27 +430,6 @@ jobs:
             exit 1
           fi
           echo "✓ All smoke checks passed."
-
-      # Always disable maintenance mode at the end, even on workflow
-      # failure. Without `if: always()`, a failed `cim` would leave the
-      # site permanently dark until someone SSH'd in to flip the flag.
-      # `steps.maintenance.outcome == 'success'` makes sure we only
-      # try to disable when we actually enabled it (skips the case
-      # where the site wasn't installed and the enable step no-op'd).
-      - name: Disable maintenance mode
-        if: always() && steps.maintenance.outcome == 'success'
-        run: |
-          ssh hostinger "
-            export PATH=/opt/alt/php84/usr/bin:\$PATH
-            cd ${{ secrets.HOSTINGER_PATH }}/public_html
-            if ! ./vendor/bin/drush status --field=bootstrap 2>/dev/null | grep -q 'Successful'; then
-              echo '⚠ Site not bootstrapping — leaving maintenance flag as-is for manual triage.'
-              exit 0
-            fi
-            ./vendor/bin/drush state:set system.maintenance_mode 0 --input-format=integer
-            ./vendor/bin/drush cr
-            echo '  ✓ Maintenance mode OFF'
-          " || echo '⚠ Could not disable maintenance — flip it manually with: drush state:set system.maintenance_mode 0'
 
       # ───── Post-deploy: re-harden permissions (only if SSH was set up) ─────
       - name: Re-harden remote permissions
