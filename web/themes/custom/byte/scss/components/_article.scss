@@ -3,7 +3,11 @@
   padding: 32px 0 96px;
 
   &__wrap {
-    max-width: 740px;
+    // 1080 widens the editorial column from the previous 740 — gives
+    // figures and code blocks more room while keeping prose readable
+    // on laptop / desktop. Body copy itself can still cap to a tighter
+    // measure further down the cascade if needed.
+    max-width: 1080px;
     margin: 0 auto;
     padding: 0 var(--pad);
   }
