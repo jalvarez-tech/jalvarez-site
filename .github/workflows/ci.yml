@@ -145,7 +145,16 @@ jobs:
       - name: Start built-in PHP web server
         run: |
           mkdir -p /tmp/simpletest-output
-          php -S 127.0.0.1:8080 -t web web/.ht.router.php > /tmp/php-server.log 2>&1 &
+          # IMPORTANT: pass ABSOLUTE paths to `-t` and the router script.
+          # Drupal's installer (and tests in general) call chdir(), which
+          # invalidates a relative router path on every subsequent request:
+          #   PHP Fatal error: Failed opening required 'web/.ht.router.php'
+          # The first request lands fine, then everything else 500s because
+          # the working directory has moved. Using absolute paths keeps the
+          # router resolvable regardless of the request handler's cwd.
+          DOCROOT="$(pwd)/web"
+          ROUTER="$DOCROOT/.ht.router.php"
+          php -S 127.0.0.1:8080 -t "$DOCROOT" "$ROUTER" > /tmp/php-server.log 2>&1 &
           # Give the server a moment to bind. BrowserTestBase installs a
           # fresh Drupal in its own DB schema, so the docroot doesn't need
           # to be pre-installed — but we DO need the server to respond to
