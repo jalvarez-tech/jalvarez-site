@@ -1,0 +1,27 @@
+uuid: f6c9c642-5ab7-4341-a0f6-7e88f6e54cb2
+langcode: es
+status: false
+dependencies:
+  config:
+    - system.menu.footer_social
+  module:
+    - system
+active_version: 1a05d48f7437bcde
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:footer_social'
+        label: 'Pie de página — En otros lugares'
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: 'Pie de página — En otros lugares'
+id: block.system_menu_block.footer_social
+provider: system
+source: block
+source_local_id: 'system_menu_block:footer_social'

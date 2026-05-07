@@ -53,6 +53,26 @@ Pretty-prints the `components` field of a canvas_page so you can verify
 ES vs EN parity without firing up the editor. Used as a sanity check
 when a translation-wipe report comes in.
 
+### `migrate-main-menu.php`
+
+Seeds the four `system.menu.main` links (Inicio · Proyectos · Notas ·
+Contacto) and their EN translations (home · work · writing · contact)
+as `menu_link_content` entities. Idempotent — looks up by stable UUID
+so a re-run updates instead of duplicating. Required after a fresh
+`drush si --existing-config` since menu_link_content rows are *content*
+(not config) and don't ship with `config/sync/`.
+
+### `migrate-footer-menus.php`
+
+Seeds the 9 footer link items across the 3 footer menus:
+
+- `system.menu.footer` — Navegación column (4 items, ES+EN translations)
+- `system.menu.footer_contact` — Contacto column (3 items, no translation needed)
+- `system.menu.footer_social` — En otros lugares column (2 items)
+
+Same idempotency contract as `migrate-main-menu.php`. Run after a fresh
+reinstall to repopulate the footer.
+
 ## When to graduate a script to a Drush command
 
 If you find yourself running one of these from prod more than twice a

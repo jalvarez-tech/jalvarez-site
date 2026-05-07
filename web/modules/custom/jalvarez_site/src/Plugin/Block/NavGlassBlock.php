@@ -7,8 +7,11 @@ namespace Drupal\jalvarez_site\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -21,10 +24,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Renders the byte:nav-glass SDC as the site-wide top navigation.
  *
- * Each link has a per-language path so URLs match the canvas_page aliases
- * configured for each translation:
- *   ES: /es, /es/proyectos, /es/notas, /es/contacto
- *   EN: /en, /en/projects,  /en/notes, /en/contact.
+ * Links come from the `main` menu (system.menu.main) so they can be edited
+ * at /admin/structure/menu/manage/main without touching code. Each
+ * menu_link_content entity is translatable: the Spanish title is the
+ * default, English is added as a translation. Drupal's URL alter pipeline
+ * resolves `entity:canvas_page/{id}` and `route:<front>` URIs to the
+ * per-language alias automatically.
  */
 #[Block(
   id: 'jalvarez_nav_glass',
@@ -43,6 +48,8 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
     private readonly CurrentPathStack $currentPath,
     private readonly AliasManagerInterface $aliasManager,
     private readonly RouteMatchInterface $routeMatch,
+    private readonly MenuLinkTreeInterface $menuTree,
+    private readonly EntityRepositoryInterface $entityRepository,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -56,29 +63,10 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
       $container->get('path.current'),
       $container->get('path_alias.manager'),
       $container->get('current_route_match'),
+      $container->get('menu.link_tree'),
+      $container->get('entity.repository'),
     );
   }
-
-  /**
-   * Per-language nav definition.
-   *
-   * Path is the alias WITHOUT the lang prefix. Drupal prepends `/{lang}/`
-   * automatically when the URL is rendered.
-   */
-  private const LINKS = [
-    'es' => [
-      ['label' => 'inicio', 'path' => '/'],
-      ['label' => 'proyectos', 'path' => '/proyectos'],
-      ['label' => 'notas', 'path' => '/notas'],
-      ['label' => 'contacto', 'path' => '/contacto'],
-    ],
-    'en' => [
-      ['label' => 'home', 'path' => '/'],
-      ['label' => 'work', 'path' => '/projects'],
-      ['label' => 'writing', 'path' => '/notes'],
-      ['label' => 'contact', 'path' => '/contact'],
-    ],
-  ];
 
   public function build(): array {
     $current_lang = $this->languageManager
@@ -87,18 +75,19 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
 
     $current_path = $this->currentPath->getPath();
     $current_alias = $this->aliasManager->getAliasByPath($current_path, $current_lang);
-
-    // Strip language prefix to compare with link path.
     $alias_no_lang = preg_replace('#^/(es|en)#', '', $current_alias) ?: '/';
 
-    $links_def = self::LINKS[$current_lang] ?? self::LINKS['es'];
-
     $links = [];
-    foreach ($links_def as $l) {
-      $href = '/' . $current_lang . ($l['path'] === '/' ? '' : $l['path']);
-      $active = ($l['path'] === '/' && $alias_no_lang === '/')
-        || ($l['path'] !== '/' && str_starts_with($alias_no_lang, $l['path']));
-      $links[] = ['label' => $l['label'], 'href' => $href, 'active' => $active];
+    foreach ($this->loadMainMenu($current_lang) as $entry) {
+      $href = $entry['href'];
+      $href_no_lang = preg_replace('#^/(es|en)#', '', $href) ?: '/';
+      $active = ($href_no_lang === '/' && $alias_no_lang === '/')
+        || ($href_no_lang !== '/' && str_starts_with($alias_no_lang, $href_no_lang));
+      $links[] = [
+        'label'  => $entry['label'],
+        'href'   => $href,
+        'active' => $active,
+      ];
     }
 
     // CTA "Disponible" / "Available" goes straight to WhatsApp with a
@@ -143,6 +132,57 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
         'i18n_primary_nav' => (string) $this->t('Primary', [], ['context' => 'jalvarez_nav']),
       ],
     ];
+  }
+
+  /**
+   * Returns the `main` menu top-level links for a given language.
+   *
+   * Each entry is `['label' => string, 'href' => string]`. The label comes
+   * from the menu link's translation in $langcode (falls back to default).
+   * The href is generated via Url::toString() with the language option
+   * forced — that way `entity:canvas_page/5` resolves to `/es/proyectos`
+   * in Spanish or `/en/projects` in English without us hardcoding a map.
+   */
+  private function loadMainMenu(string $langcode): array {
+    $params = (new MenuTreeParameters())
+      ->setMinDepth(1)
+      ->setMaxDepth(1)
+      ->onlyEnabledLinks();
+    $tree = $this->menuTree->load('main', $params);
+    $tree = $this->menuTree->transform($tree, [
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ]);
+
+    $language = $this->languageManager->getLanguage($langcode);
+    $entries = [];
+    foreach ($tree as $element) {
+      if (!$element->link->isEnabled()) {
+        continue;
+      }
+
+      // Resolve title in the requested language. Menu link plugins built
+      // from menu_link_content entities expose getEntity(); for the
+      // Drupal-native label fallback we just use the plugin title.
+      $label = (string) $element->link->getTitle();
+      $metadata = $element->link->getMetaData();
+      if (!empty($metadata['entity_id'])) {
+        $entity = $this->entityRepository->getActive('menu_link_content', $metadata['entity_id']);
+        if ($entity !== NULL) {
+          $translated = $this->entityRepository->getTranslationFromContext($entity, $langcode);
+          $label = (string) $translated->label();
+        }
+      }
+
+      $url = $element->link->getUrlObject();
+      $url->setOption('language', $language);
+      $entries[] = [
+        'label' => $label,
+        'href'  => $url->toString(),
+      ];
+    }
+
+    return $entries;
   }
 
   /**
@@ -193,7 +233,11 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
   }
 
   public function getCacheTags(): array {
-    return Cache::mergeTags(parent::getCacheTags(), ['config:system.menu.main']);
+    return Cache::mergeTags(parent::getCacheTags(), [
+      'config:system.menu.main',
+      'config:menu.menu.main',
+      'menu_link_content_list',
+    ]);
   }
 
 }

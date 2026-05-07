@@ -4,9 +4,18 @@ status: true
 dependencies:
   module:
     - jalvarez_site
-active_version: 6bb8aa4e12bd3305
+active_version: f2a0cb6434173e61
 versioned_properties:
   active:
+    settings:
+      default_settings:
+        id: jalvarez_footer
+        label: 'Byte site footer'
+        label_display: '0'
+        provider: jalvarez_site
+    fallback_metadata:
+      slot_definitions: null
+  6bb8aa4e12bd3305:
     settings:
       default_settings:
         id: jalvarez_footer

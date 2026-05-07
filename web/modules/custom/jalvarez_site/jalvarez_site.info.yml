@@ -9,3 +9,5 @@ dependencies:
   - drupal:language
   - drupal:path_alias
   - drupal:file
+  - drupal:menu_link_content
+  - drupal:menu_ui
