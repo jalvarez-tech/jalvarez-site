@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\jalvarez_site\BrandConfig;
 use Drupal\node\NodeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -74,7 +75,12 @@ class LlmsTxtBuilder {
     $lines[] = '';
     $lines[] = 'Bilingual site (Spanish default · English alternate). Stack: Drupal 11, WordPress, Headless CMS, n8n, Core Web Vitals, WCAG 2.2. Brand voice is editorial-developer, first-person, honest, anti-features-hype.';
     $lines[] = '';
-    $lines[] = 'Contact: contacto@jalvarez.tech · +57 312 801 4078 · https://wa.link/fb2acg';
+    $lines[] = sprintf(
+      'Contact: %s · %s · %s',
+      BrandConfig::EMAIL,
+      BrandConfig::PHONE,
+      BrandConfig::WHATSAPP_LINK,
+    );
     $lines[] = '';
 
     $pages = $this->loadCanvasPages();

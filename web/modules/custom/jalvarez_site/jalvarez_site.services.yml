@@ -40,6 +40,8 @@ services:
 
   Drupal\jalvarez_site\Hook\PathautoHook: {}
 
+  Drupal\jalvarez_site\Hook\PreprocessHook: {}
+
   logger.channel.jalvarez_site:
     parent: logger.channel_base
     arguments: ['jalvarez_site']
