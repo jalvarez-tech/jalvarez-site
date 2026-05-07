@@ -22,6 +22,23 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class LlmsTxtBuilder {
 
+  /**
+   * Slug → weight map for the canvas_page top section ordering.
+   *
+   * Keyed by the last URL segment (so it survives DB reinstalls and id
+   * shuffles). Both languages are listed because the rows are bilingual.
+   */
+  private const PAGE_ORDER = [
+    'inicio' => 0,
+    'home' => 0,
+    'proyectos' => 1,
+    'projects' => 1,
+    'notas' => 2,
+    'notes' => 2,
+    'contacto' => 3,
+    'contact' => 3,
+  ];
+
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
   ) {}
@@ -138,9 +155,11 @@ class LlmsTxtBuilder {
   /**
    * Returns one row per published canvas_page translation.
    *
-   * @return array<int,array{id:int,title:string,url:string,description:string,langcode:string}>
-   *   Rows ordered by the manual ID map (Inicio, Proyectos, Notas, Contacto)
-   *   and then by langcode.
+   * @return array<int,array{title:string,url:string,description:string,langcode:string}>
+   *   Rows ordered by URL slug (Inicio/Home, Proyectos/Projects, Notas/Notes,
+   *   Contacto/Contact) and then by langcode. Slug-based ordering survives DB
+   *   reinstalls — earlier versions used hardcoded entity IDs and broke when
+   *   the canvas_page entries were re-seeded.
    */
   private function loadCanvasPages(): array {
     $rows = [];
@@ -163,18 +182,32 @@ class LlmsTxtBuilder {
         $rows[] = $this->rowFromEntity($trans, $lc);
       }
     }
-    $order = [8 => 0, 5 => 1, 6 => 2, 7 => 3];
     usort($rows, fn(array $a, array $b) =>
-      ($order[$a['id']] ?? 99) <=> ($order[$b['id']] ?? 99)
+      $this->slugWeight($a['url']) <=> $this->slugWeight($b['url'])
         ?: strcmp($a['langcode'], $b['langcode'])
     );
     return $rows;
   }
 
   /**
+   * Returns the order weight for a URL based on its last path segment.
+   *
+   * Unknown slugs sort last (99). The map covers both languages.
+   */
+  private function slugWeight(string $url): int {
+    $path = parse_url($url, PHP_URL_PATH);
+    if (!is_string($path) || $path === '') {
+      return 99;
+    }
+    $segments = array_values(array_filter(explode('/', $path), fn(string $s) => $s !== ''));
+    $slug = end($segments) ?: '';
+    return self::PAGE_ORDER[$slug] ?? 99;
+  }
+
+  /**
    * Returns one row per published translation of nodes in $bundle.
    *
-   * @return array<int,array{id:int,title:string,url:string,description:string,langcode:string}>
+   * @return array<int,array{title:string,url:string,description:string,langcode:string}>
    *   Newest-first by created date.
    */
   private function loadNodes(string $bundle): array {
@@ -205,7 +238,7 @@ class LlmsTxtBuilder {
   /**
    * Projects an entity translation into the row shape used by render().
    *
-   * @return array{id:int,title:string,url:string,description:string,langcode:string}
+   * @return array{title:string,url:string,description:string,langcode:string}
    *   Description is plain text (HTML stripped, whitespace collapsed).
    */
   private function rowFromEntity(ContentEntityInterface $entity, string $langcode): array {
@@ -232,7 +265,6 @@ class LlmsTxtBuilder {
     $description = trim(preg_replace('/\s+/', ' ', strip_tags($description)) ?? '');
 
     return [
-      'id' => (int) $entity->id(),
       'title' => (string) $entity->label(),
       'url' => $url,
       'description' => $description,
