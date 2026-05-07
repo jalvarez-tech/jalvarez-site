@@ -7,8 +7,10 @@ namespace Drupal\jalvarez_site\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\file\FileInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 
@@ -112,8 +114,16 @@ final class ProjectsGridBlock extends BlockBase {
     $wrap = $this->configuration['wrap'] ?? 'section';
     return match ($wrap) {
       'none' => ['cards' => $cards],
-      'grid' => ['#prefix' => '<div class="projects-grid">', '#suffix' => '</div>', 'cards' => $cards],
-      default => ['#prefix' => '<section class="section wrap"><div class="projects-grid">', '#suffix' => '</div></section>', 'cards' => $cards],
+      'grid' => [
+        '#prefix' => '<div class="projects-grid">',
+        '#suffix' => '</div>',
+        'cards' => $cards,
+      ],
+      default => [
+        '#prefix' => '<section class="section wrap"><div class="projects-grid">',
+        '#suffix' => '</div></section>',
+        'cards' => $cards,
+      ],
     };
   }
 
@@ -121,7 +131,9 @@ final class ProjectsGridBlock extends BlockBase {
     $category = '';
     if ($node->hasField('field_primary_technology') && !$node->get('field_primary_technology')->isEmpty()) {
       $term = $node->get('field_primary_technology')->entity;
-      if ($term) $category = $term->label();
+      if ($term) {
+        $category = $term->label();
+      }
     }
 
     $year = '';
@@ -146,9 +158,9 @@ final class ProjectsGridBlock extends BlockBase {
     $cover_alt = '';
     if ($node->hasField('field_cover_media') && !$node->get('field_cover_media')->isEmpty()) {
       $media = $node->get('field_cover_media')->entity;
-      if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+      if ($media instanceof FieldableEntityInterface && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
         $file = $media->get('field_media_image')->entity;
-        if ($file) {
+        if ($file instanceof FileInterface) {
           $cover_url = $file->createFileUrl(FALSE);
           // Media library widget stores alt on the field item itself.
           $cover_alt = (string) ($media->get('field_media_image')->alt ?? $media->label());
@@ -160,7 +172,9 @@ final class ProjectsGridBlock extends BlockBase {
     if ($node->hasField('field_results_metrics') && !$node->get('field_results_metrics')->isEmpty()) {
       $i = 1;
       foreach ($node->get('field_results_metrics')->referencedEntities() as $para) {
-        if ($i > 3) break;
+        if ($i > 3) {
+          break;
+        }
         $metric_props["m{$i}_key"]   = $para->get('field_metric_key')->value ?? '';
         $metric_props["m{$i}_value"] = $para->get('field_metric_value')->value ?? '';
         $i++;

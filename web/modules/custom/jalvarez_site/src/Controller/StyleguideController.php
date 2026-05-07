@@ -14,7 +14,7 @@ class StyleguideController extends ControllerBase {
   public function index(): array {
     $build = [];
 
-    // Header
+    // Header.
     $build['header'] = [
       '#markup' => '<div class="wrap" style="padding-top:56px;padding-bottom:24px;"><h1 style="font-family:var(--f-display);font-size:42px;font-weight:500;letter-spacing:-0.03em;margin:0 0 8px;">Byte styleguide</h1><p style="font-family:var(--f-mono);font-size:13px;color:var(--fg-muted);">Phase E components — visual QA only.</p></div>',
     ];
@@ -44,7 +44,7 @@ class StyleguideController extends ControllerBase {
       ],
     ];
 
-    // Section + chip + button samples
+    // Section + chip + button samples.
     $build['primitives'] = [
       '#type' => 'component',
       '#component' => 'byte:section',
@@ -58,16 +58,45 @@ class StyleguideController extends ControllerBase {
       'samples' => [
         '#prefix' => '<div class="wrap" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:24px;">',
         '#suffix' => '</div>',
-        'chip1' => ['#type' => 'component', '#component' => 'byte:chip', '#props' => ['label' => 'WordPress', 'variant' => 'accent']],
-        'chip2' => ['#type' => 'component', '#component' => 'byte:chip', '#props' => ['label' => '2025']],
-        'chip3' => ['#type' => 'component', '#component' => 'byte:chip', '#props' => ['label' => 'Drupal 11', 'variant' => 'accent']],
-        'chip4' => ['#type' => 'component', '#component' => 'byte:chip', '#props' => ['label' => 'Performance']],
-        'btn1' => ['#type' => 'component', '#component' => 'byte:button', '#props' => ['label' => 'Iniciar tu proyecto', 'variant' => 'primary', 'arrow' => TRUE, 'href' => '/contacto']],
-        'btn2' => ['#type' => 'component', '#component' => 'byte:button', '#props' => ['label' => 'Ver el trabajo', 'variant' => 'ghost']],
+        'chip1' => [
+          '#type' => 'component',
+          '#component' => 'byte:chip',
+          '#props' => ['label' => 'WordPress', 'variant' => 'accent'],
+        ],
+        'chip2' => [
+          '#type' => 'component',
+          '#component' => 'byte:chip',
+          '#props' => ['label' => '2025'],
+        ],
+        'chip3' => [
+          '#type' => 'component',
+          '#component' => 'byte:chip',
+          '#props' => ['label' => 'Drupal 11', 'variant' => 'accent'],
+        ],
+        'chip4' => [
+          '#type' => 'component',
+          '#component' => 'byte:chip',
+          '#props' => ['label' => 'Performance'],
+        ],
+        'btn1' => [
+          '#type' => 'component',
+          '#component' => 'byte:button',
+          '#props' => [
+            'label' => 'Iniciar tu proyecto',
+            'variant' => 'primary',
+            'arrow' => TRUE,
+            'href' => '/contacto',
+          ],
+        ],
+        'btn2' => [
+          '#type' => 'component',
+          '#component' => 'byte:button',
+          '#props' => ['label' => 'Ver el trabajo', 'variant' => 'ghost'],
+        ],
       ],
     ];
 
-    // CTA final
+    // CTA final.
     $build['cta'] = [
       '#type' => 'component',
       '#component' => 'byte:cta-final',

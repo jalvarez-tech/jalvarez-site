@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\jalvarez_site\Llms;
 
-use Drupal\canvas\Entity\Page;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponse;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -21,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  * processing kicks in) can share the same logic without one depending on the
  * other through the service container.
  */
-final class LlmsTxtBuilder {
+class LlmsTxtBuilder {
 
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
@@ -137,15 +136,28 @@ final class LlmsTxtBuilder {
   }
 
   /**
+   * Returns one row per published canvas_page translation.
+   *
    * @return array<int,array{id:int,title:string,url:string,description:string,langcode:string}>
+   *   Rows ordered by the manual ID map (Inicio, Proyectos, Notas, Contacto)
+   *   and then by langcode.
    */
   private function loadCanvasPages(): array {
     $rows = [];
-    $pages = Page::loadMultiple();
+    try {
+      $pages = $this->entityTypeManager->getStorage('canvas_page')->loadMultiple();
+    }
+    catch (\Throwable) {
+      // Canvas module not enabled (e.g. minimal test profile); skip pages.
+      return [];
+    }
     foreach ($pages as $page) {
+      if (!$page instanceof ContentEntityInterface) {
+        continue;
+      }
       foreach ($page->getTranslationLanguages() as $lc => $_) {
         $trans = $page->getTranslation($lc);
-        if (!$trans->isPublished()) {
+        if ($trans instanceof EntityPublishedInterface && !$trans->isPublished()) {
           continue;
         }
         $rows[] = $this->rowFromEntity($trans, $lc);
@@ -160,7 +172,10 @@ final class LlmsTxtBuilder {
   }
 
   /**
+   * Returns one row per published translation of nodes in $bundle.
+   *
    * @return array<int,array{id:int,title:string,url:string,description:string,langcode:string}>
+   *   Newest-first by created date.
    */
   private function loadNodes(string $bundle): array {
     $rows = [];
@@ -174,7 +189,7 @@ final class LlmsTxtBuilder {
       return [];
     }
     /** @var \Drupal\node\NodeInterface[] $nodes */
-    $nodes = Node::loadMultiple($nids);
+    $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
     foreach ($nodes as $node) {
       foreach ($node->getTranslationLanguages() as $lc => $_) {
         $trans = $node->getTranslation($lc);
@@ -188,14 +203,18 @@ final class LlmsTxtBuilder {
   }
 
   /**
+   * Projects an entity translation into the row shape used by render().
+   *
    * @return array{id:int,title:string,url:string,description:string,langcode:string}
+   *   Description is plain text (HTML stripped, whitespace collapsed).
    */
-  private function rowFromEntity(EntityInterface $entity, string $langcode): array {
+  private function rowFromEntity(ContentEntityInterface $entity, string $langcode): array {
     $url = '';
     try {
       $url = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
     }
-    catch (\Throwable) {}
+    catch (\Throwable) {
+    }
 
     $description = '';
     if ($entity instanceof NodeInterface) {

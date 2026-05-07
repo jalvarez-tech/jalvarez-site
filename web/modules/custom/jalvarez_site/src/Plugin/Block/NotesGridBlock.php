@@ -71,7 +71,9 @@ final class NotesGridBlock extends BlockBase {
     $category = '';
     if ($node->hasField('field_note_topic') && !$node->get('field_note_topic')->isEmpty()) {
       $term = $node->get('field_note_topic')->entity;
-      if ($term) $category = $term->label();
+      if ($term) {
+        $category = $term->label();
+      }
     }
 
     $date = '';

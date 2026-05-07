@@ -17,7 +17,7 @@ use Drupal\Core\Url;
  * Each link has a per-language path so URLs match the canvas_page aliases
  * configured for each translation:
  *   ES: /es, /es/proyectos, /es/notas, /es/contacto
- *   EN: /en, /en/projects,  /en/notes, /en/contact
+ *   EN: /en, /en/projects,  /en/notes, /en/contact.
  */
 #[Block(
   id: 'jalvarez_nav_glass',
@@ -29,21 +29,23 @@ class NavGlassBlock extends BlockBase {
   use StringTranslationTrait;
 
   /**
-   * Per-language nav definition. Path is the alias WITHOUT the lang prefix.
-   * Drupal prepends `/{lang}/` automatically when the URL is rendered.
+   * Per-language nav definition.
+   *
+   * Path is the alias WITHOUT the lang prefix. Drupal prepends `/{lang}/`
+   * automatically when the URL is rendered.
    */
   private const LINKS = [
     'es' => [
-      ['label' => 'inicio',    'path' => '/'],
+      ['label' => 'inicio', 'path' => '/'],
       ['label' => 'proyectos', 'path' => '/proyectos'],
-      ['label' => 'notas',     'path' => '/notas'],
-      ['label' => 'contacto',  'path' => '/contacto'],
+      ['label' => 'notas', 'path' => '/notas'],
+      ['label' => 'contacto', 'path' => '/contacto'],
     ],
     'en' => [
-      ['label' => 'home',     'path' => '/'],
-      ['label' => 'work',     'path' => '/projects'],
-      ['label' => 'writing',  'path' => '/notes'],
-      ['label' => 'contact',  'path' => '/contact'],
+      ['label' => 'home', 'path' => '/'],
+      ['label' => 'work', 'path' => '/projects'],
+      ['label' => 'writing', 'path' => '/notes'],
+      ['label' => 'contact', 'path' => '/contact'],
     ],
   ];
 
@@ -102,9 +104,9 @@ class NavGlassBlock extends BlockBase {
   }
 
   /**
-   * Returns [es_href, en_href] for the current page using Drupal core's
-   * native language-switcher API.
+   * Returns [es_href, en_href] for the current page.
    *
+   * Uses Drupal core's native language-switcher API.
    * `LanguageManager::getLanguageSwitchLinks()` invokes
    * `hook_language_switch_links_alter()` and the URL alter pipeline, so:
    *  - canvas_page entities resolve to their per-language path alias
@@ -112,7 +114,7 @@ class NavGlassBlock extends BlockBase {
    *  - Translatable nodes resolve to their per-language alias
    *    (/es/proyectos/malumaonline ↔ /en/projects/malumaonline)
    *  - Untranslatable routes (admin, 404, etc.) keep the same path with
-   *    only the language prefix swapped
+   *    only the language prefix swapped.
    *
    * This is the same mechanism Drupal core's `language_block:language_interface`
    * uses internally — we just consume the result and feed two hrefs into the

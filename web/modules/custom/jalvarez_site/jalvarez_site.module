@@ -2,11 +2,14 @@
 
 /**
  * @file
- * jalvarez_site module hooks.
+ * Jalvarez_site module hooks.
  */
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\file\FileInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -67,8 +70,9 @@ function jalvarez_site_metatags_alter(array &$metatags, array &$context): void {
 }
 
 /**
- * Resolves the SEO payload (title, description, image, url, type) for the
- * current page entity in its current-language translation.
+ * Resolves the SEO payload for the current page entity.
+ *
+ * Returns title, description, image, url, type for the active translation.
  *
  * @return array{title:string,description:string,image:?string,url:string,type:string,langcode:string}|null
  *   NULL if the route is not a SEO-eligible page.
@@ -115,7 +119,7 @@ function _jalvarez_site_seo_resolve_current(string $route_name): ?array {
 /**
  * Builds the SEO payload for a canvas_page translation.
  */
-function _jalvarez_site_seo_resolve_canvas_page(EntityInterface $page, string $base): ?array {
+function _jalvarez_site_seo_resolve_canvas_page(ContentEntityInterface $page, string $base): ?array {
   $raw = $page->get('metatags')->value ?? '';
   $tags = is_string($raw) && $raw !== '' ? (json_decode($raw, TRUE) ?: []) : [];
 
@@ -129,14 +133,15 @@ function _jalvarez_site_seo_resolve_canvas_page(EntityInterface $page, string $b
   try {
     $url = $page->toUrl('canonical', ['absolute' => TRUE])->toString();
   }
-  catch (\Throwable) {}
+  catch (\Throwable) {
+  }
 
   $image = NULL;
   if ($page->hasField('image') && !$page->get('image')->isEmpty()) {
     $media = $page->get('image')->entity;
-    if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+    if ($media instanceof FieldableEntityInterface && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
       $file = $media->get('field_media_image')->entity;
-      if ($file) {
+      if ($file instanceof FileInterface) {
         $image = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
       }
     }
@@ -179,16 +184,17 @@ function _jalvarez_site_seo_resolve_node(NodeInterface $node, ?string $base = NU
   try {
     $url = $node->toUrl('canonical', ['absolute' => TRUE])->toString();
   }
-  catch (\Throwable) {}
+  catch (\Throwable) {
+  }
 
   // Image: featured_media → cover_media → first gallery item.
   $image = NULL;
   foreach (['field_featured_media', 'field_cover_media', 'field_gallery'] as $field) {
     if ($node->hasField($field) && !$node->get($field)->isEmpty()) {
       $media = $node->get($field)->entity;
-      if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+      if ($media instanceof FieldableEntityInterface && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
         $file = $media->get('field_media_image')->entity;
-        if ($file) {
+        if ($file instanceof FileInterface) {
           $image = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
           break;
         }
@@ -205,8 +211,10 @@ function _jalvarez_site_seo_resolve_node(NodeInterface $node, ?string $base = NU
 }
 
 /**
- * Injects OG, Twitter Card, hreflang, author, theme-color and JSON-LD
- * structured data into the page head for SEO-eligible routes.
+ * Injects SEO attachments into the page head for SEO-eligible routes.
+ *
+ * Adds OG, Twitter Card, hreflang, author, theme-color and JSON-LD
+ * structured data.
  */
 function _jalvarez_site_seo_attach(array &$attachments, string $route_name): void {
   $info = _jalvarez_site_seo_resolve_current($route_name);
@@ -271,7 +279,7 @@ function _jalvarez_site_seo_attach(array &$attachments, string $route_name): voi
     ];
   }
 
-  // hreflang alternates.
+  // Hreflang alternates.
   if ($entity instanceof TranslatableInterface) {
     foreach ($entity->getTranslationLanguages() as $lc => $_) {
       try {
@@ -317,8 +325,10 @@ function _jalvarez_site_seo_attach(array &$attachments, string $route_name): voi
 }
 
 /**
- * Builds a JSON-LD @graph for the current page: Person + WebSite + the
- * page-specific node (WebPage / Article / CreativeWork).
+ * Builds a JSON-LD @graph for the current page.
+ *
+ * The graph contains Person + WebSite + the page-specific node
+ * (WebPage / Article / CreativeWork).
  */
 function _jalvarez_site_seo_jsonld(array $info, string $base): array {
   $person = [
@@ -335,7 +345,16 @@ function _jalvarez_site_seo_jsonld(array $info, string $base): array {
       'addressLocality' => 'Medellín',
       'addressCountry' => 'CO',
     ],
-    'knowsAbout' => ['Drupal', 'WordPress', 'Headless CMS', 'n8n', 'Core Web Vitals', 'WCAG 2.2', 'Web Performance', 'Web Accessibility'],
+    'knowsAbout' => [
+      'Drupal',
+      'WordPress',
+      'Headless CMS',
+      'n8n',
+      'Core Web Vitals',
+      'WCAG 2.2',
+      'Web Performance',
+      'Web Accessibility',
+    ],
   ];
 
   $website = [
@@ -467,6 +486,13 @@ function jalvarez_site_canvas_page_presave(EntityInterface $entity): void {
   if ($entity->isNew()) {
     return;
   }
+  // Narrow EntityInterface (the hook signature) to the translatable +
+  // fieldable shape we actually need below. Canvas pages are content
+  // entities, so this is always true at runtime — the check exists for
+  // type safety so static analysis can verify the field/translation API.
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
 
   // Pull the unchanged entity from storage (bypasses in-flight cache).
   try {
@@ -477,14 +503,14 @@ function jalvarez_site_canvas_page_presave(EntityInterface $entity): void {
   catch (\Throwable) {
     return;
   }
-  if (!$original) {
+  if (!$original instanceof ContentEntityInterface) {
     return;
   }
 
   // Algorithm — repair-by-shape, not by diff:
-  //   For every translation that existed in storage with content, if the
-  //   in-memory entity has it missing OR with that content blanked out,
-  //   restore from storage.
+  // For every translation that existed in storage with content, if the
+  // in-memory entity has it missing OR with that content blanked out,
+  // restore from storage.
   //
   // This covers the wipe bug regardless of which translation the editor
   // legitimately changed. A legitimate edit doesn't blank an entire

@@ -31,6 +31,7 @@ class FooterBlock extends BlockBase {
 
   /**
    * Brand contact info (language-independent — values, not labels).
+   *
    * If these ever change, update here AND in canal-directo.twig defaults.
    */
   private const BRAND = [
@@ -41,9 +42,10 @@ class FooterBlock extends BlockBase {
   ];
 
   /**
-   * Per-language footer copy. Path values are bare aliases — Drupal prepends
-   * the language prefix at render time via the URL generator (see href
-   * construction in build()).
+   * Per-language footer copy.
+   *
+   * Path values are bare aliases — Drupal prepends the language prefix at
+   * render time via the URL generator (see href construction in build()).
    */
   private const LANG = [
     'es' => [
@@ -52,17 +54,17 @@ class FooterBlock extends BlockBase {
       'availability' => 'Aceptando 2 proyectos en Q3 2026',
       'nav_label' => 'Navegación',
       'nav_items' => [
-        ['label' => 'Inicio',    'path' => '/'],
+        ['label' => 'Inicio', 'path' => '/'],
         ['label' => 'Proyectos', 'path' => '/proyectos'],
-        ['label' => 'Notas',     'path' => '/notas'],
-        ['label' => 'Contacto',  'path' => '/contacto'],
+        ['label' => 'Notas', 'path' => '/notas'],
+        ['label' => 'Contacto', 'path' => '/contacto'],
       ],
       'contact_label' => 'Contacto',
       'whatsapp_label' => 'WhatsApp →',
       'elsewhere_label' => 'En otros lugares',
       'else_items' => [
         ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
-        ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
+        ['label' => 'GitHub ↗', 'href' => 'https://github.com/jalvarez-tech'],
       ],
       'copyright' => '© 2026 John Stevans Alvarez · Senior Web Specialist',
       'version' => 'v4.0 · Actualizado may 2026',
@@ -73,17 +75,17 @@ class FooterBlock extends BlockBase {
       'availability' => 'Accepting 2 projects for Q3 2026',
       'nav_label' => 'Navigation',
       'nav_items' => [
-        ['label' => 'Home',     'path' => '/'],
+        ['label' => 'Home', 'path' => '/'],
         ['label' => 'Projects', 'path' => '/projects'],
-        ['label' => 'Writing',  'path' => '/notes'],
-        ['label' => 'Contact',  'path' => '/contact'],
+        ['label' => 'Writing', 'path' => '/notes'],
+        ['label' => 'Contact', 'path' => '/contact'],
       ],
       'contact_label' => 'Contact',
       'whatsapp_label' => 'WhatsApp →',
       'elsewhere_label' => 'Elsewhere',
       'else_items' => [
         ['label' => 'LinkedIn ↗', 'href' => 'https://www.linkedin.com/in/jalvarez-tech/'],
-        ['label' => 'GitHub ↗',   'href' => 'https://github.com/jalvarez-tech'],
+        ['label' => 'GitHub ↗', 'href' => 'https://github.com/jalvarez-tech'],
       ],
       'copyright' => '© 2026 John Stevans Alvarez · Senior Web Specialist',
       'version' => 'v4.0 · Updated May 2026',
@@ -94,36 +96,36 @@ class FooterBlock extends BlockBase {
     $lang = \Drupal::languageManager()
       ->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)
       ->getId();
-    $L = self::LANG[$lang] ?? self::LANG['es'];
+    $lang_data = self::LANG[$lang] ?? self::LANG['es'];
 
     $props = [
-      // Col 1
-      'pitch_a' => $L['pitch_a'],
-      'pitch_em' => $L['pitch_em'],
-      'availability' => $L['availability'],
+      // Col 1.
+      'pitch_a' => $lang_data['pitch_a'],
+      'pitch_em' => $lang_data['pitch_em'],
+      'availability' => $lang_data['availability'],
 
       // Col 2 — site nav (per-language paths, language-prefixed at render)
-      'nav_label' => $L['nav_label'],
+      'nav_label' => $lang_data['nav_label'],
 
       // Col 3 — contact (labels translated, values from BRAND)
-      'contact_label' => $L['contact_label'],
+      'contact_label' => $lang_data['contact_label'],
       'contact_1_label' => self::BRAND['email'],
       'contact_1_href'  => 'mailto:' . self::BRAND['email'],
       'contact_2_label' => self::BRAND['phone'],
       'contact_2_href'  => 'tel:' . self::BRAND['phone_tel'],
-      'contact_3_label' => $L['whatsapp_label'],
+      'contact_3_label' => $lang_data['whatsapp_label'],
       'contact_3_href'  => self::BRAND['whatsapp'],
 
-      // Col 4 — elsewhere
-      'elsewhere_label' => $L['elsewhere_label'],
+      // Col 4 — elsewhere.
+      'elsewhere_label' => $lang_data['elsewhere_label'],
 
-      // Bottom
-      'copyright' => $L['copyright'],
-      'version'   => $L['version'],
+      // Bottom.
+      'copyright' => $lang_data['copyright'],
+      'version'   => $lang_data['version'],
     ];
 
     // Map nav items into nav_1..nav_6 slots (twig filters empties out).
-    foreach ($L['nav_items'] as $i => $item) {
+    foreach ($lang_data['nav_items'] as $i => $item) {
       $n = $i + 1;
       $href = '/' . $lang . ($item['path'] === '/' ? '' : $item['path']);
       $props["nav_{$n}_label"] = $item['label'];
@@ -131,7 +133,7 @@ class FooterBlock extends BlockBase {
     }
 
     // Map elsewhere items into else_1..else_4 slots.
-    foreach ($L['else_items'] as $i => $item) {
+    foreach ($lang_data['else_items'] as $i => $item) {
       $n = $i + 1;
       $props["else_{$n}_label"] = $item['label'];
       $props["else_{$n}_href"]  = $item['href'];

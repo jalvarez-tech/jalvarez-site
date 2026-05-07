@@ -10,9 +10,10 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Serves /llms.txt and /llms-full.txt at the docroot, bypassing the
- * language path-prefix redirect (which would otherwise rewrite the path
- * to /es/llms.txt and break the llms.txt convention).
+ * Serves /llms.txt and /llms-full.txt at the docroot.
+ *
+ * Bypasses the language path-prefix redirect (which would otherwise rewrite
+ * the path to /es/llms.txt and break the llms.txt convention).
  *
  * Runs at priority 350 so it fires before
  * \Drupal\language\HttpKernel\PathProcessorLanguage::processInbound

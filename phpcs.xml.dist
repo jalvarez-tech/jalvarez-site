@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="jalvarez-site">
+    <description>PHPCS rules for custom Drupal modules and themes.</description>
+
+    <!-- Show progress + colour. -->
+    <arg name="colors"/>
+    <arg value="p"/>
+
+    <!-- Default to checking custom code only; CI overrides via CLI args. -->
+    <file>web/modules/custom</file>
+    <file>web/themes/custom</file>
+
+    <!-- Skip generated and third-party paths. -->
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/dist/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>web/themes/custom/byte/scripts/*</exclude-pattern>
+
+    <!-- Apply scope to PHP and Drupal-specific text files. -->
+    <arg name="extensions" value="php,module,inc,install,test,profile,theme,info"/>
+
+    <rule ref="Drupal"/>
+    <rule ref="DrupalPractice"/>
+
+    <!-- Drupal/Commenting.DocComment.MissingShort fires on every constructor;
+         we use PHP 8 promoted properties so docblocks are redundant. -->
+    <rule ref="Drupal.Commenting.DocComment.MissingShort">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Drupal.Commenting.FunctionComment.Missing requires docblocks even on
+         private helpers with self-evident names; allow our shorter style. -->
+    <rule ref="Drupal.Commenting.FunctionComment.Missing">
+        <severity>0</severity>
+    </rule>
+
+    <!-- The DI conversion of Block plugins (\Drupal:: → ContainerFactoryPluginInterface)
+         is tracked as a MAJOR follow-up from the audit. Until that PR lands, we
+         keep these as informational only so CI doesn't churn on it. -->
+    <rule ref="DrupalPractice.Objects.GlobalDrupal">
+        <severity>0</severity>
+    </rule>
+    <rule ref="DrupalPractice.Objects.GlobalClass">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Soft 80-char limit; we only block on the hard 120-col limit
+         (LineLength.MaxExceeded). -->
+    <rule ref="Drupal.Files.LineLength.TooLong">
+        <severity>0</severity>
+    </rule>
+</ruleset>

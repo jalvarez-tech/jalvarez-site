@@ -24,9 +24,9 @@ function byte_preprocess_html(array &$variables): void {
   $variables['#attached']['library'][] = 'byte/global';
 
   // Inline script BEFORE first paint:
-  //   1. Read jsa-theme from localStorage (set by the theme toggle).
-  //   2. If absent, fall back to the OS color-scheme preference.
-  //   3. On any localStorage error, default to dark.
+  // 1. Read jsa-theme from localStorage (set by the theme toggle).
+  // 2. If absent, fall back to the OS color-scheme preference.
+  // 3. On any localStorage error, default to dark.
   //
   // IMPORTANT: the JS body MUST be wrapped in Markup::create(); otherwise
   // Drupal's html_head renderer treats `#value` as text and HTML-escapes
