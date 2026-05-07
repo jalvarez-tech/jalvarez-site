@@ -79,6 +79,33 @@ final class LlmsTxtBuilderTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::slugWeight
+   *
+   * @dataProvider slugWeightCases
+   */
+  public function testSlugWeightOrdersBySemanticUrlSegment(string $url, int $expected): void {
+    $reflection = new \ReflectionMethod(LlmsTxtBuilder::class, 'slugWeight');
+    $builder = new LlmsTxtBuilder($this->stubEntityTypeManagerWithEmptyNodes());
+    $this->assertSame($expected, $reflection->invoke($builder, $url));
+  }
+
+  public static function slugWeightCases(): array {
+    return [
+      'es inicio'    => ['https://x/es/inicio', 0],
+      'en home'      => ['https://x/en/home', 0],
+      'es proyectos' => ['https://x/es/proyectos', 1],
+      'en projects'  => ['https://x/en/projects', 1],
+      'es notas'     => ['https://x/es/notas', 2],
+      'en notes'     => ['https://x/en/notes', 2],
+      'es contacto'  => ['https://x/es/contacto', 3],
+      'en contact'   => ['https://x/en/contact', 3],
+      'unknown sorts last' => ['https://x/es/blog', 99],
+      'empty url' => ['', 99],
+      'trailing slash' => ['https://x/es/proyectos/', 1],
+    ];
+  }
+
+  /**
    * Stub that returns no nodes / no canvas pages.
    *
    * Lets the builder render the static brand header + Optional section
