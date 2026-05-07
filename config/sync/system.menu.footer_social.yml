@@ -1,0 +1,8 @@
+uuid: db76e975-5f53-429a-948b-295c1081a4e7
+langcode: es
+status: true
+dependencies: {  }
+id: footer_social
+label: 'Pie de página — En otros lugares'
+description: 'Enlaces a redes sociales y perfiles externos'
+locked: false

@@ -284,10 +284,14 @@ Todas las vistas con labels traducibles vía Configuration Translation.
 └─────────────────────────────────────────────────────────────────────────────┘
 
 BLOCK PLUGINS CUSTOM (registrados como Canvas Component blocks):
-  ├─ block.jalvarez_nav_glass         (top nav, language-aware active state)
+  ├─ block.jalvarez_nav_glass         (top nav: lee system.menu.main vía menu.link_tree, label/href por idioma)
   ├─ block.jalvarez_projects_grid     (carga node.project + renderiza SDC card-proyecto)
   └─ block.jalvarez_notes_grid        (carga node.note + renderiza SDC row-nota + read_time bilingüe)
 ```
+
+> **Menú principal:** los 4 enlaces (Inicio · Proyectos · Notas · Contacto) viven en `system.menu.main` como entidades `menu_link_content` traducibles (ES default, EN translation). Editables en `/admin/structure/menu/manage/main`. Para reseed tras un `drush si --existing-config`, correr `drush php:script scripts/maintenance/migrate-main-menu.php` (idempotente, lookup por UUID estable).
+
+> **Menús del footer:** las 3 columnas de enlaces (Navegación, Contacto, En otros lugares) son menús independientes — `system.menu.footer` (4 items, traducible ES↔EN), `system.menu.footer_contact` (3 items: email/tel/WhatsApp, lang-agnostic) y `system.menu.footer_social` (2 items: LinkedIn/GitHub). El `FooterBlock` los carga via `menu.link_tree` y los aplana en los slots `nav_*`, `contact_*`, `else_*` de la SDC `byte:footer`. Reseed con `drush php:script scripts/maintenance/migrate-footer-menus.php`.
 
 ### 7.1 Restricciones que impone Canvas a los SDCs
 

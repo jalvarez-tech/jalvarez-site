@@ -1,0 +1,8 @@
+uuid: 3e769038-acde-4e12-bc8b-d7f0962e54fe
+langcode: es
+status: true
+dependencies: {  }
+id: footer_contact
+label: 'Pie de página — Contacto'
+description: 'Enlaces de contacto (email, teléfono, WhatsApp)'
+locked: false

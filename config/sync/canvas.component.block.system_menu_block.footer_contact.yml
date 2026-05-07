@@ -1,0 +1,27 @@
+uuid: 44198bd2-826d-452f-89cd-2294da518248
+langcode: es
+status: false
+dependencies:
+  config:
+    - system.menu.footer_contact
+  module:
+    - system
+active_version: 6a0e53bb970492f8
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:footer_contact'
+        label: 'Pie de página — Contacto'
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: 'Pie de página — Contacto'
+id: block.system_menu_block.footer_contact
+provider: system
+source: block
+source_local_id: 'system_menu_block:footer_contact'

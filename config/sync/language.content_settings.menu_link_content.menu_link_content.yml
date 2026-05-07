@@ -1,0 +1,15 @@
+uuid: 6bce15bc-5ac2-496c-988e-2274087fa84f
+langcode: es
+status: true
+dependencies:
+  module:
+    - content_translation
+    - menu_link_content
+third_party_settings:
+  content_translation:
+    enabled: true
+id: menu_link_content.menu_link_content
+target_entity_type_id: menu_link_content
+target_bundle: menu_link_content
+default_langcode: es
+language_alterable: true
