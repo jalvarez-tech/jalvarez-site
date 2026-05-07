@@ -29,7 +29,7 @@ $settings
 echo "[ok] menu_link_content translation enabled (default es).\n";
 
 // 2) Define the 4 main menu links. Order = UI order. UUIDs are static so
-//    a re-run finds and updates instead of duplicating.
+// a re-run finds and updates instead of duplicating.
 $links = [
   [
     'uuid'    => 'b8e2a4f0-1a2b-4c3d-8e5f-000000000001',
