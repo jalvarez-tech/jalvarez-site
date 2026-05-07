@@ -13,13 +13,6 @@
   save: 'Save',
   copy: 'Copy link',
   hero_alt: 'Featured image',
-  newsletter_eyebrow: 'NEWSLETTER — ONE PER MONTH, ONLY THE USEFUL',
-  newsletter_title_a: 'If anything I',
-  newsletter_title_em: 'shared here',
-  newsletter_title_b: 'helped, take what comes next too.',
-  newsletter_email: 'you@email.com',
-  newsletter_label: 'Email address',
-  newsletter_submit: 'Subscribe',
 } : {
   back: '← Volver a notas',
   back_path: '/notas',
@@ -28,13 +21,6 @@
   save: 'Guardar',
   copy: 'Copiar enlace',
   hero_alt: 'Imagen destacada',
-  newsletter_eyebrow: 'NEWSLETTER — UNA POR MES, LO MÁS ÚTIL',
-  newsletter_title_a: 'Si te sirvió algo de lo que',
-  newsletter_title_em: 'compartí aquí',
-  newsletter_title_b: ', llévate también lo que viene.',
-  newsletter_email: 'tu@email.com',
-  newsletter_label: 'Correo electrónico',
-  newsletter_submit: 'Suscribirme',
 } %}
 
 {# Read time estimate #}
@@ -112,19 +98,8 @@
     {% endif %}
 
     <div class="article__body">
-      {{ node.body.value|raw }}
+      {# Use the filter-format-processed value; |raw bypasses Drupal's XSS filtering. #}
+      {{ node.body.processed }}
     </div>
-
-    <hr class="article__divider">
-
-    <section class="article__news">
-      <div class="article__news-eyebrow">{{ i18n.newsletter_eyebrow }}</div>
-      <h3>{{ i18n.newsletter_title_a }} <em style="color: var(--accent); font-style: italic; font-family: 'Instrument Serif', serif;">{{ i18n.newsletter_title_em }}</em>{{ i18n.newsletter_title_b }}</h3>
-      <form action="#" method="post" onsubmit="return false;">
-        <label for="newsletter-email" class="visually-hidden">{{ i18n.newsletter_label }}</label>
-        <input id="newsletter-email" type="email" placeholder="{{ i18n.newsletter_email }}" required autocomplete="email">
-        <button class="btn btn--primary btn--sm" type="submit">{{ i18n.newsletter_submit }}</button>
-      </form>
-    </section>
   </div>
 </article>

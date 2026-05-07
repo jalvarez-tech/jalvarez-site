@@ -7,3 +7,4 @@ global:
     js/nav.js: { defer: true }
   dependencies:
     - core/drupal
+    - core/once

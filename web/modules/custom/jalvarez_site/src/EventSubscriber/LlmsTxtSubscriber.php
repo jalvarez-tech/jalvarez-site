@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\jalvarez_site\EventSubscriber;
 
-use Drupal\jalvarez_site\Controller\LlmsTxtController;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\jalvarez_site\Llms\LlmsTxtBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,19 +14,17 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * language path-prefix redirect (which would otherwise rewrite the path
  * to /es/llms.txt and break the llms.txt convention).
  *
- * Runs at priority 300 so it fires before
+ * Runs at priority 350 so it fires before
  * \Drupal\language\HttpKernel\PathProcessorLanguage::processInbound
  * (which would split a non-prefixed path into a redirect).
  */
 final class LlmsTxtSubscriber implements EventSubscriberInterface {
 
   public function __construct(
-    private readonly ContainerInterface $container,
+    private readonly LlmsTxtBuilder $builder,
   ) {}
 
   public static function getSubscribedEvents(): array {
-    // Priority must be > 300 (Symfony Router) to intercept before routing,
-    // and we need to win against language-prefix redirect (priority ~250).
     return [
       KernelEvents::REQUEST => [['onRequest', 350]],
     ];
@@ -42,12 +39,9 @@ final class LlmsTxtSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $controller = LlmsTxtController::create($this->container);
-    $response = $path === '/llms-full.txt'
-      ? $controller->full($event->getRequest())
-      : $controller->index($event->getRequest());
-
-    $event->setResponse($response);
+    $event->setResponse(
+      $this->builder->buildResponse($event->getRequest(), $path === '/llms-full.txt'),
+    );
   }
 
 }

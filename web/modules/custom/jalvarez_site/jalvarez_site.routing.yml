@@ -4,9 +4,9 @@ jalvarez_site.styleguide:
     _controller: '\Drupal\jalvarez_site\Controller\StyleguideController::index'
     _title: 'Styleguide — byte components'
   requirements:
-    _permission: 'access content'
+    _permission: 'administer site configuration'
   options:
-    no_cache: 'TRUE'
+    no_cache: TRUE
 
 jalvarez_site.llms_txt:
   path: '/llms.txt'
@@ -16,7 +16,6 @@ jalvarez_site.llms_txt:
     _access: 'TRUE'
   options:
     _maintenance_access: TRUE
-    no_cache: 'TRUE'
 
 jalvarez_site.llms_full_txt:
   path: '/llms-full.txt'
@@ -26,4 +25,3 @@ jalvarez_site.llms_full_txt:
     _access: 'TRUE'
   options:
     _maintenance_access: TRUE
-    no_cache: 'TRUE'

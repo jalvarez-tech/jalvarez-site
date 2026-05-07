@@ -9,6 +9,9 @@ concurrency:
   group: deploy-production
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     name: Build & Deploy
@@ -110,12 +113,16 @@ jobs:
           php -l web/sites/default/settings.php
 
       # ───── SSH setup ─────
+      # HOSTINGER_KNOWN_HOSTS must contain the output of:
+      #   ssh-keyscan -H -p <port> <host>
+      # Without it, deploys are vulnerable to MITM on the SSH channel
+      # (TOFU = trust on first use accepts whatever key the network presents).
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           name: hostinger
-          known_hosts: 'placeholder'
+          known_hosts: ${{ secrets.HOSTINGER_KNOWN_HOSTS }}
           config: |
             Host hostinger
               HostName ${{ secrets.HOSTINGER_HOST }}
@@ -123,7 +130,7 @@ jobs:
               User ${{ secrets.HOSTINGER_USER }}
               IdentityFile ~/.ssh/hostinger
               IdentitiesOnly yes
-              StrictHostKeyChecking accept-new
+              StrictHostKeyChecking yes
 
       # ───── Pre-deploy: relax permissions + ensure target dirs exist ─────
       - name: Pre-deploy permissions
@@ -160,6 +167,19 @@ jobs:
           "
 
       # ───── Deploy: 2 rsync passes ─────
+      # Sanity gate: web/vendor lives UNDER the docroot, so it relies on the
+      # .htaccess that core-vendor-hardening drops to deny direct access. If
+      # the file is missing (composer plugin failure, accidental delete) we
+      # would expose the entire vendor tree to the web. Fail loud here rather
+      # than ship a public vendor/.
+      - name: Verify web/vendor hardening (.htaccess present)
+        run: |
+          if [ ! -f web/vendor/.htaccess ]; then
+            echo "::error::web/vendor/.htaccess is missing — refusing to deploy. Run 'composer install' to regenerate."
+            exit 1
+          fi
+          echo "✓ web/vendor/.htaccess present ($(wc -l < web/vendor/.htaccess) lines)"
+
       # web/ already contains web/vendor/ (composer vendor-dir = web/vendor),
       # so a single rsync of web/ → public_html/ deploys app + vendor together.
       - name: Rsync web/ → public_html/

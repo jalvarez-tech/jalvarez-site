@@ -4,9 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       script:
-        description: 'Path of the PHP script to execute on the production server (relative to project root).'
+        description: 'Path of the PHP script to execute on the production server (relative to project root). Must be listed in .github/allowed-seeds.txt.'
         required: true
         default: 'scripts/build-sample-projects.php'
+
+permissions:
+  contents: read
 
 jobs:
   seed:
@@ -16,11 +19,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Reject anything that isn't (a) a normalised path under scripts/,
+      # (b) a .php file, and (c) explicitly listed in .github/allowed-seeds.txt.
+      # Without this the workflow would let any actor with workflow_dispatch
+      # run arbitrary PHP on production.
+      - name: Validate script against allowlist
+        env:
+          SCRIPT: ${{ inputs.script }}
+        run: |
+          set -euo pipefail
+          case "$SCRIPT" in
+            *..*|/*|*$'\n'*)
+              echo "::error::Path traversal or absolute path rejected: $SCRIPT"; exit 1;;
+          esac
+          case "$SCRIPT" in
+            scripts/*.php) ;;
+            *) echo "::error::Script must live under scripts/ and end in .php: $SCRIPT"; exit 1;;
+          esac
+          if [ ! -f .github/allowed-seeds.txt ]; then
+            echo "::error::.github/allowed-seeds.txt is missing — refusing to run."
+            exit 1
+          fi
+          if ! grep -Fxq "$SCRIPT" .github/allowed-seeds.txt; then
+            echo "::error::$SCRIPT is not listed in .github/allowed-seeds.txt."
+            exit 1
+          fi
+          if [ ! -f "$SCRIPT" ]; then
+            echo "::error::Script not found in checkout: $SCRIPT"
+            exit 1
+          fi
+          echo "✓ $SCRIPT passed allowlist + path checks."
+
+      # HOSTINGER_KNOWN_HOSTS pinning — see deploy.yml for the rationale.
       - uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           name: hostinger
-          known_hosts: 'placeholder'
+          known_hosts: ${{ secrets.HOSTINGER_KNOWN_HOSTS }}
           config: |
             Host hostinger
               HostName ${{ secrets.HOSTINGER_HOST }}
@@ -28,15 +63,7 @@ jobs:
               User ${{ secrets.HOSTINGER_USER }}
               IdentityFile ~/.ssh/hostinger
               IdentitiesOnly yes
-              StrictHostKeyChecking accept-new
-
-      - name: Verify script exists in repo
-        run: |
-          if [ ! -f "${{ inputs.script }}" ]; then
-            echo "::error::Script not found: ${{ inputs.script }}"
-            exit 1
-          fi
-          echo "Will run: ${{ inputs.script }}"
+              StrictHostKeyChecking yes
 
       - name: Send script to server (/tmp)
         run: |

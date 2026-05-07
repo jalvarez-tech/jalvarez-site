@@ -1,4 +1,8 @@
 services:
+  jalvarez_site.llms_txt_builder:
+    class: Drupal\jalvarez_site\Llms\LlmsTxtBuilder
+    arguments: ['@entity_type.manager']
+
   jalvarez_site.canvas_lang_prefix_stripper:
     class: Drupal\jalvarez_site\EventSubscriber\CanvasLangPrefixStripper
     tags:
@@ -6,6 +10,6 @@ services:
 
   jalvarez_site.llms_txt_subscriber:
     class: Drupal\jalvarez_site\EventSubscriber\LlmsTxtSubscriber
-    arguments: ['@service_container']
+    arguments: ['@jalvarez_site.llms_txt_builder']
     tags:
       - { name: event_subscriber }
