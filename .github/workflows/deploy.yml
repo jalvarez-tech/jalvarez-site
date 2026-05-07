@@ -280,6 +280,15 @@ jobs:
               else
                 echo '⚠ Repair script not found at $REMOTE_FIX — skipping.'
               fi
+
+              # Regenerate sitemap.xml. Idempotent: simple_sitemap rebuilds
+              # from queue and overwrites the served sitemap atomically.
+              # No-op if the module isn't enabled yet (first deploy after
+              # adding it — cim above will have enabled it).
+              if \$DRUSH pm:list --status=enabled --field=name 2>/dev/null | grep -qx 'simple_sitemap'; then
+                echo '→ Generating sitemap.xml.'
+                \$DRUSH ssg -y || echo '⚠ Sitemap generation failed — non-fatal.'
+              fi
             else
               echo '⚠ Drupal not installed yet — skipping drush hooks.'
               echo '   Run \`drush site:install\` manually once via SSH to bootstrap.'

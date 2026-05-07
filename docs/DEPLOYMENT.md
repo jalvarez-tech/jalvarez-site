@@ -482,6 +482,20 @@ Después del primer deploy con Canvas, corra estos scripts vía `seed-content.ym
 6. **`scripts/configure-form-displays.php`** (opcional, solo si cambian los schemas de fields en project/note)
    Configura form displays con field_group fieldsets para project, note y page bundles.
 
+### Post-deploy específico de SEO (orden importa)
+
+El módulo `simple_sitemap` se habilita automáticamente vía `drush cim` (está en `config/sync/core.extension.yml`) y el workflow corre `drush ssg` en cada deploy para regenerar `sitemap.xml`. Lo único que no se hace solo es:
+
+1. **`scripts/configure-simple-sitemap.php`** (idempotente — solo correr 1ª vez por entorno)
+   Registra `canvas_page`, `node:project` y `node:note` como bundles indexables en el variant `default` del sitemap. Sin esto, `drush ssg` produciría un sitemap vacío. Se corre vía `seed-content.yml` desde GitHub Actions → Run workflow.
+
+2. **`scripts/update-seo-metatags.php`** (idempotente — solo correr 1ª vez por entorno o cuando cambien los textos SEO)
+   Pobla el campo `metatags` de las 4 canvas_pages (Inicio, Proyectos, Notas, Contacto) en ES y EN con los `title` y `description` SEO-optimizados de marca. Si los IDs de canvas_page en prod difieren del array hardcoded en el script (ID 8=Inicio, 5=Proyectos, 6=Notas, 7=Contacto), ajustar el array antes de correr.
+
+Después del primer deploy con SEO, ambos scripts deben correrse vía `seed-content.yml` (workflow_dispatch). En deploys posteriores no se necesitan: el sitemap se regenera automáticamente vía `drush ssg` y los metatags persisten en DB.
+
+`/llms.txt` y `/llms-full.txt` son endpoints dinámicos servidos por `LlmsTxtController`. No requieren generación: leen DB en cada request con `CacheableResponse` tagueada (cache tags `canvas_page_list`, `node_list:project`, `node_list:note`) — la edición de cualquier proyecto, nota o canvas_page invalida el cache automáticamente.
+
 ### Sobre la portabilidad de IDs
 
 `system.site.page.front = /page/<id>` referencia el ID numérico del canvas_page Inicio. Como los IDs son auto-incrementales y difieren entre entornos, el script `create-canvas-home.php` actualiza este config dinámicamente al crear la entidad. **No hay que editarlo manualmente entre entornos** — basta con correr el script.
