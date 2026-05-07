@@ -464,35 +464,40 @@ git revert <hash> && git push   # CI re-deploya el estado previo
 
 Después del primer deploy con Canvas, corra estos scripts vía SSH (ver patrón en [§ Cómo correr un script puntual en prod](#cómo-correr-un-script-puntual-en-prod) más abajo), en este orden:
 
-1. **`scripts/canvas-discover-sdcs.php`** (idempotente)
+1. **`scripts/maintenance/canvas-discover-sdcs.php`** (idempotente)
    Re-discover los SDCs de byte y registra los Component config entities. Útil si `drush cim` no creó automáticamente los `canvas.component.sdc.byte.*`. También útil tras añadir nuevos SDCs.
 
-2. **`scripts/create-media-image-type.php`** (idempotente)
+2. **`scripts/maintenance/setup/create-media-image-type.php`** (idempotente)
    Crea el `media_type: image` con su `field_media_image`. **Requisito hard de canvas_page**: sin un media type tipo image, MediaLibraryWidget crashea cuando Canvas genera el form para el campo base `image` de canvas_page. Sin esto, el editor visual queda en blanco.
 
-3. **`scripts/create-canvas-home.php`** (idempotente — borra y recrea la canvas_page "Inicio (Canvas)")
-   Crea el `canvas_page` con `components` field tree en ES + traducción EN, y setea `system.site.page.front` al `/page/<id>` correcto del entorno (los IDs de canvas_page difieren entre local y prod).
+3. **Initial canvas_page seed** — already in production. The original seed
+   scripts (`create-canvas-home.php`, `create-canvas-other-pages.php`) were
+   one-shots that ran once per environment in F8–F10. They were deleted in
+   PR2 (2026-05-07) because the resulting `canvas_page` entities now live
+   in production and the structural definitions sit in `config/sync`. For
+   a brand-new environment, recreate the four pages by editing through the
+   visual Canvas editor.
 
-4. **`scripts/create-canvas-other-pages.php`** (idempotente)
-   Crea las 3 canvas_pages restantes: Proyectos, Notas, Contacto. Cada una con traducción EN. Las páginas de listados embeben los block plugins custom (`block.jalvarez_projects_grid`, `block.jalvarez_notes_grid`); Contacto embebe `block.webform_block` con `webform_id: contact`.
-
-5. **`scripts/place-nav-block.php`** (solo primera vez)
+4. **`scripts/maintenance/setup/place-nav-block.php`** (solo primera vez)
    Coloca el block `jalvarez_nav_glass` en el region `byte:header`.
 
-6. **`scripts/configure-form-displays.php`** (opcional, solo si cambian los schemas de fields en project/note)
+5. **`scripts/maintenance/setup/configure-form-displays.php`** (opcional, solo si cambian los schemas de fields en project/note)
    Configura form displays con field_group fieldsets para project, note y page bundles.
 
 ### Post-deploy específico de SEO (orden importa)
 
 El módulo `simple_sitemap` se habilita automáticamente vía `drush cim` (está en `config/sync/core.extension.yml`) y el workflow corre `drush ssg` en cada deploy para regenerar `sitemap.xml`. Lo único que no se hace solo es:
 
-1. **`scripts/configure-simple-sitemap.php`** (idempotente — solo correr 1ª vez por entorno)
+1. **`scripts/maintenance/setup/configure-simple-sitemap.php`** (idempotente — solo correr 1ª vez por entorno)
    Registra `canvas_page`, `node:project` y `node:note` como bundles indexables en el variant `default` del sitemap. Sin esto, `drush ssg` produciría un sitemap vacío. Correr vía SSH (ver § Cómo correr un script puntual en prod).
 
-2. **`scripts/update-seo-metatags.php`** (idempotente — solo correr 1ª vez por entorno o cuando cambien los textos SEO)
-   Pobla el campo `metatags` de las 4 canvas_pages (Inicio, Proyectos, Notas, Contacto) en ES y EN con los `title` y `description` SEO-optimizados de marca. Si los IDs de canvas_page en prod difieren del array hardcoded en el script (ID 8=Inicio, 5=Proyectos, 6=Notas, 7=Contacto), ajustar el array antes de correr.
+2. **Metatags seed** — already in production. The `update-seo-metatags.php`
+   one-shot script populated the `metatags` field on the 4 canvas_pages in
+   F11; the values now live in DB and `config/sync`. Future SEO copy
+   changes go through the visual editor or `drush config:set`. Script
+   deleted in PR2.
 
-Después del primer deploy con SEO, ambos scripts deben correrse vía SSH. En deploys posteriores no se necesitan: el sitemap se regenera automáticamente vía `drush ssg` y los metatags persisten en DB.
+The sitemap variant config script must run once per environment. In subsequent deploys it's not needed: the sitemap regenerates automatically via `drush ssg` and the metatags persist in DB.
 
 `/llms.txt` y `/llms-full.txt` son endpoints dinámicos servidos por `LlmsTxtController`. No requieren generación: leen DB en cada request con `CacheableResponse` tagueada (cache tags `canvas_page_list`, `node_list:project`, `node_list:note`) — la edición de cualquier proyecto, nota o canvas_page invalida el cache automáticamente.
 
@@ -508,7 +513,7 @@ ssh hostinger "cd \$DRUPAL_PATH/public_html && ./vendor/bin/drush php:script /tm
 
 `hostinger` es el alias SSH definido localmente (`~/.ssh/config` con `HostName`, `Port`, `User`, `IdentityFile`); `$DRUPAL_PATH` es la ruta al proyecto en el servidor (ver `secrets.HOSTINGER_PATH` en GitHub Secrets para el valor canónico). En la máquina del autor está exportado en `~/.zshrc` para evitar repetirlo.
 
-> Antes había un workflow `seed-content.yml` que hacía esto vía `workflow_dispatch`. Se eliminó en PR1 (2026-05-06) porque la mayoría de los scripts en `scripts/` son one-shots ya aplicados o serán migrados a `hook_update_N` / Drush commands en PR2. Ejecutar puntualmente por SSH reduce la superficie de ataque (un workflow menos con `secrets.HOSTINGER_*`) y mantiene el flujo trivial.
+> Antes había un workflow `seed-content.yml` que hacía esto vía `workflow_dispatch`. Se eliminó en PR1 (2026-05-06) porque la mayoría de los scripts en `scripts/` eran one-shots ya aplicados, y PR2 (2026-05-07) terminó la limpieza: 49 scripts borrados, 4 supervivientes activos en `scripts/maintenance/`, 11 setup parked en `scripts/maintenance/setup/` (audit pendiente para borrarlos o migrarlos a recipe), 3 reusables convertidos a Drush commands en `MaintenanceCommands.php`, y 1 mutación de field config movida a `jalvarez_site_update_10001()`. Ejecutar puntualmente por SSH reduce la superficie de ataque (un workflow menos con `secrets.HOSTINGER_*`) y mantiene el flujo trivial.
 
 ### Sobre la portabilidad de IDs
 
@@ -548,11 +553,11 @@ Lo mismo para los aliases (`/inicio`, `/home`, `/proyectos`, etc.): son parte de
 **Fix inmediato:**
 
 ```bash
-scp scripts/restore-canvas-home-en.php hostinger:/tmp/
+scp scripts/maintenance/restore-canvas-home-en.php hostinger:/tmp/
 ssh hostinger "cd \$DRUPAL_PATH/public_html && ./vendor/bin/drush php:script /tmp/restore-canvas-home-en.php && rm /tmp/restore-canvas-home-en.php"
 ```
 
-El script [`scripts/restore-canvas-home-en.php`](../scripts/restore-canvas-home-en.php) resuelve la canvas_page Inicio por alias `/inicio` y reaplica la translation EN canónica (mismo árbol de componentes que `create-canvas-home.php`) sin tocar el ES. Idempotente: detecta si la translation existe o falta. Tras correrlo:
+El script [`scripts/maintenance/restore-canvas-home-en.php`](../scripts/maintenance/restore-canvas-home-en.php) resuelve la canvas_page Inicio por alias `/inicio` y reaplica la translation EN canónica sin tocar el ES. Idempotente: detecta si la translation existe o falta. Tras correrlo:
 
 ```bash
 # Drupal cache + page cache
@@ -563,18 +568,14 @@ Y esperar máximo 15 min a que el LiteSpeed cache de Hostinger expire (TTL `cach
 
 **Prevención automática (post-2026-05-04):** el módulo `jalvarez_site` implementa `hook_canvas_page_presave()` que detecta y revierte el wipe automáticamente — ver [`web/modules/custom/jalvarez_site/jalvarez_site.module`](../web/modules/custom/jalvarez_site/jalvarez_site.module). El hook se ejecuta antes de cada `->save()` de canvas_page y, si detecta que una translation existente quedaría con `components` vacíos o que desaparecería de la entity, restaura el value original desde storage.
 
-Se valida con [`scripts/test-translation-wipe-guard.php`](../scripts/test-translation-wipe-guard.php), que reproduce el bug por entity API y comprueba que el hook lo bloquea. Idempotente y safe en prod (revierte sus cambios al final). Para ejecutar en prod: ver § Cómo correr un script puntual en prod.
+Se valida con `drush jalvarez:test-wipe-guard` (portado a Drush command en PR2), que reproduce el bug por entity API y comprueba que el hook lo bloquea. Idempotente y safe en prod (revierte sus cambios al final). Para ejecutarlo: `ssh hostinger "cd \$DRUPAL_PATH/public_html && ./vendor/bin/drush jalvarez:test-wipe-guard"`.
 
 **Trade-off:** vaciar legítimamente todos los componentes de una translation desde el editor visual ya no funciona. Si quieres hacerlo a propósito, usa drush:
 ```bash
 drush php:eval '\Drupal\canvas\Entity\Page::load(5)->getTranslation("en")->set("components", [])->save();'
 ```
 
-**Si todo falla:** el restore manual sigue disponible (ver § Cómo correr un script puntual en prod):
-```bash
-scp scripts/restore-canvas-home-en.php hostinger:/tmp/
-ssh hostinger "cd \$DRUPAL_PATH/public_html && ./vendor/bin/drush php:script /tmp/restore-canvas-home-en.php && rm /tmp/restore-canvas-home-en.php"
-```
+**Si todo falla:** el restore manual sigue disponible — ver el script en `scripts/maintenance/restore-canvas-home-en.php` y la sección § Cómo correr un script puntual en prod más abajo.
 
 > ⚠️ **Importante para devs locales:** después de un `git pull` que toca `*.module` o `*.install`, hay que correr `ddev exec ./web/vendor/bin/drush cr` antes de probar el editor visual. Drupal cachea `module.implements` y un hook nuevo no se dispara hasta el rebuild. El deploy a prod ya lo hace automáticamente (`drush cim && cr` en el workflow), pero el entorno local depende de la disciplina del dev.
 >

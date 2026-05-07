@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Emergency restore for the EN translation of the Inicio canvas_page.
@@ -39,10 +40,13 @@
 
 use Drupal\canvas\Entity\Component;
 
-// ---------------------------------------------------------------------------
-// Helpers (copied from scripts/create-canvas-home.php — keep in sync if the
-// SDC field-type contract changes upstream in Canvas).
-// ---------------------------------------------------------------------------
+/**
+ * Generates a fresh UUID for a Canvas component_tree row.
+ *
+ * Helpers below are copied from the deleted scripts/create-canvas-home.php
+ * — keep them in sync if the SDC field-type contract changes upstream in
+ * Canvas.
+ */
 function _restore_uuid(): string {
   return \Drupal::service('uuid')->generate();
 }
@@ -57,7 +61,9 @@ function _restore_tree_item(string $uuid, string $component_id, array $values, ?
 
   $inputs = [];
   foreach ($values as $prop_name => $value) {
-    if (!isset($defs[$prop_name])) continue;
+    if (!isset($defs[$prop_name])) {
+      continue;
+    }
     $field_type = $defs[$prop_name]['field_type'];
     $entry = [
       'sourceType' => "static:field_item:{$field_type}",
@@ -133,7 +139,7 @@ $test_kids  = [_restore_uuid(), _restore_uuid()];
 
 $tree_en = [];
 
-// Hero
+// Hero.
 $tree_en[] = _restore_tree_item($hero_uuid, 'sdc.byte.banner-inicio', [
   'status' => 'Available · Q3 2026 · 2 slots',
   'title_a' => 'I believe a website',
@@ -147,14 +153,20 @@ $tree_en[] = _restore_tree_item($hero_uuid, 'sdc.byte.banner-inicio', [
   'cta_primary_href' => '/contact',
   'cta_secondary_label' => 'See the work',
   'cta_secondary_href' => '/projects',
-  'm1_value' => '15', 'm1_unit' => '+', 'm1_label' => 'years defending this',
-  'm2_value' => '80', 'm2_unit' => '+', 'm2_label' => 'platforms in production',
-  'm3_value' => '97', 'm3_unit' => '%', 'm3_label' => 'returning clients',
+  'm1_value' => '15',
+  'm1_unit' => '+',
+  'm1_label' => 'years defending this',
+  'm2_value' => '80',
+  'm2_unit' => '+',
+  'm2_label' => 'platforms in production',
+  'm3_value' => '97',
+  'm3_unit' => '%',
+  'm3_label' => 'returning clients',
   'show_terminal' => TRUE,
   'show_portrait' => TRUE,
 ]);
 
-// Marquee
+// Marquee.
 $tree_en[] = _restore_tree_item($marquee_uuid, 'sdc.byte.marquee', [
   'item_1' => 'WordPress',
   'item_2' => 'Drupal 11',
@@ -167,7 +179,7 @@ $tree_en[] = _restore_tree_item($marquee_uuid, 'sdc.byte.marquee', [
   'item_9' => 'Performance Audits',
 ]);
 
-// Cómo lo hago + 4 value cards
+// Cómo lo hago + 4 value cards.
 $tree_en[] = _restore_tree_item($values_uuid, 'sdc.byte.como-lo-hago', [
   'eyebrow_label' => 'how I work',
   'eyebrow_number' => 1,
@@ -176,22 +188,32 @@ $tree_en[] = _restore_tree_item($values_uuid, 'sdc.byte.como-lo-hago', [
 ]);
 $en_value_cards = [
   [1, 'gauge', 'performance', 'Measure before promising',
-   'Every technical decision starts with a real number: LCP, CLS, page weight, bounce rate. If it isn\'t measured, it doesn\'t exist.',
-   '42', '%', 'average speed gain after audit'],
+    'Every technical decision starts with a real number: LCP, CLS, page weight, bounce rate. If it isn\'t measured, it doesn\'t exist.',
+    '42', '%', 'average speed gain after audit',
+  ],
   [2, 'layers', 'architecture', 'Built to last',
-   'WordPress and Drupal written as if I had to maintain them five years from now. Reusable components, clean builds, near-zero technical debt.',
-   '15', '+ years', 'building platforms that don\'t break'],
+    'WordPress and Drupal written as if I had to maintain them five years from now. Reusable components, clean builds, near-zero technical debt.',
+    '15', '+ years', 'building platforms that don\'t break',
+  ],
   [3, 'accessibility', 'accessibility', 'Respect every visitor',
-   'WCAG 2.2 AA is the floor, not the ceiling. A site that excludes 15% of users is not "almost accessible": it\'s broken.',
-   'AA', '', 'WCAG 2.2 conformance by default'],
+    'WCAG 2.2 AA is the floor, not the ceiling. A site that excludes 15% of users is not "almost accessible": it\'s broken.',
+    'AA', '', 'WCAG 2.2 conformance by default',
+  ],
   [4, 'workflow', 'automation', 'Automate the repetitive',
-   'n8n flows, API integrations, funnels connected to your CRM. The site is a silent collaborator working while you sleep.',
-   '∞', 'h', 'hours/month recovered for active clients'],
+    'n8n flows, API integrations, funnels connected to your CRM. The site is a silent collaborator working while you sleep.',
+    '∞', 'h', 'hours/month recovered for active clients',
+  ],
 ];
 foreach ($en_value_cards as $i => [$num, $icon, $tag, $title, $body, $mv, $mu, $cap]) {
   $tree_en[] = _restore_tree_item($value_kids[$i], 'sdc.byte.value-card', [
-    'number' => $num, 'icon' => $icon, 'tag' => $tag, 'title' => $title,
-    'body' => $body, 'metric_value' => $mv, 'metric_unit' => $mu, 'caption' => $cap,
+    'number' => $num,
+    'icon' => $icon,
+    'tag' => $tag,
+    'title' => $title,
+    'body' => $body,
+    'metric_value' => $mv,
+    'metric_unit' => $mu,
+    'caption' => $cap,
   ], $values_uuid, 'values');
 }
 
@@ -213,7 +235,7 @@ $tree_en[] = _restore_block_item($projects_block_uuid, 'block.jalvarez_projects_
   'wrap' => 'none',
 ], $featured_uuid, 'projects');
 
-// Método + 4 process rows
+// Método + 4 process rows.
 $tree_en[] = _restore_tree_item($process_uuid, 'sdc.byte.metodo', [
   'eyebrow_label' => 'the method',
   'eyebrow_number' => 3,
@@ -221,18 +243,41 @@ $tree_en[] = _restore_tree_item($process_uuid, 'sdc.byte.metodo', [
   'title_em' => 'this is how I work when we start.',
 ]);
 $en_steps = [
-  [1, 'Technical audit', 'Week 1', 'Before proposing anything, I measure. Performance, architecture, real opportunities. I deliver a document that says what hurts, what matters, and what can be safely ignored.'],
-  [2, 'Architecture', 'Week 2', 'I choose the stack based on your team, budget, and growth — not on what\'s trendy. Drupal, WordPress, headless: the right answer depends on your case.'],
-  [3, 'Implementation', 'Wk 3-8', 'Bi-weekly sprints with demos. Internal code reviews, performance budgets that break the build if exceeded. Zero surprises on launch day.'],
-  [4, 'Launch + support', 'Ongoing', 'Zero-downtime migration, active monitoring during the first 4 weeks, and a 12-month maintenance plan. Launching is the beginning, not the end.'],
+  [
+    1,
+    'Technical audit',
+    'Week 1',
+    'Before proposing anything, I measure. Performance, architecture, real opportunities. I deliver a document that says what hurts, what matters, and what can be safely ignored.',
+  ],
+  [
+    2,
+    'Architecture',
+    'Week 2',
+    'I choose the stack based on your team, budget, and growth — not on what\'s trendy. Drupal, WordPress, headless: the right answer depends on your case.',
+  ],
+  [
+    3,
+    'Implementation',
+    'Wk 3-8',
+    'Bi-weekly sprints with demos. Internal code reviews, performance budgets that break the build if exceeded. Zero surprises on launch day.',
+  ],
+  [
+    4,
+    'Launch + support',
+    'Ongoing',
+    'Zero-downtime migration, active monitoring during the first 4 weeks, and a 12-month maintenance plan. Launching is the beginning, not the end.',
+  ],
 ];
 foreach ($en_steps as $i => [$num, $title, $tag, $body]) {
   $tree_en[] = _restore_tree_item($step_kids[$i], 'sdc.byte.process-row', [
-    'number' => $num, 'title' => $title, 'tag' => $tag, 'body' => $body,
+    'number' => $num,
+    'title' => $title,
+    'tag' => $tag,
+    'body' => $body,
   ], $process_uuid, 'steps');
 }
 
-// Palabras cliente + 2 testimonials
+// Palabras cliente + 2 testimonials.
 $tree_en[] = _restore_tree_item($tests_uuid, 'sdc.byte.palabras-cliente', [
   'eyebrow_label' => 'client words',
   'eyebrow_number' => 4,
@@ -240,17 +285,22 @@ $tree_en[] = _restore_tree_item($tests_uuid, 'sdc.byte.palabras-cliente', [
 ]);
 $en_tests = [
   ['John implemented our site with impeccable technical execution. He optimized performance achieving more than 40% improvement in speed and stability.',
-   'Tatiana Restrepo', 'Maluma.online', 'TR'],
+    'Tatiana Restrepo', 'Maluma.online', 'TR',
+  ],
   ['He turned the design into a functional, optimized, and scalable platform. His ability to execute with precision made an enormous difference.',
-   'Tes Pimienta', 'Royalty Films', 'TP'],
+    'Tes Pimienta', 'Royalty Films', 'TP',
+  ],
 ];
 foreach ($en_tests as $i => [$quote, $name, $role, $initials]) {
   $tree_en[] = _restore_tree_item($test_kids[$i], 'sdc.byte.card-testimonio', [
-    'quote' => $quote, 'name' => $name, 'role' => $role, 'initials' => $initials,
+    'quote' => $quote,
+    'name' => $name,
+    'role' => $role,
+    'initials' => $initials,
   ], $tests_uuid, 'testimonials');
 }
 
-// CTA final
+// CTA final.
 $tree_en[] = _restore_tree_item($cta_uuid, 'sdc.byte.cta-final', [
   'title' => 'If you believe the same, ',
   'title_em' => 'let\'s build something together.',
