@@ -66,14 +66,20 @@ final class NotesGridBlock extends BlockBase implements ContainerFactoryPluginIn
     // falls back to the canonical translation when a translation doesn't
     // exist).
     $current_lang = $this->languageManager->getCurrentLanguage()->getId();
-
+    // Iterate in the query order, not in the order returned by loadMultiple()
+    // — Drupal hydrates entities keyed by their id, which silently destroys
+    // the `field_publish_date DESC, nid DESC` sort applied above.
+    $nodes = $node_storage->loadMultiple($nids ?: []);
     $rows = [];
-    foreach ($node_storage->loadMultiple($nids ?: []) as $i => $node) {
-      $node = $this->entityRepository->getTranslationFromContext($node, $current_lang);
+    foreach ($nids as $nid) {
+      if (!isset($nodes[$nid])) {
+        continue;
+      }
+      $node = $this->entityRepository->getTranslationFromContext($nodes[$nid], $current_lang);
       if (!$node instanceof NodeInterface) {
         continue;
       }
-      $rows[$i] = [
+      $rows[] = [
         '#type' => 'component',
         '#component' => 'byte:row-nota',
         '#props' => $this->mapNodeToProps($node),
@@ -153,7 +159,13 @@ final class NotesGridBlock extends BlockBase implements ContainerFactoryPluginIn
   }
 
   public function getCacheContexts(): array {
-    return Cache::mergeContexts(parent::getCacheContexts(), ['languages:language_interface']);
+    // `accessCheck(TRUE)` on the entity query means a user with `view
+    // unpublished node` would otherwise share the cached render with an
+    // anonymous user. `user.permissions` keeps both bins distinct.
+    return Cache::mergeContexts(parent::getCacheContexts(), [
+      'languages:language_interface',
+      'user.permissions',
+    ]);
   }
 
 }

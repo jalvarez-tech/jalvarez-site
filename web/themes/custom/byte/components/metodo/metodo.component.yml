@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Método (Process)'
 status: stable
 description: 'Section header (eyebrow + title) followed by a process list. Drop process-row components into the steps slot.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

@@ -122,13 +122,20 @@ final class ProjectsGridBlock extends BlockBase implements ContainerFactoryPlugi
     // renders titles + excerpts in the right language (canonical fallback
     // when no translation exists).
     $current_lang = $this->languageManager->getCurrentLanguage()->getId();
+    // Iterate in the query order, not in the order returned by loadMultiple()
+    // — Drupal hydrates entities keyed by their id, which silently destroys
+    // the `field_sort_order ASC, nid ASC` sort applied above.
+    $nodes = $node_storage->loadMultiple($nids ?: []);
     $cards = [];
-    foreach ($node_storage->loadMultiple($nids ?: []) as $i => $node) {
-      $node = $this->entityRepository->getTranslationFromContext($node, $current_lang);
+    foreach ($nids as $nid) {
+      if (!isset($nodes[$nid])) {
+        continue;
+      }
+      $node = $this->entityRepository->getTranslationFromContext($nodes[$nid], $current_lang);
       if (!$node instanceof NodeInterface) {
         continue;
       }
-      $cards[$i] = [
+      $cards[] = [
         '#type' => 'component',
         '#component' => 'byte:card-proyecto',
         '#props' => $this->mapNodeToProps($node),
@@ -227,7 +234,13 @@ final class ProjectsGridBlock extends BlockBase implements ContainerFactoryPlugi
   }
 
   public function getCacheContexts(): array {
-    return Cache::mergeContexts(parent::getCacheContexts(), ['languages:language_interface']);
+    // `accessCheck(TRUE)` on the entity query means a user with `view
+    // unpublished node` would otherwise share the cached render with an
+    // anonymous user. `user.permissions` keeps both bins distinct.
+    return Cache::mergeContexts(parent::getCacheContexts(), [
+      'languages:language_interface',
+      'user.permissions',
+    ]);
   }
 
 }

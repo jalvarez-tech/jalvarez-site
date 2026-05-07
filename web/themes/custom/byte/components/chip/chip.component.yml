@@ -4,6 +4,9 @@ name: Chip
 status: stable
 description: 'Pill tag/label. Variants: default (line), accent (filled green, hover orange).'
 
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

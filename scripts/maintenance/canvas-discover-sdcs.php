@@ -1,18 +1,20 @@
 <?php
+
 /**
  * @file
- * Force Canvas to (re)discover and register all eligible byte SDCs as
- * Canvas Component config entities. Reports any that fail checkRequirements.
+ * Force Canvas to (re)discover and register all eligible byte SDCs.
  *
- * Uses the public ComponentSourceManager::generateComponents() API
- * (which internally constructs SDC source plugins with proper configuration).
+ * Reports any that fail checkRequirements. Uses the public
+ * ComponentSourceManager::generateComponents() API (which internally
+ * constructs SDC source plugins with proper configuration).
  */
 
 use Drupal\canvas\ComponentSource\ComponentSourceManager;
 use Drupal\canvas\Entity\Component;
 use Drupal\canvas\Plugin\Canvas\ComponentSource\SingleDirectoryComponentDiscovery;
 
-/** @var ComponentSourceManager $sm */
+/**
+ * @var \Drupal\canvas\ComponentSource\ComponentSourceManager $sm */
 $sm = \Drupal::service(ComponentSourceManager::class);
 
 // Get the discovery class directly (bypasses createInstance which requires local_source_id).
@@ -36,14 +38,17 @@ foreach (array_keys($defs) as $id) {
 }
 echo "Discovered byte SDCs: " . count($byte_ids) . "\n";
 
-$ok = 0; $fail = 0; $eligible = [];
+$ok = 0;
+$fail = 0;
+$eligible = [];
 foreach ($byte_ids as $id) {
   try {
     $discovery->checkRequirements($id);
     echo "  ✓ {$id} — eligible\n";
     $eligible[] = $id;
     $ok++;
-  } catch (\Throwable $e) {
+  }
+  catch (\Throwable $e) {
     echo "  ✗ {$id} — " . $e->getMessage() . "\n";
     $fail++;
   }

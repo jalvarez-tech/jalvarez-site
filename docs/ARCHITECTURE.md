@@ -293,7 +293,7 @@ BLOCK PLUGINS CUSTOM (registrados como Canvas Component blocks):
 
 Para que un SDC sea registrable como Canvas Component config entity:
 
-1. **Cada prop necesita `title`** — sin `title` Canvas lanza `ComponentDoesNotMeetRequirementsException`. Aplicado por `scripts/add-sdc-prop-titles.php`.
+1. **Cada prop necesita `title`** — sin `title` Canvas lanza `ComponentDoesNotMeetRequirementsException`. Todos los SDCs en `web/themes/custom/byte/components/` ya cumplen este contrato; el script `add-sdc-prop-titles.php` que migró el theme original se borró en PR2 (one-shot ya aplicado).
 2. **Props no pueden ser `array of object`** — Canvas no tiene field type/widget que mapee a `[{name,value,…}]`. Soluciones:
    - Si el array tiene tamaño fijo (≤ 3): aplanar a `m1_*`, `m2_*`, `m3_*`.
    - Si el array tiene tamaño variable: convertir a slot, extraer el item-template a un SDC atómico.
@@ -316,9 +316,9 @@ Estilos viven en `web/themes/custom/byte/scss/components/_<nombre>.scss` (un arc
 
 ## 8. Composición Canvas por página
 
-Cada canvas_page se crea programáticamente la primera vez (idempotente, scripts en `scripts/`). Después del seed inicial el editor modifica libremente desde `/canvas/editor/canvas_page/{id}`. Las traducciones EN comparten UUIDs con la ES (mismo árbol estructural), solo cambian los inputs (textos).
+Cada canvas_page se creó programáticamente la primera vez en F8–F10. Los seed scripts originales (`create-canvas-home.php`, `create-canvas-other-pages.php`) se borraron en PR2 — el contenido vive en producción y se mantiene desde el editor visual de Canvas. Para reconstruir desde cero en un entorno nuevo: `drush si --existing-config` reproduce la estructura (content types, fields, paragraphs, views, displays, blocks, sitemap), y las cuatro canvas_pages se recrean editando a través del Canvas visual editor. Las traducciones EN comparten UUIDs con la ES (mismo árbol estructural), solo cambian los inputs (textos).
 
-### Inicio (canvas_page id=1) — `scripts/create-canvas-home.php`
+### Inicio (canvas_page id=1)
 
 20 instancias de componentes:
 
@@ -336,7 +336,7 @@ palabras-cliente     (slot testimonials)
 cta-final
 ```
 
-### Proyectos (canvas_page id=5) — `scripts/create-canvas-other-pages.php`
+### Proyectos (canvas_page id=5)
 
 ```
 phead                                    (eyebrow + título + sub)

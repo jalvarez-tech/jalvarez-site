@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: Button
 status: stable
 description: 'Pill button. Variants: primary (green→hover orange), ghost (outline). Optional →.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

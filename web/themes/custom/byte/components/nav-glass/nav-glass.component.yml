@@ -3,6 +3,9 @@ name: 'Nav glass (top)'
 status: stable
 noUi: true
 description: 'Liquid-glass fixed top nav: brand monogram + nav links + CTA + lang toggle. Rendered programmatically by jalvarez_nav_glass block (links built from the active route + language). Hidden from Canvas editor by design.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:
@@ -55,3 +58,26 @@ props:
       type: string
       title: 'English toggle href'
       default: /en
+    # i18n strings — injected by NavGlassBlock via $this->t() so the SDC
+    # itself stays language-agnostic. Defaults are present for the Canvas
+    # editor preview; the block always overrides them at render time.
+    i18n_open_menu:
+      type: string
+      title: 'i18n: open menu'
+      default: 'Open menu'
+    i18n_close_menu:
+      type: string
+      title: 'i18n: close menu'
+      default: 'Close menu'
+    i18n_toggle_theme:
+      type: string
+      title: 'i18n: toggle theme'
+      default: 'Toggle theme'
+    i18n_language:
+      type: string
+      title: 'i18n: language switcher label'
+      default: 'Language'
+    i18n_primary_nav:
+      type: string
+      title: 'i18n: primary nav label'
+      default: 'Primary'

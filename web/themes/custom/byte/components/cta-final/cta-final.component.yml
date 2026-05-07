@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'CTA final'
 status: stable
 description: 'Centered call-to-action band with display title (with optional italic fragment), sub, and primary + ghost buttons.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

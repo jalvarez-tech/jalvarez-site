@@ -130,6 +130,17 @@ final class NavGlassBlock extends BlockBase implements ContainerFactoryPluginInt
         'current_lang'  => $current_lang,
         'lang_es_href'  => $lang_es_href,
         'lang_en_href'  => $lang_en_href,
+        // i18n strings injected from the block plugin so the SDC stays
+        // language-agnostic. The nav twig used to carry a `{% set i18n
+        // = lang == 'en' ? {…} : {…} %}` map — that violated the SDC
+        // contract (component.yml schema can't represent it, the strings
+        // weren't extractable to .po, and a third language would have
+        // required editing the twig).
+        'i18n_open_menu'   => (string) $this->t('Open menu', [], ['context' => 'jalvarez_nav']),
+        'i18n_close_menu'  => (string) $this->t('Close menu', [], ['context' => 'jalvarez_nav']),
+        'i18n_toggle_theme' => (string) $this->t('Toggle theme', [], ['context' => 'jalvarez_nav']),
+        'i18n_language'    => (string) $this->t('Language', [], ['context' => 'jalvarez_nav']),
+        'i18n_primary_nav' => (string) $this->t('Primary', [], ['context' => 'jalvarez_nav']),
       ],
     ];
   }

@@ -6,6 +6,9 @@ description: |
   contact links, elsewhere links. Plus bottom bar (copyright + version).
   All visible strings are passed in as props so the bilingual block plugin
   (jalvarez_site:jalvarez_footer) can translate them at render time.
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Case step card'
 status: stable
 description: 'Numbered step card for §02 Enfoque inside a Project detail. Shows: tag (mono accent), title (display), body (muted).'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

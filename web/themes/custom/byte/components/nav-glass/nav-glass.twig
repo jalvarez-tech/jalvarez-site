@@ -1,30 +1,20 @@
-{# Nav glass — fixed top liquid-glass nav with mobile drawer + theme toggle #}
-{%- set lang = current_lang|default('es') -%}
-{%- set i18n = lang == 'en' ? {
-  open_menu: 'Open menu',
-  close_menu: 'Close menu',
-  toggle_theme: 'Toggle theme',
-  language: 'Language',
-  current_page: 'Current page',
-  current_lang: 'Current language',
-} : {
-  open_menu: 'Abrir menú',
-  close_menu: 'Cerrar menú',
-  toggle_theme: 'Cambiar tema',
-  language: 'Idioma',
-  current_page: 'Página actual',
-  current_lang: 'Idioma actual',
-} -%}
+{# Nav glass — fixed top liquid-glass nav with mobile drawer + theme toggle.
+
+   All visible strings come from the `jalvarez_nav_glass` block plugin
+   (NavGlassBlock::build) which translates them through Drupal's t()
+   pipeline. The SDC stays language-agnostic — props with no `|default`
+   fail loudly if the block stops passing them, instead of silently
+   falling back to a hardcoded string in the wrong language. #}
 {%- set _attrs = attributes|default(create_attribute()).addClass('nav').setAttribute('data-nav-root', '') -%}
 <header{{ _attrs }}>
   <div class="nav__inner">
-    <a class="brand" href="/{{ lang }}">
-      <span class="brand__mark">{{ brand_initial|default('J') }}</span>
-      <span class="brand__name">{{ brand_name|default('jalvarez') }}<span class="brand__tld">{{ brand_tld|default('.tech') }}</span></span>
+    <a class="brand" href="/{{ current_lang }}">
+      <span class="brand__mark">{{ brand_initial }}</span>
+      <span class="brand__name">{{ brand_name }}<span class="brand__tld">{{ brand_tld }}</span></span>
     </a>
 
     {%- if links|length > 0 -%}
-      <nav class="nav__links nav__links--desktop" aria-label="{{ lang == 'en' ? 'Primary' : 'Principal' }}">
+      <nav class="nav__links nav__links--desktop" aria-label="{{ i18n_primary_nav }}">
         {%- for l in links -%}
           <a href="{{ l.href }}" class="nav__link{{ l.active ? ' nav__link--active' : '' }}"{{ l.active ? ' aria-current="page"' : '' }}>
             {{ l.label }}
@@ -34,22 +24,22 @@
         {# When cta_href is external (e.g. wa.me WhatsApp link) open in a
            new tab. For internal aliases keep same-tab navigation. #}
         {%- set _cta_external = cta_href and (cta_href starts with 'http' or cta_href starts with '//') -%}
-        <a href="{{ cta_href|default('/contacto') }}"
+        <a href="{{ cta_href }}"
            class="nav__cta"
            {%- if _cta_external %} target="_blank" rel="noopener"{% endif -%}>
           <span class="status-dot" aria-hidden="true"></span>
-          {{ cta_label|default('Disponible') }}
+          {{ cta_label }}
         </a>
 
-        <button class="theme-toggle" type="button" aria-label="{{ i18n.toggle_theme }}" data-theme-toggle>
+        <button class="theme-toggle" type="button" aria-label="{{ i18n_toggle_theme }}" data-theme-toggle>
           {% include 'byte:icon' with { name: 'sun',  decorative_class: 'theme-toggle__icon theme-toggle__icon--sun' } only %}
           {% include 'byte:icon' with { name: 'moon', decorative_class: 'theme-toggle__icon theme-toggle__icon--moon' } only %}
         </button>
 
-        {%- if show_lang_toggle|default(true) -%}
-          <div class="lang-toggle" role="group" aria-label="{{ i18n.language }}">
-            <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}"{{ lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
-            <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}"{{ lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
+        {%- if show_lang_toggle -%}
+          <div class="lang-toggle" role="group" aria-label="{{ i18n_language }}">
+            <a href="{{ lang_es_href }}" class="lang-toggle__btn{{ current_lang == 'es' ? ' is-on' : '' }}"{{ current_lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
+            <a href="{{ lang_en_href }}" class="lang-toggle__btn{{ current_lang == 'en' ? ' is-on' : '' }}"{{ current_lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
           </div>
         {%- endif -%}
       </nav>
@@ -58,11 +48,11 @@
     {# Mobile hamburger — aria-label updated by JS via data-label-* attrs #}
     <button class="nav__burger"
             type="button"
-            aria-label="{{ i18n.open_menu }}"
+            aria-label="{{ i18n_open_menu }}"
             aria-expanded="false"
             aria-controls="nav-drawer"
-            data-label-open="{{ i18n.open_menu }}"
-            data-label-close="{{ i18n.close_menu }}"
+            data-label-open="{{ i18n_open_menu }}"
+            data-label-close="{{ i18n_close_menu }}"
             data-nav-toggle>
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
@@ -79,12 +69,12 @@
 <div id="nav-drawer" class="nav-drawer" data-nav-drawer aria-hidden="true" inert>
   <button class="nav-drawer__close"
           type="button"
-          aria-label="{{ i18n.close_menu }}"
+          aria-label="{{ i18n_close_menu }}"
           aria-controls="nav-drawer"
           data-nav-close>
     {% include 'byte:icon' with { name: 'x', size: 20 } only %}
   </button>
-  <nav class="nav-drawer__links" aria-label="{{ lang == 'en' ? 'Primary' : 'Principal' }}">
+  <nav class="nav-drawer__links" aria-label="{{ i18n_primary_nav }}">
     {%- for l in links -%}
       <a href="{{ l.href }}" class="nav-drawer__link{{ l.active ? ' nav-drawer__link--active' : '' }}"{{ l.active ? ' aria-current="page"' : '' }}>
         <span class="nav-drawer__num" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
@@ -94,18 +84,18 @@
     {%- endfor -%}
   </nav>
   <div class="nav-drawer__foot">
-    <a href="{{ cta_href|default('/contacto') }}" class="nav__cta">
+    <a href="{{ cta_href }}" class="nav__cta">
       <span class="status-dot" aria-hidden="true"></span>
-      {{ cta_label|default('Disponible') }}
+      {{ cta_label }}
     </a>
     <div class="nav-drawer__controls">
-      <div class="lang-toggle" role="group" aria-label="{{ i18n.language }}">
-        <a href="{{ lang_es_href|default('/es') }}" class="lang-toggle__btn{{ lang == 'es' ? ' is-on' : '' }}"{{ lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
-        <a href="{{ lang_en_href|default('/en') }}" class="lang-toggle__btn{{ lang == 'en' ? ' is-on' : '' }}"{{ lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
+      <div class="lang-toggle" role="group" aria-label="{{ i18n_language }}">
+        <a href="{{ lang_es_href }}" class="lang-toggle__btn{{ current_lang == 'es' ? ' is-on' : '' }}"{{ current_lang == 'es' ? ' aria-current="true" lang="es" hreflang="es"' : ' lang="es" hreflang="es"' }}>ES</a>
+        <a href="{{ lang_en_href }}" class="lang-toggle__btn{{ current_lang == 'en' ? ' is-on' : '' }}"{{ current_lang == 'en' ? ' aria-current="true" lang="en" hreflang="en"' : ' lang="en" hreflang="en"' }}>EN</a>
       </div>
       {# Mobile theme toggle — same data-theme-toggle target as the desktop
          button so the existing nav.js click handler works for both. #}
-      <button class="theme-toggle" type="button" aria-label="{{ i18n.toggle_theme }}" data-theme-toggle>
+      <button class="theme-toggle" type="button" aria-label="{{ i18n_toggle_theme }}" data-theme-toggle>
         {% include 'byte:icon' with { name: 'sun',  decorative_class: 'theme-toggle__icon theme-toggle__icon--sun' } only %}
         {% include 'byte:icon' with { name: 'moon', decorative_class: 'theme-toggle__icon theme-toggle__icon--moon' } only %}
       </button>

@@ -2,6 +2,16 @@
 
 > Plan en ejecución autónoma. Marcas: ✅ hecho · ⏳ en curso · ⬜ pendiente.
 > Última actualización: 2026-05-02 (Pase WCAG 2.2 AA site-wide: focus-visible, prefers-reduced-motion, contraste --fg-dim, ARIA, touch targets)
+>
+> **Nota retrospectiva PR2 + PR3c (2026-05-07):** las referencias a `scripts/X.php`
+> a lo largo de este documento son históricas. Estado final tras la limpieza:
+> · 60 scripts borrados en total (49 one-shot/diagnostic/duplicate en PR2 +
+>   11 SETUP en PR3c tras confirmar que `config/sync` los reproduce 100%)
+> · 4 supervivientes activos en `scripts/maintenance/` (con README)
+> · 3 reusables son Drush commands en `MaintenanceCommands.php`
+>   (`drush jalvarez:audit-translations`, `pathauto-rebuild`, `test-wipe-guard`)
+> · 1 mutación de field config movida a `jalvarez_site_update_10001()`
+> · `lib/canvas-tree.inc.php` borrado junto con sus consumidores
 
 ## Estado actual del sitio (referencia rápida)
 
@@ -82,10 +92,10 @@ Canvas 1.3.x no soporta props `array of object` en su UI editor (sólo strings/i
 
 **Deploy a producción**
 
-El workflow `.github/workflows/seed-content.yml` ejecuta cualquier `scripts/*.php` en prod. En el primer deploy post-migración:
+Los scripts puntuales en prod se ejecutan vía SSH (`scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php'`). En el primer deploy post-migración:
 1. `composer install`/`drush cim` traen los `canvas.component.sdc.byte.*.yml` y el `field_canvas`.
-2. Correr `seed-content` → `scripts/canvas-discover-sdcs.php` (idempotente, registra los Components si la sync no los trajo).
-3. Correr `seed-content` → `scripts/create-canvas-home.php` (idempotente, regenera el nodo "Inicio (Canvas)" y el page.front).
+2. Correr `scripts/canvas-discover-sdcs.php` (idempotente, registra los Components si la sync no los trajo).
+3. Correr `scripts/create-canvas-home.php` (idempotente, regenera el nodo "Inicio (Canvas)" y el page.front).
 
 ### F5 — Responsive verification ⬜
 
@@ -184,7 +194,7 @@ Para `Contacto`, el formulario se incrusta como Canvas component con settings `w
 
 **Deploy a producción**
 
-`seed-content.yml` correr en orden:
+Correr vía SSH (`scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php'`) en orden:
 1. `scripts/canvas-discover-sdcs.php` (registra SDCs)
 2. `scripts/create-media-image-type.php` (Canvas requirement)
 3. `scripts/create-canvas-home.php` (Inicio + setea page.front)
@@ -444,6 +454,6 @@ curl -s  https://jalvarez.tech/inicio | grep -E '<(title|meta property="og:|link
 ## Convenciones operativas durante este plan
 
 - Cada fase: trabajo local → build CSS → verificación visual → commit + push → seed prod si requiere data.
-- Workflow `seed-content.yml` reusable para cualquier `.php` script en producción.
+- Para scripts puntuales en prod: `scp scripts/X.php hostinger:/tmp/ && ssh hostinger './vendor/bin/drush php:script /tmp/X.php && rm /tmp/X.php'`.
 - Si un cambio no aplica vía `drush cim` (UUID mismatch), se ejecuta script directo en prod.
 - Mantener idempotencia en todos los scripts.

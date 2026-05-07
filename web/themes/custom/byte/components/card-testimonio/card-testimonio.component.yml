@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Card Testimonio'
 status: stable
 description: 'Testimonial card: serif quote with accent quote marks + author chip.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:

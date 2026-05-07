@@ -1,24 +1,28 @@
 <?php
+
 /**
  * @file
- * Inspect the components tree of a specific canvas_page translation, with
- * UUID, component_id, parent/slot, and a peek at each input value. Use this
- * to find the UUID + prop name for scripts/edit-canvas-component-en.php.
+ * Inspect the components tree of a specific canvas_page translation.
  *
- * Different from scripts/list-canvas-components.php — that one lists the
- * Component config-entity registry (component types). This one inspects a
- * specific page's tree of component instances.
+ * Lists each component's UUID, component_id, parent/slot, and a peek at each
+ * input value. Different from the deprecated list-canvas-components.php (that
+ * one listed the Component config-entity registry; this one inspects a
+ * specific page's tree of component instances).
  *
  * USAGE
  * -----
- *   ddev exec ./web/vendor/bin/drush php:script scripts/list-canvas-page-tree.php
+ * ddev exec ./web/vendor/bin/drush php:script scripts/maintenance/list-canvas-page-tree.php
  *
  * Edit CONFIG below to target a different page or language.
  */
 
+use Drupal\canvas\Entity\Page;
+
 // ─── CONFIG ───
-$page_alias = '/inicio';   // /inicio /proyectos /notas /contacto
-$language   = 'es';        // 'es' or 'en'
+// /inicio /proyectos /notas /contacto
+$page_alias = '/inicio';
+// 'es' or 'en'
+$language = 'es';
 
 // ─── Resolution ───
 $home_path = \Drupal::service('path_alias.manager')->getPathByAlias($page_alias);
@@ -28,7 +32,7 @@ if (!preg_match('#^/page/(\d+)$#', $home_path, $m)) {
 }
 $page_id = (int) $m[1];
 
-$page = \Drupal\canvas\Entity\Page::load($page_id);
+$page = Page::load($page_id);
 if (!$page->hasTranslation($language)) {
   fwrite(STDERR, "✗ Page {$page_id} has no '{$language}' translation.\n");
   exit(1);
@@ -40,9 +44,9 @@ echo str_repeat('─', 80) . "\n";
 
 foreach ($trans->get('components')->getValue() as $i => $row) {
   $uuid = $row['uuid'];
-  $cid  = $row['component_id'];
-  $parent = $row['parent_uuid'] ?? null;
-  $slot = $row['slot'] ?? null;
+  $cid = $row['component_id'];
+  $parent = $row['parent_uuid'] ?? NULL;
+  $slot = $row['slot'] ?? NULL;
 
   $inputs = json_decode($row['inputs'], TRUE) ?? [];
   // SDC inputs are {sourceType, value, expression}; block inputs are flat.
@@ -53,9 +57,11 @@ foreach ($trans->get('components')->getValue() as $i => $row) {
       : $entry;
     if (is_string($val) && strlen($val) > 60) {
       $val = substr($val, 0, 57) . '...';
-    } elseif (is_array($val) || is_object($val)) {
+    }
+    elseif (is_array($val) || is_object($val)) {
       $val = '<complex>';
-    } elseif (is_bool($val)) {
+    }
+    elseif (is_bool($val)) {
       $val = $val ? 'true' : 'false';
     }
     $preview[$prop] = $val;

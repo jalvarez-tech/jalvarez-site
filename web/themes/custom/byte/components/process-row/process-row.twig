@@ -1,7 +1,7 @@
 {# Process row — single step row inside Método. #}
 {%- set _attrs = attributes|default(create_attribute()).addClass('process-row') -%}
 <div{{ _attrs }}>
-  <div class="process-num">{{ '%02d'|format(number|default(1)) }} — step</div>
+  <div class="process-num">{{ '%02d'|format(number|default(1)) }} — {{ 'step'|t({}, {'context': 'jalvarez_proceso'}) }}</div>
   <div class="process-title">{{ title }}</div>
   <div class="process-body">{{ body }}</div>
   {%- if tag %}<div class="process-tag">{{ tag }}</div>{% endif -%}

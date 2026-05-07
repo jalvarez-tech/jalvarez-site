@@ -74,7 +74,7 @@
            keep the SVG placeholder so the page still looks intentional in
            empty states (new pages, deleted media, etc.). #}
         {%- set _portrait_src = portrait.src|default('') -%}
-        <div class="hero__portrait"{% if not _portrait_src %} aria-label="Portrait placeholder"{% endif %}>
+        <div class="hero__portrait"{% if not _portrait_src %} aria-label="{{ 'Portrait placeholder'|t({}, {'context': 'jalvarez_hero'}) }}"{% endif %}>
           <div class="hp-frame">
             {%- if _portrait_src -%}
               <img class="hp-img"
@@ -100,11 +100,11 @@
                 <circle cx="100" cy="92" r="36" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
                 <path d="M34 240c0-38 30-64 66-64s66 26 66 64" fill="var(--bg-elev)" stroke="var(--line-strong)" stroke-width="1"/>
               </svg>
-              <div class="hp-caption mono">[ portrait · drop jpg here ]</div>
+              <div class="hp-caption mono">{{ '[ portrait · drop jpg here ]'|t({}, {'context': 'jalvarez_hero'}) }}</div>
             {%- endif -%}
             <div class="hp-badge">
               <span class="status-dot"></span>
-              <span class="mono">15+ años</span>
+              <span class="mono">{{ '15+ years'|t({}, {'context': 'jalvarez_hero'}) }}</span>
             </div>
           </div>
         </div>

@@ -1,4 +1,9 @@
-{# Canal directo — sidebar for contact page (Canvas-editable). #}
+{# Canal directo — sidebar for contact page (Canvas-editable).
+
+   The Canvas editor sets each label as a prop in the page tree (one
+   value per language translation). Defaults below run through Drupal's
+   |t filter so they're extractable to .po and degrade to a translated
+   fallback if a Canvas editor leaves a label blank in one language. #}
 {%- set _channels = [
   { name: c1_name, value: c1_value, href: c1_href },
   { name: c2_name, value: c2_value, href: c2_href },
@@ -10,7 +15,7 @@
 <aside{{ _attrs }}>
   {%- if _channels|length > 0 -%}
     <div class="contact-card">
-      <h2 class="contact-card__title">{{ channels_label|default('Canales directos') }}</h2>
+      <h2 class="contact-card__title">{{ channels_label|default('Direct channels'|t({}, {'context': 'jalvarez_canal'})) }}</h2>
       <div class="contact-channels">
         {%- for c in _channels -%}
           <div class="channel">
@@ -27,20 +32,20 @@
   {%- endif -%}
 
   <div class="contact-card">
-    <h2 class="contact-card__title">{{ availability_label|default('Disponibilidad') }}</h2>
+    <h2 class="contact-card__title">{{ availability_label|default('Availability'|t({}, {'context': 'jalvarez_canal'})) }}</h2>
     <div class="availability">
       <span class="status-dot"></span>
-      <span><strong>{{ free_value|default('2') }}</strong> {{ free_label|default('cupos libres') }}</span>
+      <span><strong>{{ free_value|default('2') }}</strong> {{ free_label|default('free slots'|t({}, {'context': 'jalvarez_canal'})) }}</span>
     </div>
     <div class="channel" style="margin-top: 16px;">
-      <span class="channel__name">{{ response_label|default('Tiempo de respuesta') }}</span>
-      <span class="channel__val">{{ response_value|default('< 24h lun-vie') }}</span>
+      <span class="channel__name">{{ response_label|default('Response time'|t({}, {'context': 'jalvarez_canal'})) }}</span>
+      <span class="channel__val">{{ response_value|default('< 24h Mon-Fri'|t({}, {'context': 'jalvarez_canal'})) }}</span>
     </div>
   </div>
 
   {%- if _steps|length > 0 -%}
     <div class="contact-card">
-      <h2 class="contact-card__title">{{ expect_label|default('Cómo va a ser') }}</h2>
+      <h2 class="contact-card__title">{{ expect_label|default('What to expect'|t({}, {'context': 'jalvarez_canal'})) }}</h2>
       <ol class="contact-steps">
         {%- for s in _steps -%}
           <li>{{ s }}</li>

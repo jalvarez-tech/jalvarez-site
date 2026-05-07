@@ -1,0 +1,101 @@
+<?php
+
+/**
+ * @file
+ * Install / update / uninstall hooks for the jalvarez_site module.
+ *
+ * `hook_update_N` entries here capture data migrations that cannot be
+ * expressed declaratively in `config/sync` — typically things like flipping
+ * `translatable` flags on field configs and re-saving entities so the new
+ * flag propagates through field storage. They run automatically on every
+ * `drush deploy` (which calls `drush updatedb` after `cim`), so they only
+ * fire once per environment.
+ */
+
+declare(strict_types=1);
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Flip paragraph reference fields on node.project to non-translatable.
+ *
+ * `field_approach_steps`, `field_results_metrics` and `field_testimonial_embed`
+ * were originally created as translatable, which meant each translation row
+ * could carry its own list of paragraph references. In practice the structural
+ * list (which paragraphs belong to a project) is the same across languages —
+ * only the text inside each paragraph differs, and that's already handled per-
+ * translation on the paragraph entity itself.
+ *
+ * Side effect of the original translatable=TRUE setting: editing a project in
+ * EN didn't copy the ES references over, so the EN node ended up with empty
+ * Approach / Results / Testimonial sections. Same fix was applied to
+ * `field_cover_media` earlier (commit 728b101) outside of this update path.
+ *
+ * Idempotent: skips fields already non-translatable, skips nodes that don't
+ * have the field, only writes when there's drift.
+ *
+ * Replaces the historical scripts/flip-paragraph-refs-non-translatable.php
+ * one-shot.
+ */
+function jalvarez_site_update_10001(): string {
+  $field_configs = [
+    'field.field.node.project.field_approach_steps',
+    'field.field.node.project.field_results_metrics',
+    'field.field.node.project.field_testimonial_embed',
+  ];
+
+  $field_machine_names = [
+    'field_approach_steps',
+    'field_results_metrics',
+    'field_testimonial_embed',
+  ];
+
+  $config_factory = \Drupal::configFactory();
+  $messages = [];
+
+  foreach ($field_configs as $config_name) {
+    $config = $config_factory->getEditable($config_name);
+    if ($config->isNew()) {
+      $messages[] = "{$config_name}: not found, skipped";
+      continue;
+    }
+    if ($config->get('translatable') === FALSE) {
+      $messages[] = "{$config_name}: already non-translatable";
+      continue;
+    }
+    $config->set('translatable', FALSE)->save();
+    $messages[] = "{$config_name}: translatable → FALSE";
+  }
+
+  // Force-resave every project node so field storage reads the new
+  // translatable flag and propagates the canonical (default-language)
+  // references into every translation row.
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $node_storage = $entity_type_manager->getStorage('node');
+  $nids = $node_storage->getQuery()
+    ->condition('type', 'project')
+    ->accessCheck(FALSE)
+    ->execute();
+
+  $republished = 0;
+  foreach ($node_storage->loadMultiple($nids) as $node) {
+    if (!$node instanceof NodeInterface) {
+      continue;
+    }
+    $default_lang = $node->getUntranslated()->language()->getId();
+    $default = $node->getTranslation($default_lang);
+    foreach ($field_machine_names as $field_name) {
+      if (!$node->hasField($field_name)) {
+        continue;
+      }
+      $node->set($field_name, $default->get($field_name)->getValue());
+    }
+    foreach ($node->getTranslationLanguages() as $lang_code => $_) {
+      $node->getTranslation($lang_code)->setPublished()->save();
+    }
+    $republished++;
+  }
+  $messages[] = "Republished {$republished} project node(s) so the shared references propagate.";
+
+  return implode("\n", $messages);
+}

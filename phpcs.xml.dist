@@ -9,6 +9,15 @@
     <!-- Default to checking custom code only; CI overrides via CLI args. -->
     <file>web/modules/custom</file>
     <file>web/themes/custom</file>
+    <!-- Active maintenance scripts (PR2). PHPStan deliberately skips
+         these because they're procedural drush php:script helpers with
+         dynamic Drupal API access — level 5 would be noise — but PHPCS
+         catches drift in style and unused imports.
+         scripts/maintenance/setup/* is excluded: those scripts are
+         parked pending the config/sync audit and will be deleted once
+         the recipe replaces them, so style drift is not worth fixing. -->
+    <file>scripts/maintenance</file>
+    <exclude-pattern>scripts/maintenance/setup/*</exclude-pattern>
 
     <!-- Skip generated and third-party paths. -->
     <exclude-pattern>*/node_modules/*</exclude-pattern>

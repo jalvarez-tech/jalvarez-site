@@ -43,6 +43,15 @@ jobs:
       - name: Composer install (dev)
         run: composer install --prefer-dist --no-interaction
 
+      # Block CVEs in PHP dependencies before they reach prod. `--locked`
+      # audits exactly what composer.lock pins, including transitive deps,
+      # so a fresh advisory against any pinned version fails the build.
+      # If you ever need to ship through a known advisory while you wait
+      # for an upstream fix, suppress here with `composer audit --ignore=…`
+      # rather than disabling the gate.
+      - name: Composer audit (security advisories)
+        run: composer audit --locked
+
       - name: PHPCS (Drupal + DrupalPractice)
         run: composer phpcs
 
@@ -75,6 +84,15 @@ jobs:
             npm install --no-audit --no-fund
           fi
 
+      # `npm ci` runs above with `--no-audit` because we want a focused
+      # audit step we can iterate on. `--audit-level=high` ignores low /
+      # moderate noise (most build-time warnings) and only fails on
+      # high / critical advisories, which is the policy the team can
+      # actually respond to.
+      - name: npm audit (high+critical)
+        working-directory: ${{ env.THEME_DIR }}
+        run: npm audit --audit-level=high
+
       - name: Build theme (SCSS + sprite)
         working-directory: ${{ env.THEME_DIR }}
         run: npm run build
@@ -92,6 +110,24 @@ jobs:
             > /tmp/settings.rendered.php
           php -l /tmp/settings.rendered.php
           grep -q '^\$databases' /tmp/settings.rendered.php || (echo "ERROR: \$databases stripped" && exit 1)
+
+  # GitHub-native vulnerability gate for *new* dependencies introduced by a
+  # PR. Compares the lockfiles between base and head and fails on any added
+  # package with a known advisory at or above the configured severity. This
+  # complements `composer audit` / `npm audit` (which check the *current*
+  # state) by making it impossible to land a known-vulnerable bump.
+  # Only meaningful on pull_request events — no base ref to diff on push.
+  dependency-review:
+    name: Dependency review (PRs only)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
 
   functional-tests:
     name: PHPUnit Functional tests

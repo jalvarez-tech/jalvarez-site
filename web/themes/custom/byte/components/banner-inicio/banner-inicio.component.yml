@@ -2,6 +2,9 @@ $schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schem
 name: 'Banner inicio (Hero)'
 status: stable
 description: 'Home hero. Status pill + multi-line title with stroke + accent + muted fragments + sub + CTAs + 3 KPIs. Right column: portrait + terminal card.'
+libraries:
+  - byte/global
+
 props:
   type: object
   properties:
