@@ -133,7 +133,8 @@
                 "[web-root]/sites/default/default.settings.php": {
                     "append": "assets/append-default.settings.php.txt"
                 },
-                "[web-root]/example.gitignore": false
+                "[web-root]/example.gitignore": false,
+                "[web-root]/robots.txt": false
             },
             "allowed-packages": [
                 "drupal/drupal_cms_seo_tools"

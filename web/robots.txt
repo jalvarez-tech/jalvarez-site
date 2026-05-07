@@ -13,6 +13,13 @@
 # For more information about the robots.txt standard, see:
 # http://www.robotstxt.org/robotstxt.html
 
+Sitemap: https://jalvarez.tech/sitemap.xml
+
+# llms.txt — index of canonical URLs and brand context for AI crawlers.
+# https://llmstxt.org
+# /llms.txt           — short index
+# /llms-full.txt      — same index with expanded descriptions
+
 User-agent: *
 # CSS, JS, Images
 Allow: /core/*.css$

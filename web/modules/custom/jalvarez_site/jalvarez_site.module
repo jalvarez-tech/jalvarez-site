@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_page_attachments_alter().
@@ -31,6 +33,389 @@ function jalvarez_site_page_attachments_alter(array &$attachments): void {
   if ($route_name === 'entity.canvas_page.canonical') {
     $attachments['#attached']['library'][] = 'byte/global';
   }
+
+  _jalvarez_site_seo_attach($attachments, $route_name);
+}
+
+/**
+ * Implements hook_metatags_alter().
+ *
+ * Replaces the generic metatag defaults with content-aware values for
+ * `project` and `note` nodes — their bundles don't have a metatag field
+ * attached, so the metatag.metatag_defaults.node fallback was emitting
+ * `[node:summary]` (always empty) as the description.
+ *
+ * For canvas_page, tags come from each entity's own `metatags` JSON field
+ * and are left untouched here.
+ */
+function jalvarez_site_metatags_alter(array &$metatags, array &$context): void {
+  $entity = $context['entity'] ?? NULL;
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+  $bundle = $entity->bundle();
+  if (!in_array($bundle, ['project', 'note'], TRUE)) {
+    return;
+  }
+  $info = _jalvarez_site_seo_resolve_node($entity);
+  if (!$info) {
+    return;
+  }
+  $metatags['title'] = $info['title'];
+  $metatags['description'] = $info['description'];
+  $metatags['canonical_url'] = $info['url'];
+}
+
+/**
+ * Resolves the SEO payload (title, description, image, url, type) for the
+ * current page entity in its current-language translation.
+ *
+ * @return array{title:string,description:string,image:?string,url:string,type:string,langcode:string}|null
+ *   NULL if the route is not a SEO-eligible page.
+ */
+function _jalvarez_site_seo_resolve_current(string $route_name): ?array {
+  $entity = NULL;
+  $type = NULL;
+  if ($route_name === 'entity.canvas_page.canonical') {
+    $entity = \Drupal::routeMatch()->getParameter('canvas_page');
+    $type = 'canvas_page';
+  }
+  elseif ($route_name === 'entity.node.canonical') {
+    $node = \Drupal::routeMatch()->getParameter('node');
+    if ($node instanceof NodeInterface && in_array($node->bundle(), ['project', 'note'], TRUE)) {
+      $entity = $node;
+      $type = $node->bundle();
+    }
+  }
+  if (!$entity) {
+    return NULL;
+  }
+
+  $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  if ($entity instanceof TranslatableInterface && $entity->hasTranslation($langcode)) {
+    $entity = $entity->getTranslation($langcode);
+  }
+  else {
+    $langcode = $entity->language()->getId();
+  }
+
+  $base = \Drupal::request()->getSchemeAndHttpHost();
+  $info = $type === 'canvas_page'
+    ? _jalvarez_site_seo_resolve_canvas_page($entity, $base)
+    : _jalvarez_site_seo_resolve_node($entity, $base);
+  if (!$info) {
+    return NULL;
+  }
+  $info['type'] = $type;
+  $info['langcode'] = $langcode;
+  $info['entity'] = $entity;
+  return $info;
+}
+
+/**
+ * Builds the SEO payload for a canvas_page translation.
+ */
+function _jalvarez_site_seo_resolve_canvas_page(EntityInterface $page, string $base): ?array {
+  $raw = $page->get('metatags')->value ?? '';
+  $tags = is_string($raw) && $raw !== '' ? (json_decode($raw, TRUE) ?: []) : [];
+
+  $title = $tags['title'] ?? ((string) $page->label() . ' | jalvarez.tech');
+  $description = $tags['description'] ?? '';
+  if ($description === '' && $page->hasField('description')) {
+    $description = (string) $page->get('description')->value;
+  }
+
+  $url = '';
+  try {
+    $url = $page->toUrl('canonical', ['absolute' => TRUE])->toString();
+  }
+  catch (\Throwable) {}
+
+  $image = NULL;
+  if ($page->hasField('image') && !$page->get('image')->isEmpty()) {
+    $media = $page->get('image')->entity;
+    if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+      $file = $media->get('field_media_image')->entity;
+      if ($file) {
+        $image = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+      }
+    }
+  }
+
+  return [
+    'title' => $title,
+    'description' => $description,
+    'image' => $image,
+    'url' => $url,
+  ];
+}
+
+/**
+ * Builds the SEO payload for a project/note node translation.
+ */
+function _jalvarez_site_seo_resolve_node(NodeInterface $node, ?string $base = NULL): ?array {
+  $base = $base ?? \Drupal::request()->getSchemeAndHttpHost();
+  $bundle = $node->bundle();
+
+  // Description: project uses field_summary, note uses field_excerpt.
+  $description = '';
+  if ($bundle === 'project' && $node->hasField('field_summary') && !$node->get('field_summary')->isEmpty()) {
+    $description = (string) $node->get('field_summary')->value;
+  }
+  elseif ($bundle === 'note' && $node->hasField('field_excerpt') && !$node->get('field_excerpt')->isEmpty()) {
+    $description = (string) $node->get('field_excerpt')->value;
+  }
+  $description = trim(preg_replace('/\s+/', ' ', strip_tags($description)) ?? '');
+  if (mb_strlen($description) > 300) {
+    $description = mb_substr($description, 0, 297) . '…';
+  }
+
+  // Brand suffix is appended once here so the same value flows into <title>,
+  // og:title, twitter:title and JSON-LD without double-suffixing.
+  $title = (string) $node->label() . ' | jalvarez.tech';
+
+  // Canonical URL.
+  $url = '';
+  try {
+    $url = $node->toUrl('canonical', ['absolute' => TRUE])->toString();
+  }
+  catch (\Throwable) {}
+
+  // Image: featured_media → cover_media → first gallery item.
+  $image = NULL;
+  foreach (['field_featured_media', 'field_cover_media', 'field_gallery'] as $field) {
+    if ($node->hasField($field) && !$node->get($field)->isEmpty()) {
+      $media = $node->get($field)->entity;
+      if ($media && $media->hasField('field_media_image') && !$media->get('field_media_image')->isEmpty()) {
+        $file = $media->get('field_media_image')->entity;
+        if ($file) {
+          $image = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+          break;
+        }
+      }
+    }
+  }
+
+  return [
+    'title' => $title,
+    'description' => $description,
+    'image' => $image,
+    'url' => $url,
+  ];
+}
+
+/**
+ * Injects OG, Twitter Card, hreflang, author, theme-color and JSON-LD
+ * structured data into the page head for SEO-eligible routes.
+ */
+function _jalvarez_site_seo_attach(array &$attachments, string $route_name): void {
+  $info = _jalvarez_site_seo_resolve_current($route_name);
+  if (!$info) {
+    return;
+  }
+  $entity = $info['entity'];
+  $langcode = $info['langcode'];
+  $base = \Drupal::request()->getSchemeAndHttpHost();
+
+  $locale_map = ['es' => 'es_CO', 'en' => 'en_US'];
+  $og_locale = $locale_map[$langcode] ?? 'es_CO';
+  $og_alt = $langcode === 'es' ? 'en_US' : 'es_CO';
+
+  $og_type = match ($info['type']) {
+    'note' => 'article',
+    'project' => 'article',
+    default => 'website',
+  };
+
+  $tags = [
+    ['name' => 'author', 'content' => 'John Stevans Alvarez'],
+    ['name' => 'theme-color', 'content' => '#0f0f0f'],
+    ['property' => 'og:type', 'content' => $og_type],
+    ['property' => 'og:title', 'content' => $info['title']],
+    ['property' => 'og:description', 'content' => $info['description']],
+    ['property' => 'og:url', 'content' => $info['url']],
+    ['property' => 'og:site_name', 'content' => 'jalvarez.tech'],
+    ['property' => 'og:locale', 'content' => $og_locale],
+    ['property' => 'og:locale:alternate', 'content' => $og_alt],
+    ['name' => 'twitter:card', 'content' => $info['image'] ? 'summary_large_image' : 'summary'],
+    ['name' => 'twitter:title', 'content' => $info['title']],
+    ['name' => 'twitter:description', 'content' => $info['description']],
+    ['name' => 'twitter:creator', 'content' => '@jalvareztech'],
+  ];
+  if ($info['image']) {
+    $tags[] = ['property' => 'og:image', 'content' => $info['image']];
+    $tags[] = ['property' => 'og:image:alt', 'content' => $info['title']];
+    $tags[] = ['name' => 'twitter:image', 'content' => $info['image']];
+  }
+
+  // Article-specific OG.
+  if ($og_type === 'article' && $entity instanceof NodeInterface) {
+    $tags[] = ['property' => 'article:author', 'content' => 'John Stevans Alvarez'];
+    if ($entity->bundle() === 'note' && $entity->hasField('field_publish_date') && !$entity->get('field_publish_date')->isEmpty()) {
+      $published = (string) $entity->get('field_publish_date')->value;
+      if ($published !== '') {
+        $tags[] = ['property' => 'article:published_time', 'content' => $published];
+      }
+    }
+    $tags[] = ['property' => 'article:modified_time', 'content' => date('c', (int) $entity->getChangedTime())];
+  }
+
+  $i = 0;
+  foreach ($tags as $tag) {
+    if (empty($tag['content'])) {
+      continue;
+    }
+    $attachments['#attached']['html_head'][] = [
+      ['#tag' => 'meta', '#attributes' => $tag],
+      'jalvarez_seo_' . $i++,
+    ];
+  }
+
+  // hreflang alternates.
+  if ($entity instanceof TranslatableInterface) {
+    foreach ($entity->getTranslationLanguages() as $lc => $_) {
+      try {
+        $alt_url = $entity->getTranslation($lc)->toUrl('canonical', ['absolute' => TRUE])->toString();
+      }
+      catch (\Throwable) {
+        continue;
+      }
+      $attachments['#attached']['html_head_link'][] = [
+        [
+          'rel' => 'alternate',
+          'hreflang' => $lc,
+          'href' => $alt_url,
+        ],
+        TRUE,
+      ];
+      // x-default points at the site's default language (es).
+      if ($lc === 'es') {
+        $attachments['#attached']['html_head_link'][] = [
+          [
+            'rel' => 'alternate',
+            'hreflang' => 'x-default',
+            'href' => $alt_url,
+          ],
+          TRUE,
+        ];
+      }
+    }
+  }
+
+  // JSON-LD structured data.
+  $jsonld = _jalvarez_site_seo_jsonld($info, $base);
+  if ($jsonld) {
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#tag' => 'script',
+        '#attributes' => ['type' => 'application/ld+json'],
+        '#value' => json_encode($jsonld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+      ],
+      'jalvarez_seo_jsonld',
+    ];
+  }
+}
+
+/**
+ * Builds a JSON-LD @graph for the current page: Person + WebSite + the
+ * page-specific node (WebPage / Article / CreativeWork).
+ */
+function _jalvarez_site_seo_jsonld(array $info, string $base): array {
+  $person = [
+    '@type' => 'Person',
+    '@id' => $base . '/#person',
+    'name' => 'John Stevans Alvarez',
+    'alternateName' => 'JSA',
+    'url' => $base . '/',
+    'jobTitle' => 'Senior Web Specialist',
+    'email' => 'mailto:contacto@jalvarez.tech',
+    'telephone' => '+57 312 801 4078',
+    'address' => [
+      '@type' => 'PostalAddress',
+      'addressLocality' => 'Medellín',
+      'addressCountry' => 'CO',
+    ],
+    'knowsAbout' => ['Drupal', 'WordPress', 'Headless CMS', 'n8n', 'Core Web Vitals', 'WCAG 2.2', 'Web Performance', 'Web Accessibility'],
+  ];
+
+  $website = [
+    '@type' => 'WebSite',
+    '@id' => $base . '/#website',
+    'name' => 'jalvarez.tech',
+    'url' => $base . '/',
+    'inLanguage' => ['es-CO', 'en-US'],
+    'publisher' => ['@id' => $base . '/#person'],
+  ];
+
+  $page_lang = $info['langcode'] === 'en' ? 'en-US' : 'es-CO';
+  $page_node = [
+    '@type' => 'WebPage',
+    '@id' => $info['url'] . '#webpage',
+    'url' => $info['url'],
+    'name' => $info['title'],
+    'description' => $info['description'],
+    'inLanguage' => $page_lang,
+    'isPartOf' => ['@id' => $base . '/#website'],
+    'about' => ['@id' => $base . '/#person'],
+  ];
+  if ($info['image']) {
+    $page_node['primaryImageOfPage'] = ['@type' => 'ImageObject', 'url' => $info['image']];
+  }
+
+  if ($info['type'] === 'note' && $info['entity'] instanceof NodeInterface) {
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $info['entity'];
+    $published = NULL;
+    if ($node->hasField('field_publish_date') && !$node->get('field_publish_date')->isEmpty()) {
+      $published = (string) $node->get('field_publish_date')->value;
+    }
+    $page_node = [
+      '@type' => 'BlogPosting',
+      '@id' => $info['url'] . '#article',
+      'url' => $info['url'],
+      'headline' => $info['title'],
+      'description' => $info['description'],
+      'inLanguage' => $page_lang,
+      'isPartOf' => ['@id' => $base . '/#website'],
+      'author' => ['@id' => $base . '/#person'],
+      'publisher' => ['@id' => $base . '/#person'],
+      'mainEntityOfPage' => $info['url'],
+      'datePublished' => $published ?: date('c', (int) $node->getCreatedTime()),
+      'dateModified' => date('c', (int) $node->getChangedTime()),
+    ];
+    if ($info['image']) {
+      $page_node['image'] = ['@type' => 'ImageObject', 'url' => $info['image']];
+    }
+  }
+  elseif ($info['type'] === 'project' && $info['entity'] instanceof NodeInterface) {
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $info['entity'];
+    $year = NULL;
+    if ($node->hasField('field_project_year') && !$node->get('field_project_year')->isEmpty()) {
+      $year = (string) $node->get('field_project_year')->value;
+    }
+    $page_node = [
+      '@type' => 'CreativeWork',
+      '@id' => $info['url'] . '#work',
+      'url' => $info['url'],
+      'name' => $info['title'],
+      'description' => $info['description'],
+      'inLanguage' => $page_lang,
+      'isPartOf' => ['@id' => $base . '/#website'],
+      'creator' => ['@id' => $base . '/#person'],
+      'author' => ['@id' => $base . '/#person'],
+      'dateCreated' => $year ?: date('c', (int) $node->getCreatedTime()),
+      'dateModified' => date('c', (int) $node->getChangedTime()),
+    ];
+    if ($info['image']) {
+      $page_node['image'] = ['@type' => 'ImageObject', 'url' => $info['image']];
+    }
+  }
+
+  return [
+    '@context' => 'https://schema.org',
+    '@graph' => [$person, $website, $page_node],
+  ];
 }
 
 /**

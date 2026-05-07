@@ -7,3 +7,23 @@ jalvarez_site.styleguide:
     _permission: 'access content'
   options:
     no_cache: 'TRUE'
+
+jalvarez_site.llms_txt:
+  path: '/llms.txt'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\LlmsTxtController::index'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+    no_cache: 'TRUE'
+
+jalvarez_site.llms_full_txt:
+  path: '/llms-full.txt'
+  defaults:
+    _controller: '\Drupal\jalvarez_site\Controller\LlmsTxtController::full'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+    no_cache: 'TRUE'
